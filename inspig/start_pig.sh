@@ -1,13 +1,8 @@
 #!/bin/bash
-cd /c/Projects/pig3.1
-
-# .claude 폴더 및 instructions 설정
-mkdir -p .claude
-cp insitepig.md .claude/instructions.md
+cd /c/Projects/inspig-repo/inspig
 
 echo "================================================"
-echo "Claude Code - Pig3.1 Project"
-echo "Auto-loading: insitepig.md"
+echo "Claude Code - InsightPig Project"
 echo "================================================"
 echo ""
 
