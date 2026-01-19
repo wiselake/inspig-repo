@@ -441,6 +441,9 @@ function SettingsContent() {
                     알림톡은 피그플랜에 가입하신 휴대폰 번호로 발송됩니다.
                     수신 번호 변경은 피그플랜에서 직접 수정하시거나 관리자에게 문의해 주세요.
                 </p>
+                <p className="text-blue-600 dark:text-blue-400 text-xs break-keep mt-1">
+                    * 알림톡 발송 시간은 카카오 서비스 상황에 따라 지연될 수 있습니다.
+                </p>
             </div>
         </div>
     );
