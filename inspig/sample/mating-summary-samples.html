@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교배 요약 + 예정/달성률 통합 샘플</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f7;
+            padding: 20px;
+            color: #1d1d1f;
+        }
+        .container {
+            max-width: 420px;
+            margin: 0 auto 40px;
+        }
+        h2 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        .sample-title {
+            background: #007aff;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px 8px 0 0;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* 공통 스타일 */
+        .mating-summary {
+            background: white;
+            border-radius: 0 0 12px 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+        .summary-row.highlight {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            margin: -8px -12px 8px;
+            padding: 12px;
+            border-radius: 8px;
+        }
+        .summary-label {
+            font-size: 13px;
+            color: #666;
+        }
+        .summary-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+        .summary-value.large {
+            font-size: 20px;
+        }
+        .summary-bar {
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+        .summary-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+        .summary-bar-fill.primary { background: #007aff; }
+        .summary-bar-fill.success { background: #34c759; }
+        .summary-bar-fill.warning { background: #ff9500; }
+        .summary-bar-fill.danger { background: #ff3b30; }
+
+        .divider {
+            height: 1px;
+            background: #e9ecef;
+            margin: 12px 0;
+        }
+        .section-title {
+            font-size: 11px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        /* 달성률 뱃지 */
+        .rate-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .rate-badge.good { background: #d4edda; color: #155724; }
+        .rate-badge.warn { background: #fff3cd; color: #856404; }
+        .rate-badge.bad { background: #f8d7da; color: #721c24; }
+
+        /* 그리드 레이아웃 */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        .stat-card .label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        .stat-card .value {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .stat-card .sub {
+            font-size: 10px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        /* 인라인 테이블 스타일 */
+        .inline-table {
+            width: 100%;
+            font-size: 12px;
+        }
+        .inline-table th, .inline-table td {
+            padding: 6px 4px;
+            text-align: center;
+        }
+        .inline-table th {
+            color: #999;
+            font-weight: 500;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .inline-table td {
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .inline-table .label-col {
+            text-align: left;
+            color: #666;
+        }
+
+        /* 프로그레스 원형 */
+        .progress-circle {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            margin: 0 auto;
+        }
+        .progress-circle svg {
+            transform: rotate(-90deg);
+        }
+        .progress-circle .bg {
+            fill: none;
+            stroke: #e9ecef;
+            stroke-width: 6;
+        }
+        .progress-circle .progress {
+            fill: none;
+            stroke: #007aff;
+            stroke-width: 6;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.3s;
+        }
+        .progress-circle .value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* 컴팩트 리스트 */
+        .compact-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 12px;
+        }
+        .compact-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+        }
+        .compact-item .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        .compact-item .dot.primary { background: #007aff; }
+        .compact-item .dot.success { background: #34c759; }
+        .compact-item .dot.warning { background: #ff9500; }
+    </style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- 유형 1: 카드형 그리드 (예정/실적/달성률) -->
+<!-- ============================================ -->
+<div class="container">
+    <div class="sample-title">유형 1: 카드형 그리드</div>
+    <div class="mating-summary">
+        <!-- 합계 하이라이트 -->
+        <div class="summary-row highlight">
+            <div>
+                <span class="summary-label">합계</span>
+            </div>
+            <span class="summary-value large">45복</span>
+        </div>
+
+        <!-- 예정/달성 카드 그리드 -->
+        <div class="grid-3" style="margin-bottom: 12px;">
+            <div class="stat-card">
+                <div class="label">초교배</div>
+                <div class="value">12</div>
+                <div class="sub">예정 15 · <span style="color:#34c759">80%</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="label">이유교배</div>
+                <div class="value">28</div>
+                <div class="sub">예정 25 · <span style="color:#34c759">112%</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="label">재발교배</div>
+                <div class="value">5</div>
+                <div class="sub">예정 8 · <span style="color:#ff9500">63%</span></div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 기타 정보 -->
+        <div class="grid-2">
+            <div class="summary-row" style="padding: 4px 0;">
+                <span class="summary-label">교배도중 사고</span>
+                <span class="summary-value">2</span>
+            </div>
+            <div class="summary-row" style="padding: 4px 0;">
+                <span class="summary-label">교배도중 분만</span>
+                <span class="summary-value">1</span>
+            </div>
+            <div class="summary-row" style="padding: 4px 0;">
+                <span class="summary-label">평균 재귀발정일</span>
+                <span class="summary-value">5.2일</span>
+            </div>
+            <div class="summary-row" style="padding: 4px 0;">
+                <span class="summary-label">평균 초교배일</span>
+                <span class="summary-value">245일</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- 유형 2: 프로그레스바 + 우측 달성률 -->
+<!-- ============================================ -->
+<div class="container">
+    <div class="sample-title">유형 2: 프로그레스바 + 달성률 뱃지</div>
+    <div class="mating-summary">
+        <!-- 합계 -->
+        <div class="summary-row highlight">
+            <div>
+                <span class="summary-label">합계</span>
+            </div>
+            <div style="text-align: right;">
+                <span class="summary-value large">45복</span>
+                <div style="font-size: 11px; color: #666;">예정 48 · <span class="rate-badge good">94%</span></div>
+            </div>
+        </div>
+
+        <!-- 교배 구성 -->
+        <div class="section-title">교배 구성</div>
+
+        <div style="margin-bottom: 12px;">
+            <div class="summary-row" style="padding: 4px 0;">
+                <span class="summary-label">초교배복수</span>
+                <span class="summary-value">12복 <span class="rate-badge good">80%</span></span>
+            </div>
+            <div class="summary-bar">
+                <div class="summary-bar-fill success" style="width: 80%;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #999; margin-top: 2px;">
+                <span>예정 15</span>
+                <span>실적 12</span>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+            <div class="summary-row" style="padding: 4px 0;">
+                <span class="summary-label">이유교배복수</span>
+                <span class="summary-value">28복 <span class="rate-badge good">112%</span></span>
+            </div>
+            <div class="summary-bar">
+                <div class="summary-bar-fill primary" style="width: 100%;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #999; margin-top: 2px;">
+                <span>예정 25</span>
+                <span>실적 28</span>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+            <div class="summary-row" style="padding: 4px 0;">
+                <span class="summary-label">재발교배복수</span>
+                <span class="summary-value">5복 <span class="rate-badge warn">63%</span></span>
+            </div>
+            <div class="summary-bar">
+                <div class="summary-bar-fill warning" style="width: 63%;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #999; margin-top: 2px;">
+                <span>예정 8</span>
+                <span>실적 5</span>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 기타 정보 -->
+        <div class="compact-list">
+            <div class="compact-item"><span class="dot" style="background:#ff3b30"></span>교배도중 사고 2</div>
+            <div class="compact-item"><span class="dot" style="background:#007aff"></span>교배도중 분만 1</div>
+            <div class="compact-item"><span class="dot" style="background:#666"></span>재귀발정일 5.2일</div>
+            <div class="compact-item"><span class="dot" style="background:#666"></span>초교배일 245일</div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- 유형 3: 인라인 테이블 통합 -->
+<!-- ============================================ -->
+<div class="container">
+    <div class="sample-title">유형 3: 인라인 테이블 통합</div>
+    <div class="mating-summary">
+        <!-- 합계 -->
+        <div class="summary-row highlight">
+            <span class="summary-label">합계</span>
+            <span class="summary-value large">45복</span>
+        </div>
+
+        <!-- 테이블 -->
+        <table class="inline-table">
+            <thead>
+                <tr>
+                    <th class="label-col">구분</th>
+                    <th>예정</th>
+                    <th>실적</th>
+                    <th>달성률</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="label-col">초교배</td>
+                    <td>15</td>
+                    <td><strong>12</strong></td>
+                    <td><span class="rate-badge good">80%</span></td>
+                </tr>
+                <tr>
+                    <td class="label-col">이유교배</td>
+                    <td>25</td>
+                    <td><strong>28</strong></td>
+                    <td><span class="rate-badge good">112%</span></td>
+                </tr>
+                <tr>
+                    <td class="label-col">재발교배</td>
+                    <td>8</td>
+                    <td><strong>5</strong></td>
+                    <td><span class="rate-badge warn">63%</span></td>
+                </tr>
+                <tr style="background: #f8f9fa;">
+                    <td class="label-col"><strong>합계</strong></td>
+                    <td><strong>48</strong></td>
+                    <td><strong>45</strong></td>
+                    <td><span class="rate-badge good">94%</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="divider"></div>
+
+        <!-- 기타 정보 2열 -->
+        <div class="grid-2">
+            <div class="summary-row" style="padding: 4px 0;">
+                <span class="summary-label">교배도중 사고</span>
+                <span class="summary-value">2</span>
+            </div>
+            <div class="summary-row" style="padding: 4px 0;">
+                <span class="summary-label">교배도중 분만</span>
+                <span class="summary-value">1</span>
+            </div>
+            <div class="summary-row" style="padding: 4px 0;">
+                <span class="summary-label">평균 재귀발정일</span>
+                <span class="summary-value">5.2일</span>
+            </div>
+            <div class="summary-row" style="padding: 4px 0;">
+                <span class="summary-label">평균 초교배일</span>
+                <span class="summary-value">245일</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- 유형 4: 원형 프로그레스 (달성률 강조) -->
+<!-- ============================================ -->
+<div class="container">
+    <div class="sample-title">유형 4: 원형 프로그레스 (달성률 강조)</div>
+    <div class="mating-summary">
+        <!-- 상단: 총 달성률 + 합계 -->
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+            <div class="progress-circle">
+                <svg width="60" height="60">
+                    <circle class="bg" cx="30" cy="30" r="24"></circle>
+                    <circle class="progress" cx="30" cy="30" r="24"
+                            stroke-dasharray="150.8"
+                            stroke-dashoffset="9"></circle>
+                </svg>
+                <div class="value">94%</div>
+            </div>
+            <div>
+                <div style="font-size: 11px; color: #999;">총 교배복수</div>
+                <div style="font-size: 28px; font-weight: 700;">45<span style="font-size: 14px; color: #666;">복</span></div>
+                <div style="font-size: 11px; color: #666;">예정 48복</div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 구성 카드 -->
+        <div class="grid-3" style="margin-bottom: 12px;">
+            <div class="stat-card" style="border-left: 3px solid #34c759;">
+                <div class="label">초교배</div>
+                <div class="value" style="color: #34c759;">12</div>
+                <div class="sub">예정 15</div>
+            </div>
+            <div class="stat-card" style="border-left: 3px solid #007aff;">
+                <div class="label">이유교배</div>
+                <div class="value" style="color: #007aff;">28</div>
+                <div class="sub">예정 25</div>
+            </div>
+            <div class="stat-card" style="border-left: 3px solid #ff9500;">
+                <div class="label">재발교배</div>
+                <div class="value" style="color: #ff9500;">5</div>
+                <div class="sub">예정 8</div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 기타 정보 -->
+        <div class="compact-list">
+            <div class="compact-item"><span class="dot" style="background:#ff3b30"></span>사고 2</div>
+            <div class="compact-item"><span class="dot" style="background:#007aff"></span>분만 1</div>
+            <div class="compact-item"><span class="dot" style="background:#666"></span>재귀 5.2일</div>
+            <div class="compact-item"><span class="dot" style="background:#666"></span>초교배 245일</div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- 유형 5: 심플 리스트 (모바일 최적화) -->
+<!-- ============================================ -->
+<div class="container">
+    <div class="sample-title">유형 5: 심플 리스트 (모바일 최적화)</div>
+    <div class="mating-summary">
+        <!-- 합계 헤더 -->
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px;">
+            <div>
+                <div style="font-size: 11px; color: #999;">교배 합계</div>
+                <div style="font-size: 32px; font-weight: 700; line-height: 1;">45<span style="font-size: 16px; color: #666;">복</span></div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 24px; font-weight: 700; color: #34c759;">94%</div>
+                <div style="font-size: 11px; color: #999;">예정 48복 대비</div>
+            </div>
+        </div>
+
+        <!-- 구분별 리스트 -->
+        <div style="background: #f8f9fa; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e9ecef;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #34c759;"></span>
+                    <span style="font-size: 13px;">초교배</span>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 15px; font-weight: 600;">12복</span>
+                    <span style="font-size: 11px; color: #999; margin-left: 8px;">예정 15 (80%)</span>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e9ecef;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #007aff;"></span>
+                    <span style="font-size: 13px;">이유교배</span>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 15px; font-weight: 600;">28복</span>
+                    <span style="font-size: 11px; color: #999; margin-left: 8px;">예정 25 (112%)</span>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #ff9500;"></span>
+                    <span style="font-size: 13px;">재발교배</span>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 15px; font-weight: 600;">5복</span>
+                    <span style="font-size: 11px; color: #999; margin-left: 8px;">예정 8 (63%)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 기타 정보 (2x2) -->
+        <div class="grid-2" style="gap: 8px;">
+            <div style="background: #fff5f5; border-radius: 6px; padding: 8px; display: flex; justify-content: space-between;">
+                <span style="font-size: 11px; color: #666;">교배도중 사고</span>
+                <span style="font-size: 13px; font-weight: 600; color: #ff3b30;">2</span>
+            </div>
+            <div style="background: #f0f7ff; border-radius: 6px; padding: 8px; display: flex; justify-content: space-between;">
+                <span style="font-size: 11px; color: #666;">교배도중 분만</span>
+                <span style="font-size: 13px; font-weight: 600; color: #007aff;">1</span>
+            </div>
+            <div style="background: #f8f9fa; border-radius: 6px; padding: 8px; display: flex; justify-content: space-between;">
+                <span style="font-size: 11px; color: #666;">평균 재귀발정일</span>
+                <span style="font-size: 13px; font-weight: 600;">5.2일</span>
+            </div>
+            <div style="background: #f8f9fa; border-radius: 6px; padding: 8px; display: flex; justify-content: space-between;">
+                <span style="font-size: 11px; color: #666;">평균 초교배일</span>
+                <span style="font-size: 13px; font-weight: 600;">245일</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

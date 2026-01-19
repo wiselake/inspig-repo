@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리포인트 카드 디자인 샘플</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f7;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .sample-section {
+            max-width: 1200px;
+            margin: 0 auto 40px;
+        }
+
+        .sample-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1d1d1f;
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            background: #fff;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        /* ============================================
+           샘플 1: 심플 리스트 카드 (추천)
+           - 깔끔한 리스트 스타일
+           ============================================ */
+        .sample1-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .sample1-card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .sample1-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        .sample1-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+        }
+
+        .sample1-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #fff;
+        }
+
+        .sample1-icon.quiz { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .sample1-icon.highlight { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .sample1-icon.news { background: linear-gradient(135deg, #10b981, #059669); }
+
+        .sample1-title {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .sample1-arrow {
+            color: #999;
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+
+        .sample1-header:hover .sample1-arrow {
+            transform: translateX(3px);
+            color: #667eea;
+        }
+
+        .sample1-list {
+            list-style: none;
+            padding: 8px;
+        }
+
+        .sample1-item {
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sample1-item:hover {
+            background: #f8f9fa;
+        }
+
+        .sample1-item-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #667eea;
+            flex-shrink: 0;
+        }
+
+        .sample1-item-text {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sample1-item-link {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .sample1-item:hover .sample1-item-link {
+            opacity: 1;
+        }
+
+        .sample1-empty {
+            padding: 20px;
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+        }
+
+        /* ============================================
+           샘플 2: 컴팩트 칩 스타일
+           - 작은 화면에 적합
+           ============================================ */
+        .sample2-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sample2-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .sample2-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .sample2-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .sample2-badge.quiz { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .sample2-badge.highlight { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .sample2-badge.news { background: linear-gradient(135deg, #10b981, #059669); }
+
+        .sample2-more {
+            margin-left: auto;
+            font-size: 12px;
+            color: #667eea;
+            cursor: pointer;
+        }
+
+        .sample2-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .sample2-chip {
+            padding: 8px 14px;
+            background: #f8f9fa;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.15s;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sample2-chip:hover {
+            background: #667eea;
+            color: #fff;
+        }
+
+        /* ============================================
+           샘플 3: 그라디언트 카드
+           - 화려한 디자인
+           ============================================ */
+        .sample3-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .sample3-card {
+            border-radius: 20px;
+            padding: 20px;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            min-height: 180px;
+        }
+
+        .sample3-card.quiz {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .sample3-card.highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .sample3-card.news {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .sample3-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .sample3-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .sample3-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .sample3-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .sample3-list {
+            list-style: none;
+            position: relative;
+        }
+
+        .sample3-item {
+            padding: 10px 0;
+            font-size: 14px;
+            opacity: 0.95;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            cursor: pointer;
+            transition: opacity 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sample3-item:last-child {
+            border-bottom: none;
+        }
+
+        .sample3-item:hover {
+            opacity: 1;
+        }
+
+        .sample3-item i {
+            font-size: 10px;
+            opacity: 0.7;
+        }
+
+        .sample3-item-text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ============================================
+           샘플 4: 미니멀 보더 스타일
+           - 클린한 디자인
+           ============================================ */
+        .sample4-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .sample4-card {
+            background: #fff;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .sample4-card:hover {
+            border-color: #667eea;
+        }
+
+        .sample4-card.quiz { border-top: 3px solid #f59e0b; }
+        .sample4-card.highlight { border-top: 3px solid #667eea; }
+        .sample4-card.news { border-top: 3px solid #10b981; }
+
+        .sample4-header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sample4-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1d1d1f;
+        }
+
+        .sample4-count {
+            margin-left: auto;
+            background: #f3f4f6;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .sample4-list {
+            list-style: none;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .sample4-item {
+            padding: 14px 16px;
+            font-size: 14px;
+            color: #333;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sample4-item:last-child {
+            border-bottom: none;
+        }
+
+        .sample4-item:hover {
+            background: #f9fafb;
+        }
+
+        .sample4-item-num {
+            width: 22px;
+            height: 22px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .sample4-item-text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ============================================
+           샘플 5: 아코디언 스타일
+           - 공간 효율적
+           ============================================ */
+        .sample5-container {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .sample5-card {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .sample5-card:last-child {
+            border-bottom: none;
+        }
+
+        .sample5-header {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .sample5-header:hover {
+            background: #f9fafb;
+        }
+
+        .sample5-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .sample5-icon.quiz { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .sample5-icon.highlight { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .sample5-icon.news { background: linear-gradient(135deg, #10b981, #059669); }
+
+        .sample5-title {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .sample5-badge {
+            background: #f3f4f6;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .sample5-arrow {
+            color: #999;
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+
+        .sample5-card.open .sample5-arrow {
+            transform: rotate(90deg);
+        }
+
+        .sample5-content {
+            display: none;
+            padding: 0 20px 16px 64px;
+        }
+
+        .sample5-card.open .sample5-content {
+            display: block;
+        }
+
+        .sample5-item {
+            padding: 10px 12px;
+            font-size: 14px;
+            color: #333;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sample5-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .sample5-item:hover {
+            background: #667eea;
+            color: #fff;
+        }
+
+        .sample5-item-text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sample5-item-link {
+            font-size: 10px;
+            opacity: 0.7;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .sample1-cards,
+            .sample3-cards,
+            .sample4-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .sample3-card {
+                min-height: auto;
+            }
+        }
+
+        /* 다크모드 미리보기 */
+        .dark-preview {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 16px;
+            margin-top: 20px;
+        }
+
+        .dark-preview .sample1-card,
+        .dark-preview .sample4-card {
+            background: #2d2d2d;
+            border-color: #404040;
+        }
+
+        .dark-preview .sample1-header {
+            border-color: #404040;
+        }
+
+        .dark-preview .sample1-title,
+        .dark-preview .sample4-title {
+            color: #e6edf3;
+        }
+
+        .dark-preview .sample1-item-text,
+        .dark-preview .sample4-item-text {
+            color: #c9d1d9;
+        }
+
+        .dark-preview .sample1-item:hover,
+        .dark-preview .sample4-item:hover {
+            background: #404040;
+        }
+    </style>
+</head>
+<body>
+    <!-- 샘플 1: 심플 리스트 카드 -->
+    <div class="sample-section">
+        <div class="sample-title">
+            <i class="fas fa-star" style="color: #f59e0b; margin-right: 8px;"></i>
+            샘플 1: 심플 리스트 카드 (추천)
+        </div>
+        <div class="sample1-cards">
+            <div class="sample1-card">
+                <div class="sample1-header">
+                    <div class="sample1-icon quiz">
+                        <i class="fas fa-question"></i>
+                    </div>
+                    <div class="sample1-title">퀴즈</div>
+                    <i class="fas fa-chevron-right sample1-arrow"></i>
+                </div>
+                <ul class="sample1-list">
+                    <li class="sample1-item">
+                        <span class="sample1-item-dot"></span>
+                        <span class="sample1-item-text">퀴즈1. 4.6-5.4를 아시나요? (힌트: 주간관리 목표)</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="sample1-card">
+                <div class="sample1-header">
+                    <div class="sample1-icon highlight">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="sample1-title">중점사항</div>
+                    <i class="fas fa-chevron-right sample1-arrow"></i>
+                </div>
+                <div class="sample1-empty">등록된 중점사항이 없습니다</div>
+            </div>
+            <div class="sample1-card">
+                <div class="sample1-header">
+                    <div class="sample1-icon news">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
+                    <div class="sample1-title">한돈&업계소식</div>
+                    <i class="fas fa-chevron-right sample1-arrow"></i>
+                </div>
+                <ul class="sample1-list">
+                    <li class="sample1-item">
+                        <span class="sample1-item-dot"></span>
+                        <span class="sample1-item-text">'생산성 확보' 한목소리… 한돈산업 발전방안 포럼 성료</span>
+                        <span class="sample1-item-link"><i class="fas fa-external-link-alt"></i></span>
+                    </li>
+                    <li class="sample1-item">
+                        <span class="sample1-item-dot"></span>
+                        <span class="sample1-item-text">ASF 방역을 위한 권역화 방역관리 관련 행정명령(개정)</span>
+                        <span class="sample1-item-link"><i class="fas fa-external-link-alt"></i></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 샘플 2: 컴팩트 칩 스타일 -->
+    <div class="sample-section">
+        <div class="sample-title">
+            <i class="fas fa-mobile-alt" style="color: #10b981; margin-right: 8px;"></i>
+            샘플 2: 컴팩트 칩 스타일 (모바일 최적화)
+        </div>
+        <div class="sample2-cards">
+            <div class="sample2-card">
+                <div class="sample2-header">
+                    <span class="sample2-badge quiz">퀴즈</span>
+                    <span class="sample2-more">더보기 <i class="fas fa-chevron-right"></i></span>
+                </div>
+                <div class="sample2-items">
+                    <span class="sample2-chip">퀴즈1. 4.6-5.4를 아시나요?</span>
+                </div>
+            </div>
+            <div class="sample2-card">
+                <div class="sample2-header">
+                    <span class="sample2-badge highlight">중점사항</span>
+                    <span class="sample2-more">더보기 <i class="fas fa-chevron-right"></i></span>
+                </div>
+                <div class="sample2-items">
+                    <span style="color: #999; font-size: 13px;">등록된 중점사항이 없습니다</span>
+                </div>
+            </div>
+            <div class="sample2-card">
+                <div class="sample2-header">
+                    <span class="sample2-badge news">한돈&업계소식</span>
+                    <span class="sample2-more">더보기 <i class="fas fa-chevron-right"></i></span>
+                </div>
+                <div class="sample2-items">
+                    <span class="sample2-chip">'생산성 확보' 한목소리…</span>
+                    <span class="sample2-chip">ASF 방역 행정명령(개정)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 샘플 3: 그라디언트 카드 -->
+    <div class="sample-section">
+        <div class="sample-title">
+            <i class="fas fa-palette" style="color: #764ba2; margin-right: 8px;"></i>
+            샘플 3: 그라디언트 카드 (화려한 디자인)
+        </div>
+        <div class="sample3-cards">
+            <div class="sample3-card quiz">
+                <div class="sample3-header">
+                    <div class="sample3-icon"><i class="fas fa-question"></i></div>
+                    <div class="sample3-title">퀴즈</div>
+                </div>
+                <ul class="sample3-list">
+                    <li class="sample3-item">
+                        <i class="fas fa-circle"></i>
+                        <span class="sample3-item-text">퀴즈1. 4.6-5.4를 아시나요?</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="sample3-card highlight">
+                <div class="sample3-header">
+                    <div class="sample3-icon"><i class="fas fa-star"></i></div>
+                    <div class="sample3-title">중점사항</div>
+                </div>
+                <ul class="sample3-list">
+                    <li class="sample3-item" style="opacity: 0.6;">
+                        <span class="sample3-item-text">등록된 중점사항이 없습니다</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="sample3-card news">
+                <div class="sample3-header">
+                    <div class="sample3-icon"><i class="fas fa-newspaper"></i></div>
+                    <div class="sample3-title">한돈&업계소식</div>
+                </div>
+                <ul class="sample3-list">
+                    <li class="sample3-item">
+                        <i class="fas fa-circle"></i>
+                        <span class="sample3-item-text">'생산성 확보' 한목소리…</span>
+                    </li>
+                    <li class="sample3-item">
+                        <i class="fas fa-circle"></i>
+                        <span class="sample3-item-text">ASF 방역 행정명령(개정)</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 샘플 4: 미니멀 보더 스타일 -->
+    <div class="sample-section">
+        <div class="sample-title">
+            <i class="fas fa-border-style" style="color: #3b82f6; margin-right: 8px;"></i>
+            샘플 4: 미니멀 보더 스타일
+        </div>
+        <div class="sample4-cards">
+            <div class="sample4-card quiz">
+                <div class="sample4-header">
+                    <i class="fas fa-question-circle" style="color: #f59e0b;"></i>
+                    <div class="sample4-title">퀴즈</div>
+                    <span class="sample4-count">1건</span>
+                </div>
+                <ul class="sample4-list">
+                    <li class="sample4-item">
+                        <span class="sample4-item-num">1</span>
+                        <span class="sample4-item-text">퀴즈1. 4.6-5.4를 아시나요? (힌트: 주간관리 목표)</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="sample4-card highlight">
+                <div class="sample4-header">
+                    <i class="fas fa-star" style="color: #667eea;"></i>
+                    <div class="sample4-title">중점사항</div>
+                    <span class="sample4-count">0건</span>
+                </div>
+                <ul class="sample4-list">
+                    <li class="sample4-item" style="color: #999; justify-content: center;">
+                        등록된 중점사항이 없습니다
+                    </li>
+                </ul>
+            </div>
+            <div class="sample4-card news">
+                <div class="sample4-header">
+                    <i class="fas fa-newspaper" style="color: #10b981;"></i>
+                    <div class="sample4-title">한돈&업계소식</div>
+                    <span class="sample4-count">2건</span>
+                </div>
+                <ul class="sample4-list">
+                    <li class="sample4-item">
+                        <span class="sample4-item-num">1</span>
+                        <span class="sample4-item-text">'생산성 확보' 한목소리… 한돈산업 발전방안 포럼 성료</span>
+                    </li>
+                    <li class="sample4-item">
+                        <span class="sample4-item-num">2</span>
+                        <span class="sample4-item-text">ASF 방역을 위한 권역화 방역관리 관련 행정명령(개정)</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 샘플 5: 아코디언 스타일 -->
+    <div class="sample-section">
+        <div class="sample-title">
+            <i class="fas fa-layer-group" style="color: #ec4899; margin-right: 8px;"></i>
+            샘플 5: 아코디언 스타일 (공간 효율적)
+        </div>
+        <div class="sample5-container">
+            <div class="sample5-card open">
+                <div class="sample5-header" onclick="this.parentElement.classList.toggle('open')">
+                    <div class="sample5-icon quiz"><i class="fas fa-question"></i></div>
+                    <div class="sample5-title">퀴즈</div>
+                    <span class="sample5-badge">1건</span>
+                    <i class="fas fa-chevron-right sample5-arrow"></i>
+                </div>
+                <div class="sample5-content">
+                    <div class="sample5-item">
+                        <span class="sample5-item-text">퀴즈1. 4.6-5.4를 아시나요? (힌트: 주간관리 목표)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="sample5-card">
+                <div class="sample5-header" onclick="this.parentElement.classList.toggle('open')">
+                    <div class="sample5-icon highlight"><i class="fas fa-star"></i></div>
+                    <div class="sample5-title">중점사항</div>
+                    <span class="sample5-badge">0건</span>
+                    <i class="fas fa-chevron-right sample5-arrow"></i>
+                </div>
+                <div class="sample5-content">
+                    <div class="sample5-item" style="color: #999; justify-content: center;">
+                        등록된 중점사항이 없습니다
+                    </div>
+                </div>
+            </div>
+            <div class="sample5-card open">
+                <div class="sample5-header" onclick="this.parentElement.classList.toggle('open')">
+                    <div class="sample5-icon news"><i class="fas fa-newspaper"></i></div>
+                    <div class="sample5-title">한돈&업계소식</div>
+                    <span class="sample5-badge">2건</span>
+                    <i class="fas fa-chevron-right sample5-arrow"></i>
+                </div>
+                <div class="sample5-content">
+                    <div class="sample5-item">
+                        <span class="sample5-item-text">'생산성 확보' 한목소리… 한돈산업 발전방안 포럼 성료</span>
+                        <i class="fas fa-external-link-alt sample5-item-link"></i>
+                    </div>
+                    <div class="sample5-item">
+                        <span class="sample5-item-text">ASF 방역을 위한 권역화 방역관리 관련 행정명령(개정)</span>
+                        <i class="fas fa-external-link-alt sample5-item-link"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 다크모드 미리보기 -->
+    <div class="sample-section">
+        <div class="sample-title">
+            <i class="fas fa-moon" style="color: #6366f1; margin-right: 8px;"></i>
+            다크모드 미리보기 (샘플 1 기준)
+        </div>
+        <div class="dark-preview">
+            <div class="sample1-cards">
+                <div class="sample1-card">
+                    <div class="sample1-header">
+                        <div class="sample1-icon quiz">
+                            <i class="fas fa-question"></i>
+                        </div>
+                        <div class="sample1-title">퀴즈</div>
+                        <i class="fas fa-chevron-right sample1-arrow"></i>
+                    </div>
+                    <ul class="sample1-list">
+                        <li class="sample1-item">
+                            <span class="sample1-item-dot"></span>
+                            <span class="sample1-item-text">퀴즈1. 4.6-5.4를 아시나요?</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="sample1-card">
+                    <div class="sample1-header">
+                        <div class="sample1-icon highlight">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="sample1-title">중점사항</div>
+                        <i class="fas fa-chevron-right sample1-arrow"></i>
+                    </div>
+                    <div class="sample1-empty">등록된 중점사항이 없습니다</div>
+                </div>
+                <div class="sample1-card">
+                    <div class="sample1-header">
+                        <div class="sample1-icon news">
+                            <i class="fas fa-newspaper"></i>
+                        </div>
+                        <div class="sample1-title">한돈&업계소식</div>
+                        <i class="fas fa-chevron-right sample1-arrow"></i>
+                    </div>
+                    <ul class="sample1-list">
+                        <li class="sample1-item">
+                            <span class="sample1-item-dot"></span>
+                            <span class="sample1-item-text">'생산성 확보' 한목소리…</span>
+                            <span class="sample1-item-link"><i class="fas fa-external-link-alt"></i></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,2833 @@
+/* ============================================
+   POPUP CSS
+   팝업 전용 스타일시트
+   ============================================
+
+   [역할]
+   - 팝업 테이블 스타일 (.popup-table-02)
+   - 팝업 탭 UI (.popup-tabs, .popup-tab)
+   - 팝업 공통 요소 (팁, 닫기 버튼, 섹션 라벨 등)
+   - 증감 배지 (.change-badge)
+
+   [우선순위]
+   - @layer 밖 (높은 우선순위)
+   - 반드시 적용되어야 하는 스타일
+
+   [종속성]
+   - 독립적으로 동작 (다른 CSS 파일에 종속되지 않음)
+   - CSS 변수는 style.css에서 정의된 것 사용
+
+   [섹션 목록]
+   1. 팝업 다크모드 CSS 변수
+   2. popup-tip: 팁/안내 메시지
+   3. popup-close-btn: 닫기 버튼
+   4. popup-tabs: 팝업 내 탭 UI
+   5. popup-section-label: 섹션 라벨
+   6. popup-table-02: 카드형 테이블 (border-spacing)
+   7. tbl-alert-status: 관리대상모돈 테이블
+   8. stats-bar-modern: 연결형 스탯 바
+   9. cell-with-bar: 셀 내 비율 막대
+   10. change-badge: 증감 표시 배지
+   11. metric-item.highlight: 출하 팝업 메트릭스
+
+   [다크모드 색상 - 블루 틴트 계열]
+   - 팝업 배경: #1a1d24
+   - 테이블 래퍼: #232830
+   - 데이터 행: #2d3340
+   - 헤더 텍스트: #b8c9e8
+   - 강조 색상: #6ea8fe
+
+   ============================================ */
+
+/* ============================================
+   팝업 다크모드 CSS 변수 (블루 틴트 계열)
+   ============================================ */
+.dark .wr-popup-content {
+    --popup-bg: #1a1d24;
+    --popup-table-wrap-bg: #232830;
+    --popup-row-bg: #2d3340;
+    --popup-header-color: #b8c9e8;  /* 더 밝은 블루 그레이 */
+    --popup-accent: #6ea8fe;
+}
+
+/* 팝업 다크모드 테이블 래퍼 - 블루 틴트 */
+.dark .wr-popup-content .popup-table-wrap {
+    background: var(--popup-table-wrap-bg, #232830);
+}
+
+/* 팝업 다크모드 테이블 행 - 블루 틴트 */
+.dark .wr-popup-content .popup-table-02 tbody tr {
+    background: var(--popup-row-bg, #2d3340);
+}
+
+/* 팝업 다크모드 테이블 헤더 텍스트 - 블루 틴트 */
+.dark .wr-popup-content .popup-table-02 thead tr th {
+    color: var(--popup-header-color, #8b9dc3);
+}
+
+/* ============================================
+   📱 반응형 디자인 지침 (RESPONSIVE DESIGN GUIDE)
+   ============================================
+
+   [브레이크포인트]
+   - 모바일: 480px 이하 (기본)
+   - 태블릿: 481px ~ 768px (@media min-width: 481px)
+   - 데스크탑: 769px 이상 (@media min-width: 769px)
+
+   ============================================ */
+
+/* ============================================
+   팝업 팁 (.popup-tip)
+   ============================================ */
+.popup-tip {
+    margin-top: 12px; /* 모바일 */
+    padding: 10px 12px; /* 모바일 */
+    background: #fff5f5;
+    border-radius: 6px; /* 모바일 */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px; /* 모바일 */
+}
+
+.dark .popup-tip {
+    background: rgba(255, 59, 48, 0.1);
+}
+
+.popup-tip-label {
+    font-size: 12px; /* 모바일 */
+    font-weight: 600;
+    color: #ff6b6b;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px; /* 모바일 */
+}
+
+.popup-tip-label svg {
+    font-size: 11px; /* 모바일 */
+}
+
+.popup-tip-text {
+    font-size: 12px; /* 모바일 */
+    color: var(--rp-text-secondary);
+    line-height: 1.5;
+    margin: 0;
+    word-break: keep-all;
+}
+
+/* ============================================
+   팝업 닫기 버튼 (.popup-close-btn)
+   ============================================ */
+.popup-close-btn {
+    width: 30px; /* 모바일 */
+    height: 30px; /* 모바일 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    font-size: 14px; /* 모바일 */
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    flex-shrink: 0;
+}
+
+.popup-close-btn:hover {
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.5);
+}
+
+/* ============================================
+   팝업 탭 컨텐츠 애니메이션
+   ============================================ */
+.popup-tab-content {
+    animation: popupTabFadeIn 0.3s ease;
+}
+
+@keyframes popupTabFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   팝업 섹션 라벨 (.popup-section-label)
+   ============================================ */
+.popup-section-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px; /* 모바일 */
+    font-weight: 600;
+    color: var(--rp-text-primary);
+    margin-bottom: 4px; /* 모바일 - 테이블과 간격 축소 */
+    padding-bottom: 2px; /* 모바일 */
+}
+
+.popup-section-desc {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px; /* 모바일 */
+    color: var(--rp-text-tertiary);
+    margin-bottom: 5px;
+    padding: 0 5px;
+    font-weight: 400;
+}
+
+.popup-section-desc.justify-end {
+    justify-content: flex-end;
+}
+
+/* ============================================
+   팝업 탭 스타일 (.popup-tabs)
+   ============================================ */
+.popup-tabs {
+    display: flex;
+    position: relative;
+    border-bottom: 1px solid var(--rp-border-light);
+    margin-bottom: 12px; /* 모바일 */
+    gap: 0;
+}
+
+.popup-tab {
+    flex: 1 1 auto;
+    padding: 8px 10px; /* 모바일 */
+    background: transparent;
+    border: none;
+    font-size: 14px; /* 모바일 */
+    font-weight: 500;
+    white-space: nowrap;
+    color: var(--rp-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px; /* 모바일 */
+    position: relative;
+}
+
+.popup-tab:hover {
+    color: var(--rp-accent-primary);
+}
+
+.popup-tab.active {
+    color: var(--rp-accent-primary);
+    font-weight: 600;
+}
+
+.popup-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px; /* 모바일 */
+    background: linear-gradient(90deg, #f39c12, #e67e22);
+    border-radius: 3px 3px 0 0;
+    transition: all 0.3s ease;
+}
+
+.popup-tab svg {
+    font-size: 18px; /* 모바일 */
+}
+
+/* ============================================
+   팝업 테이블 02 - 카드형 스타일 (.popup-table-02)
+   - border-spacing으로 행간 간격
+   - 각 행이 카드 형태 (box-shadow, border-radius)
+   - 래퍼: .popup-table-wrap
+   - 용도: ModonPopup 등
+   ============================================ */
+
+/* 테이블 래퍼 */
+.popup-table-wrap {
+    background: var(--rp-card-wrap-bg);
+    border-radius: 8px; /* 모바일 */
+    padding: 10px; /* 모바일 */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    transition: background 0.3s ease;
+}
+
+/* 카드형 테이블 */
+.popup-table-02 {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 5px; /* 모바일 */
+    font-size: 13px; /* 모바일 */
+}
+
+.popup-table-02 thead tr th {
+    background: transparent;
+    border-bottom: none;
+    padding: 5px 3px; /* 모바일 */
+    font-size: 13px; /* 모바일 */
+    font-weight: 600;
+    color: var(--rp-text-secondary);
+    text-align: center;
+    transition: color 0.3s ease;
+}
+
+.popup-table-02 tbody tr {
+    background: var(--rp-card-row-bg);
+    box-shadow: var(--rp-card-row-shadow);
+    border-radius: 8px; /* 모바일 */
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.popup-table-02 tbody td {
+    border-bottom: none;
+    padding: 8px 3px; /* 모바일: 좌우 50% 축소 */
+    font-size: 13px; /* 모바일 */
+    text-align: center;
+    color: var(--rp-text-primary);
+    white-space: nowrap;
+}
+
+.popup-table-02 tbody td:first-child {
+    border-radius: 8px 0 0 8px; /* 모바일 */
+}
+
+.popup-table-02 tbody td:last-child {
+    border-radius: 0 8px 8px 0; /* 모바일 */
+}
+
+.popup-table-02 tbody td.label {
+    font-weight: 500;
+    text-align: center;
+}
+
+.popup-table-02 tbody td.label.sub {
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--rp-text-tertiary, #86868b);
+}
+
+/* ============================================
+   출하 테이블 전용 스타일 (.shipment-table)
+   - 구분1(category): 가로 중앙정렬
+   - 구분2(sub): 폰트 살짝 크게, padding 조정
+   ============================================ */
+.popup-table-02.shipment-table tbody td.label {
+    text-align: center;
+    padding: 8px 4px;
+}
+
+.popup-table-02.shipment-table tbody td.label.sub {
+    font-size: 12px;
+    padding: 8px 5px;
+    text-align: left;
+}
+
+/* 다크모드 - 구분 두번째 열 폰트 색상 밝게 */
+.dark .popup-table-02.shipment-table tbody td.label.sub {
+    color: #93c5fd;  /* 밝은 블루 */
+}
+
+/* 태블릿 (481px~) */
+@media (min-width: 481px) {
+    .popup-table-02.shipment-table tbody td.label {
+        padding: 9px 5px;
+    }
+
+    .popup-table-02.shipment-table tbody td.label.sub {
+        font-size: 13px;
+        padding: 9px 6px;
+    }
+}
+
+/* 데스크탑 (769px~) */
+@media (min-width: 769px) {
+    .popup-table-02.shipment-table tbody td.label {
+        padding: 10px 6px;
+    }
+
+    .popup-table-02.shipment-table tbody td.label.sub {
+        font-size: 14px;
+        padding: 10px 7px;
+    }
+}
+
+/* 출하 테이블 평균 컬럼 색상 */
+.popup-table-02.shipment-table tbody td.total.avg {
+    color: #10b981;
+}
+
+.dark .popup-table-02.shipment-table tbody td.total.avg {
+    color: #34d399;
+}
+
+/* N/A 셀 스타일 (일별 육성율 등 해당없음 표시) */
+.popup-table-02.shipment-table tbody td.na-cell {
+    background: rgba(0, 0, 0, 0.03);
+    color: var(--rp-text-tertiary);
+    font-style: italic;
+}
+
+.dark .popup-table-02.shipment-table tbody td.na-cell {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--rp-text-tertiary);
+}
+
+.popup-table-02 tbody td.total {
+    font-weight: 600;
+    color: var(--rp-accent-primary);
+}
+
+.dark .popup-table-02 tbody td.total {
+    color: #67e8f9;  /* 밝은 시안 - 다크모드에서 잘 보이게 */
+}
+
+.popup-table-02 tbody td.total.grand {
+    font-size: 14px; /* 모바일 */
+    font-weight: 700;
+    color: var(--rp-accent-primary);
+}
+
+.dark .popup-table-02 tbody td.total.grand {
+    color: #22d3ee;  /* 밝은 시안 - 강조 */
+}
+
+/* 하이라이트 컬럼 */
+.popup-table-02 thead tr th.col-highlight {
+    color: var(--rp-accent-red);
+    font-weight: 600;
+}
+
+.popup-table-02 tbody td.col-highlight {
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+    color: #dc2626;
+    font-weight: 700;
+}
+
+.dark .popup-table-02 tbody td.col-highlight {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.2) 0%, rgba(220, 38, 38, 0.15) 100%);
+    color: #f87171;
+}
+
+/* 섹션 헤더 행 */
+.popup-table-02 tbody tr.section-header {
+    background: transparent;
+    box-shadow: none;
+}
+
+.popup-table-02 tbody tr.section-header td {
+    font-weight: 600;
+    color: var(--rp-text-primary);
+    font-size: 12px; /* 모바일 */
+    text-align: left;
+    padding: 10px 8px 4px 8px; /* 모바일 */
+    border-radius: 0;
+}
+
+/* 섹션 헤더 다크모드 - 블루 틴트 강조색 */
+.dark .wr-popup-content .popup-table-02 tbody tr.section-header td {
+    color: var(--popup-header-color, #8b9dc3);
+}
+
+/* 합계 행 */
+.popup-table-02 tbody tr.total-row,
+.popup-table-02 tbody tr.sum-row {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dark .popup-table-02 tbody tr.total-row,
+.dark .popup-table-02 tbody tr.sum-row {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(0, 212, 255, 0.1) 100%);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.popup-table-02 tbody tr.total-row td,
+.popup-table-02 tbody tr.sum-row td {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* sum-row 합계 라벨 - 진한 파란색 계열 */
+.popup-table-02 tbody tr.sum-row td.label {
+    color: #1e40af;
+    font-weight: 700;
+}
+
+/* sum-row 값 - 밝은 파란색 계열 */
+.popup-table-02 tbody tr.sum-row td.total {
+    color: #2563eb;
+    font-weight: 700;
+}
+
+.dark .popup-table-02 tbody tr.total-row td,
+.dark .popup-table-02 tbody tr.sum-row td {
+    color: #f1f5f9;
+}
+
+/* 다크모드 sum-row 합계 라벨 - 더 밝은 골드 계열 */
+.dark .popup-table-02 tbody tr.sum-row td.label {
+    color: #fbbf24;
+    font-weight: 700;
+}
+
+/* 다크모드 sum-row 값 - 밝은 시안 계열 */
+.dark .popup-table-02 tbody tr.sum-row td.total {
+    color: #22d3ee;
+    font-weight: 700;
+}
+
+.popup-table-02 tbody tr.total-row td.col-highlight,
+.popup-table-02 tbody tr.sum-row td.col-highlight {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #b91c1c;
+    font-weight: 700;
+}
+
+.dark .popup-table-02 tbody tr.total-row td.col-highlight,
+.dark .popup-table-02 tbody tr.sum-row td.col-highlight {
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 59, 48, 0.25) 100%);
+    color: #ff6b6b;
+}
+
+/* 행 강조 스타일 (row-highlight) */
+.popup-table-02 tbody tr.row-highlight {
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+}
+
+.popup-table-02 tbody tr.row-highlight td {
+    font-weight: 600;
+}
+
+.dark .popup-table-02 tbody tr.row-highlight {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.15) 0%, rgba(14, 165, 233, 0.2) 100%);
+}
+
+/* ============================================
+   비율 행 스타일 (.rate-row)
+   - 헤더 바로 아래 상태별 비율 표시 행
+   - tbl-modon-parity 테이블에서 사용
+   ============================================ */
+.popup-table-02 thead tr.rate-row th {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    color: #0369a1;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 3px;
+    border-top: 1px dashed rgba(3, 105, 161, 0.3);
+}
+
+.dark .popup-table-02 thead tr.rate-row th {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(56, 189, 248, 0.1) 100%);
+    color: #7dd3fc;
+    border-top-color: rgba(125, 211, 252, 0.3);
+}
+
+/* 태블릿 (481px~) */
+@media (min-width: 481px) {
+    .popup-table-02 thead tr.rate-row th {
+        font-size: 12px;
+        padding: 7px 4px;
+    }
+}
+
+/* 데스크탑 (769px~) */
+@media (min-width: 769px) {
+    .popup-table-02 thead tr.rate-row th {
+        font-size: 13px;
+        padding: 8px 6px;
+    }
+}
+
+/* ============================================
+   관리대상모돈 테이블 (#tbl-alert-status)
+   - 첫번째 열(초과일수) 좁게, 나머지 열 균등
+   - 가로스크롤 방지
+   ============================================ */
+#tbl-alert-status {
+    table-layout: fixed;
+    width: 100%;
+}
+
+/* 첫번째 열: 초과일수 (좁게) */
+#tbl-alert-status th:first-child,
+#tbl-alert-status td:first-child {
+    width: 11%;
+}
+
+/* 2~6번째 열: 균등 배분 (100% - 11% - 13%) / 5 = 15.2% */
+#tbl-alert-status th:nth-child(n+2):not(:last-child),
+#tbl-alert-status td:nth-child(n+2):not(:last-child) {
+    width: 15.2%;
+}
+
+/* 7번째 열: 합계 (조금 넓게) */
+#tbl-alert-status th:last-child,
+#tbl-alert-status td:last-child {
+    width: 13%;
+}
+
+/* ============================================
+   관리대상모돈 - 중요 열 강조 (이유후미교배돈, 사고후미교배돈)
+   - 세로 구분선으로 강조 영역 표시
+   - 연한 빨간색 배경
+   - 헤더: .highlight, 셀: .highlight
+   ============================================ */
+
+/* 헤더 강조 - 빨간색 텍스트 + 상단 라인 */
+#tbl-alert-status thead th.highlight {
+    color: #dc2626;
+    font-weight: 700;
+    position: relative;
+}
+
+#tbl-alert-status thead th.highlight::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ef4444, #f87171);
+    border-radius: 3px 3px 0 0;
+}
+
+/* 셀 강조 - 연한 빨간 배경 + 세로 구분선 */
+#tbl-alert-status tbody td.highlight {
+    background: linear-gradient(180deg, #fef2f2 0%, #fee2e2 100%);
+    color: #dc2626;
+    font-weight: 600;
+    position: relative;
+}
+
+/* 첫 번째 강조 열 - 왼쪽 구분선 */
+#tbl-alert-status tbody td.highlight:first-of-type,
+#tbl-alert-status tbody td:nth-child(3) {
+    /* border-left: 2px solid rgba(239, 68, 68, 0.3); */
+}
+
+/* 마지막 강조 열 - 오른쪽 구분선 */
+#tbl-alert-status tbody td:nth-child(4) {
+    /* border-right: 2px solid rgba(239, 68, 68, 0.3); */
+}
+
+/* 합계행 강조 열 - 더 진한 배경 */
+#tbl-alert-status tbody tr.sum-row td.highlight {
+    background: linear-gradient(180deg, #fee2e2 0%, #fecaca 100%);
+    color: #b91c1c;
+    font-weight: 700;
+}
+
+/* 다크모드 - 헤더 강조 */
+.dark #tbl-alert-status thead th.highlight {
+    color: #fca5a5;
+}
+
+.dark #tbl-alert-status thead th.highlight::before {
+    background: linear-gradient(90deg, #f87171, #fb923c);
+}
+
+/* 다크모드 - 셀 강조 */
+.dark #tbl-alert-status tbody td.highlight {
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.12) 100%);
+    color: #fca5a5;
+}
+
+/* 다크모드 - 합계행 강조 열 */
+.dark #tbl-alert-status tbody tr.sum-row td.highlight {
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.25) 0%, rgba(239, 68, 68, 0.18) 100%);
+    color: #fca5a5;
+}
+
+/* ============================================
+   Modern Stats Bar (.stats-bar-modern)
+   - 연결형 바 스타일 (샘플 3: 연보라 배경 + 테두리)
+   - 도태폐사 팝업 등에서 사용
+   ============================================ */
+.stats-bar-modern {
+    display: flex;
+    gap: 0;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #f0f4ff 0%, #f8f9ff 100%);
+    border: 1px solid rgba(102, 126, 234, 0.15);
+    border-radius: 12px;
+    padding: 8px 4px;
+}
+
+.stats-bar-modern-item {
+    flex: 1;
+    padding: 12px 8px;
+    text-align: center;
+    border-right: 1px solid rgba(102, 126, 234, 0.1);
+    transition: background 0.15s ease;
+}
+
+.stats-bar-modern-item:last-child {
+    border-right: none;
+}
+
+.stats-bar-modern-item:hover {
+    background: rgba(102, 126, 234, 0.08);
+}
+
+.stats-bar-modern-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 6px;
+}
+
+.stats-bar-modern-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1d1d1f;
+}
+
+.stats-bar-modern-value.danger {
+    color: #dc3545;
+}
+
+.stats-bar-modern-value.warning {
+    color: #ff9800;
+}
+
+.stats-bar-modern-value.success {
+    color: #28a745;
+}
+
+.stats-bar-modern-value.primary {
+    color: var(--rp-accent-primary, #667eea);
+}
+
+/* Dark mode */
+.dark .stats-bar-modern {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+    border-color: rgba(102, 126, 234, 0.25);
+}
+
+.dark .stats-bar-modern-item {
+    border-right-color: rgba(102, 126, 234, 0.2);
+}
+
+.dark .stats-bar-modern-item:hover {
+    background: rgba(102, 126, 234, 0.15);
+}
+
+.dark .stats-bar-modern-label {
+    color: var(--rp-text-tertiary, #9ca3af);
+}
+
+.dark .stats-bar-modern-value {
+    color: var(--rp-text-primary, #e6edf3);
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+    .stats-bar-modern {
+        padding: 6px 2px;
+    }
+
+    .stats-bar-modern-item {
+        padding: 10px 4px;
+    }
+
+    .stats-bar-modern-label {
+        font-size: 12px;
+    }
+
+    .stats-bar-modern-value {
+        font-size: 18px;
+    }
+}
+
+/* Tablet responsive */
+@media (min-width: 481px) and (max-width: 768px) {
+    .stats-bar-modern-label {
+        font-size: 13px;
+    }
+
+    .stats-bar-modern-value {
+        font-size: 20px;
+    }
+}
+
+/* ============================================
+   셀 내부 비율 막대 (.cell-with-bar)
+   - 도태폐사 테이블 등에서 사용
+   ============================================ */
+.cell-with-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cell-with-bar .bar-bg {
+    flex: 1;
+    height: 14px;
+    background: var(--rp-bg-cell-alt, #f5f5f5);
+    border-radius: 3px;
+    overflow: hidden;
+    min-width: 40px;
+}
+
+.dark .cell-with-bar .bar-bg {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.cell-with-bar .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.cell-with-bar .bar-fill.red {
+    background: linear-gradient(90deg, #dc3545, #c82333);
+}
+
+.cell-with-bar .bar-fill.blue {
+    background: linear-gradient(90deg, #667eea, #5a6fd6);
+}
+
+.cell-with-bar .bar-fill.green {
+    background: linear-gradient(90deg, #28a745, #218838);
+}
+
+.cell-with-bar .bar-fill.gray {
+    background: linear-gradient(90deg, #6b7280, #4b5563);
+}
+
+.cell-with-bar .percent {
+    font-size: 11px;
+    color: var(--rp-text-tertiary, #86868b);
+    min-width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.cell-with-bar .value {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--rp-text-primary, #1d1d1f);
+    min-width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+    padding-left: 0;
+}
+
+.dark .cell-with-bar .value {
+    color: var(--rp-text-primary);
+}
+
+/* 첫 번째 바 차트 컬럼 (지난주)의 값에 오른쪽 여백 추가 */
+.popup-table-02 tbody td:nth-child(2) .cell-with-bar .value {
+    padding-right: 5px;
+}
+
+/* 증감 표시 */
+.change-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px; /* 모바일 */
+    font-size: 11px; /* 모바일 */
+    font-weight: 600;
+    margin-left: 3px; /* 모바일 */
+}
+
+.change-badge.up {
+    color: var(--rp-accent-green);
+}
+
+.change-badge.down {
+    color: var(--rp-accent-red);
+}
+
+.change-badge svg {
+    font-size: 10px; /* 모바일 */
+}
+
+/* 합계 행의 증감 배지 */
+.popup-table-02 tbody tr.total-row .change-badge,
+.popup-table-02 tbody tr.sum-row .change-badge {
+    font-size: 12px; /* 모바일 */
+    margin-left: 5px; /* 모바일 */
+}
+
+.popup-table-02 tbody tr.total-row .change-badge svg,
+.popup-table-02 tbody tr.sum-row .change-badge svg {
+    font-size: 11px; /* 모바일 */
+}
+
+/* ============================================
+   반응형 - 태블릿 (min-width: 481px)
+   ============================================ */
+@media (min-width: 481px) {
+    /* 팝업 팁 태블릿 */
+    .popup-tip {
+        margin-top: 14px;
+        padding: 11px 14px;
+        border-radius: 7px;
+        gap: 7px;
+    }
+
+    .popup-tip-label {
+        font-size: 12px;
+        gap: 6px;
+    }
+
+    .popup-tip-label svg {
+        font-size: 11px;
+    }
+
+    .popup-tip-text {
+        font-size: 12px;
+    }
+
+    /* 팝업 닫기 버튼 태블릿 */
+    .popup-close-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+
+    /* 팝업 섹션 라벨 태블릿 */
+    .popup-section-label {
+        font-size: 14px;
+        margin-bottom: 5px;
+        padding-bottom: 3px;
+    }
+
+    .popup-section-desc {
+        font-size: 12px;
+    }
+
+    /* 팝업 탭 태블릿 */
+    .popup-tabs {
+        margin-bottom: 14px;
+    }
+
+    .popup-tab {
+        font-size: 14px;
+        padding: 10px 12px;
+        gap: 5px;
+    }
+
+    .popup-tab svg {
+        font-size: 20px;
+    }
+
+    .popup-tab.active::after {
+        height: 2px;
+    }
+
+    /* 팝업 테이블 02 태블릿 */
+    .popup-table-wrap {
+        padding: 12px;
+        border-radius: 10px;
+    }
+
+    .popup-table-02 {
+        border-spacing: 0 6px;
+    }
+
+    .popup-table-02 thead tr th {
+        padding: 6px 4px;
+        font-size: 14px;
+    }
+
+    .popup-table-02 tbody tr {
+        border-radius: 10px;
+    }
+
+    .popup-table-02 tbody td {
+        padding: 10px 5px; /* 태블릿: 점진적 증가 */
+        font-size: 14px;
+    }
+
+    .popup-table-02 tbody td:first-child {
+        border-radius: 10px 0 0 10px;
+    }
+
+    .popup-table-02 tbody td:last-child {
+        border-radius: 0 10px 10px 0;
+    }
+
+    .popup-table-02 tbody tr.section-header td {
+        font-size: 13px;
+        padding: 12px 10px 6px 10px;
+    }
+
+    .popup-table-02 tbody td.total.grand {
+        font-size: 15px;
+    }
+
+    .change-badge {
+        font-size: 12px;
+        margin-left: 4px;
+    }
+
+    .change-badge svg {
+        font-size: 11px;
+    }
+
+    .popup-table-02 tbody tr.total-row .change-badge,
+    .popup-table-02 tbody tr.sum-row .change-badge {
+        font-size: 13px;
+        margin-left: 6px;
+    }
+
+    .popup-table-02 tbody tr.total-row .change-badge svg,
+    .popup-table-02 tbody tr.sum-row .change-badge svg {
+        font-size: 12px;
+    }
+}
+
+/* ============================================
+   반응형 - 데스크탑 (min-width: 769px)
+   ============================================ */
+@media (min-width: 769px) {
+    /* 팝업 팁 데스크탑 */
+    .popup-tip {
+        margin-top: 16px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        gap: 8px;
+    }
+
+    .popup-tip-label {
+        font-size: 13px;
+        gap: 6px;
+    }
+
+    .popup-tip-label svg {
+        font-size: 12px;
+    }
+
+    .popup-tip-text {
+        font-size: 13px;
+    }
+
+    /* 팝업 닫기 버튼 데스크탑 */
+    .popup-close-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+
+    /* 팝업 섹션 라벨 데스크탑 */
+    .popup-section-label {
+        font-size: 15px;
+        margin-bottom: 6px;
+        padding-bottom: 4px;
+    }
+
+    .popup-section-desc {
+        font-size: 13px;
+    }
+
+    /* 팝업 탭 데스크탑 */
+    .popup-tabs {
+        margin-bottom: 16px;
+    }
+
+    .popup-tab {
+        font-size: 17px;
+        padding: 12px 16px;
+        gap: 6px;
+    }
+
+    .popup-tab svg {
+        font-size: 20px;
+    }
+
+    .popup-tab.active::after {
+        height: 3px;
+    }
+
+    /* 팝업 테이블 02 데스크탑 */
+    .popup-table-wrap {
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .popup-table-02 {
+        border-spacing: 0 8px;
+        font-size: 14px;
+    }
+
+    .popup-table-02 thead tr th {
+        padding: 8px 6px;
+        font-size: 15px;
+    }
+
+    .popup-table-02 tbody tr {
+        border-radius: 12px;
+    }
+
+    .popup-table-02 tbody td {
+        padding: 14px 10px; /* 데스크탑: 원래값 유지 */
+        font-size: 15px;
+    }
+
+    .popup-table-02 tbody td:first-child {
+        border-radius: 12px 0 0 12px;
+    }
+
+    .popup-table-02 tbody td:last-child {
+        border-radius: 0 12px 12px 0;
+    }
+
+    .popup-table-02 tbody tr.section-header td {
+        font-size: 14px;
+        padding: 16px 12px 8px 12px;
+    }
+
+    .popup-table-02 tbody td.total.grand {
+        font-size: 16px;
+    }
+
+    .change-badge {
+        font-size: 14px;
+        margin-left: 6px;
+    }
+
+    .change-badge svg {
+        font-size: 13px;
+    }
+
+    .popup-table-02 tbody tr.total-row .change-badge {
+        font-size: 14px;
+        margin-left: 8px;
+    }
+
+    .popup-table-02 tbody tr.total-row .change-badge svg {
+        font-size: 13px;
+    }
+}
+
+/* ============================================
+   출하 팝업 - 메트릭스 하이라이트 스타일
+   ============================================ */
+.metric-item.highlight {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+}
+
+.metric-item.highlight .metric-value {
+    color: #fff;
+}
+
+.metric-item.highlight .metric-value .unit {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.metric-item.highlight .metric-label {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.metric-sub {
+    font-size: 10px;
+    opacity: 0.8;
+    margin-left: 2px;
+}
+
+/* 가격 비교 바 다크모드 */
+.dark .price-compare-bar {
+    background: linear-gradient(90deg, rgba(40, 167, 69, 0.15) 0%, rgba(0, 122, 255, 0.15) 100%);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .price-compare-bar .price-item .metric-label {
+    color: var(--rp-text-tertiary);
+}
+
+/* ============================================
+   교배 팝업 요약 리스트 (.mating-summary-list)
+   - 리스트형 + 프로그레스 바 혼합
+   ============================================ */
+.mating-summary-list {
+    background: var(--rp-card-wrap-bg);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 16px;
+}
+
+/* 요약 행 기본 */
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--rp-border-light);
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-row-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.summary-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--rp-accent-primary);
+}
+
+.summary-label {
+    font-size: 13px;
+    color: var(--rp-text-secondary);
+    font-weight: 500;
+}
+
+.summary-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--rp-text-primary);
+}
+
+/* 하이라이트 행 (합계) */
+.summary-row.highlight {
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8ecff 100%);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border-bottom: none;
+}
+
+.summary-row.highlight .summary-dot {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    width: 10px;
+    height: 10px;
+}
+
+.summary-row.highlight .summary-label {
+    font-weight: 600;
+    color: var(--rp-text-primary);
+}
+
+.summary-row.highlight .summary-value {
+    font-size: 20px;
+    color: #667eea;
+}
+
+/* 프로그레스 바 행 */
+.summary-row.with-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 8px 12px;
+}
+
+.summary-row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.summary-bar {
+    height: 6px;
+    background: var(--rp-bg-cell-alt, #e5e7eb);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.summary-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.summary-bar-fill.primary {
+    background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.summary-bar-fill.success {
+    background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.summary-bar-fill.warning {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.summary-bar-fill.danger {
+    background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+.summary-bar-fill.info {
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+/* 2열 그룹 (기타 정보) */
+.summary-row-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--rp-border-light);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.summary-row.compact {
+    padding: 8px 12px;
+    background: var(--rp-card-row-bg);
+    border-bottom: none;
+}
+
+.summary-row.compact .summary-label {
+    font-size: 11px;
+}
+
+.summary-row.compact .summary-value {
+    font-size: 13px;
+}
+
+/* 다크모드 */
+.dark .mating-summary-list {
+    background: var(--popup-table-wrap-bg, #232830);
+}
+
+.dark .summary-row {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .summary-row.highlight {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.15) 100%);
+}
+
+.dark .summary-row.highlight .summary-value {
+    color: #a5b4fc;
+}
+
+.dark .summary-bar {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.dark .summary-row-group {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.dark .summary-row.compact {
+    background: var(--popup-row-bg, #2d3340);
+}
+
+/* 실산 강조 스타일 (with-bar.accent) */
+.summary-row.with-bar.accent {
+    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+    border-radius: 8px;
+    margin-bottom: 4px;
+    border-bottom: none;
+}
+
+.summary-row.with-bar.accent .summary-label {
+    font-weight: 600;
+    color: var(--rp-text-primary);
+}
+
+.summary-row.with-bar.accent .summary-value {
+    font-size: 16px;
+    color: #667eea;
+}
+
+.dark .summary-row.with-bar.accent {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(99, 102, 241, 0.15) 100%);
+}
+
+.dark .summary-row.with-bar.accent .summary-value {
+    color: #a5b4fc;
+}
+
+/* ============================================
+   유형 2 스타일: 프로그레스바 + 예정/실적
+   ============================================ */
+.summary-row-right {
+    text-align: right;
+}
+
+.summary-sub {
+    font-size: 11px;
+    color: #666;
+    margin-top: 2px;
+}
+
+.dark .summary-sub {
+    color: #a5b4fc;  /* 밝은 라벤더 블루 */
+}
+
+/* 달성률 뱃지 */
+.rate-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.rate-badge.good {
+    background: #d4edda;
+    color: #155724;
+}
+
+.rate-badge.warn {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.rate-badge.bad {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.dark .rate-badge.good {
+    background: rgba(52, 199, 89, 0.2);
+    color: #34c759;
+}
+
+.dark .rate-badge.warn {
+    background: rgba(255, 149, 0, 0.2);
+    color: #ff9500;
+}
+
+.dark .rate-badge.bad {
+    background: rgba(255, 59, 48, 0.2);
+    color: #ff3b30;
+}
+
+/* 섹션 타이틀 */
+.section-title {
+    font-size: 11px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 12px 0 8px;
+}
+
+.dark .section-title {
+    color: #93c5fd;  /* 밝은 스카이 블루 - 세부 타이틀용 */
+}
+
+/* 예정/달성률 표기 (라벨 우측 인라인) */
+.summary-plan {
+    display: inline;
+    font-size: 11px; /* 모바일 */
+    font-weight: 400;
+    color: #888;
+    margin-left: 6px;
+}
+
+.dark .summary-plan {
+    color: #a5b4fc;  /* 밝은 라벤더 블루 */
+}
+
+/* 프로그레스 바 하단 정보 */
+.summary-bar-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #999;
+    margin-top: 2px;
+}
+
+.dark .summary-bar-info {
+    color: #666;
+}
+
+/* 구분선 */
+.summary-divider {
+    height: 1px;
+    background: #e9ecef;
+    margin: 12px 0;
+}
+
+.dark .summary-divider {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* 그라데이션 구분선 */
+.gradient-divider {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #667eea, transparent);
+    margin: 12px 0;
+}
+
+.dark .gradient-divider {
+    background: linear-gradient(90deg, transparent, #a5b4fc, transparent);
+}
+
+/* 내장 테이블 (mating-summary-list 안에서 사용) */
+.embedded-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 4px;
+    font-size: 12px;
+}
+
+.embedded-table thead th {
+    background: transparent;
+    padding: 6px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--rp-text-secondary);
+    text-align: center;
+}
+
+.embedded-table tbody tr {
+    background: var(--rp-card-row-bg);
+    box-shadow: var(--rp-card-row-shadow);
+    border-radius: 6px;
+}
+
+.embedded-table tbody td {
+    padding: 8px;
+    text-align: center;
+    color: var(--rp-text-primary);
+}
+
+.embedded-table tbody td:first-child {
+    border-radius: 6px 0 0 6px;
+    text-align: left;
+    font-weight: 500;
+}
+
+.embedded-table tbody td:last-child {
+    border-radius: 0 6px 6px 0;
+}
+
+.embedded-table tbody tr.row-highlight {
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+}
+
+.embedded-table tbody tr.row-highlight td {
+    font-weight: 600;
+}
+
+.dark .embedded-table tbody tr {
+    background: var(--popup-row-bg, #2d3340);
+}
+
+.dark .embedded-table thead th {
+    color: var(--popup-header-color, #b8c9e8);
+}
+
+.dark .embedded-table tbody tr.row-highlight {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.15) 0%, rgba(14, 165, 233, 0.2) 100%);
+}
+
+/* 컴팩트 리스트 (기타 정보) */
+.compact-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+}
+
+.compact-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #666;
+}
+
+.dark .compact-item {
+    color: #999;
+}
+
+.compact-item .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #666;
+}
+
+.compact-item .dot.primary {
+    background: #007aff;
+}
+
+.compact-item .dot.success {
+    background: #34c759;
+}
+
+.compact-item .dot.warning {
+    background: #ff9500;
+}
+
+.compact-item .dot.danger {
+    background: #ff3b30;
+}
+
+/* 태블릿 (481px~) */
+@media (min-width: 481px) {
+    .mating-summary-list {
+        padding: 14px;
+    }
+
+    .summary-label {
+        font-size: 13px;
+    }
+
+    .summary-value {
+        font-size: 16px;
+    }
+
+    .summary-row.highlight .summary-value {
+        font-size: 22px;
+    }
+
+    .summary-row.compact .summary-label {
+        font-size: 12px;
+    }
+
+    .summary-row.compact .summary-value {
+        font-size: 14px;
+    }
+
+    .summary-plan {
+        font-size: 12px;
+    }
+
+    .embedded-table {
+        font-size: 13px;
+    }
+
+    .embedded-table thead th {
+        font-size: 12px;
+        padding: 7px 10px;
+    }
+
+    .embedded-table tbody td {
+        padding: 9px 10px;
+    }
+}
+
+/* 데스크탑 (769px~) */
+@media (min-width: 769px) {
+    .mating-summary-list {
+        padding: 16px;
+    }
+
+    .summary-row {
+        padding: 12px 16px;
+    }
+
+    .summary-label {
+        font-size: 14px;
+    }
+
+    .summary-value {
+        font-size: 17px;
+    }
+
+    .summary-row.highlight .summary-value {
+        font-size: 24px;
+    }
+
+    .summary-bar {
+        height: 8px;
+    }
+
+    .summary-row.compact .summary-label {
+        font-size: 13px;
+    }
+
+    .summary-row.compact .summary-value {
+        font-size: 15px;
+    }
+
+    .summary-plan {
+        font-size: 13px;
+    }
+
+    .embedded-table {
+        font-size: 14px;
+        border-spacing: 0 6px;
+    }
+
+    .embedded-table thead th {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+
+    .embedded-table tbody td {
+        padding: 10px 12px;
+    }
+
+    .embedded-table tbody tr {
+        border-radius: 8px;
+    }
+
+    .embedded-table tbody td:first-child {
+        border-radius: 8px 0 0 8px;
+    }
+
+    .embedded-table tbody td:last-child {
+        border-radius: 0 8px 8px 0;
+    }
+}
+
+/* ============================================
+   이유 팝업 - 3×2 그리드 카드 스타일
+   ============================================ */
+
+/* 그리드 카드 기본 스타일 */
+.weaning-grid-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+}
+
+.weaning-grid-card .card-label {
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.weaning-grid-card .card-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+}
+
+/* 이유육성율 카드 (강조) */
+.weaning-grid-card.highlight-green {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border: 1px solid #bbf7d0;
+}
+
+.weaning-grid-card.highlight-green .card-label {
+    color: #16a34a;
+}
+
+.weaning-grid-card.highlight-green .card-label-sub {
+    font-size: 10px;
+    color: #22c55e;
+}
+
+.weaning-grid-card.highlight-green .card-value {
+    color: #16a34a;
+}
+
+/* 분만 기준 현황 카드 - 총산 (회색) */
+.weaning-stat-card.gray {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border: 1px solid #e2e8f0;
+}
+
+.weaning-stat-card.gray .card-label {
+    color: #64748b;
+}
+
+.weaning-stat-card.gray .card-value {
+    color: #334155;
+}
+
+/* 분만 기준 현황 카드 - 실산 (파랑) */
+.weaning-stat-card.blue {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border: 1px solid #bfdbfe;
+}
+
+.weaning-stat-card.blue .card-label {
+    color: #3b82f6;
+}
+
+.weaning-stat-card.blue .card-value {
+    color: #1d4ed8;
+}
+
+/* 분만 기준 현황 카드 - 포유개시 (초록) */
+.weaning-stat-card.green {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border: 1px solid #bbf7d0;
+}
+
+.weaning-stat-card.green .card-label {
+    color: #22c55e;
+}
+
+.weaning-stat-card.green .card-value {
+    color: #16a34a;
+}
+
+/* 다크모드 - 그리드 카드 */
+.dark .weaning-grid-card {
+    background: var(--popup-row-bg, #2d3340);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .weaning-grid-card .card-label {
+    color: #a5b4fc;
+}
+
+.dark .weaning-grid-card .card-value {
+    color: #e2e8f0;
+}
+
+/* 다크모드 - 이유육성율 카드 */
+.dark .weaning-grid-card.highlight-green {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.2) 100%);
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.dark .weaning-grid-card.highlight-green .card-label {
+    color: #4ade80;
+}
+
+.dark .weaning-grid-card.highlight-green .card-label-sub {
+    color: #86efac;
+}
+
+.dark .weaning-grid-card.highlight-green .card-value {
+    color: #4ade80;
+}
+
+/* 다크모드 - 분만 기준 현황 카드 (총산) */
+.dark .weaning-stat-card.gray {
+    background: linear-gradient(135deg, rgba(100, 116, 139, 0.15) 0%, rgba(71, 85, 105, 0.2) 100%);
+    border-color: rgba(100, 116, 139, 0.3);
+}
+
+.dark .weaning-stat-card.gray .card-label {
+    color: #94a3b8;
+}
+
+.dark .weaning-stat-card.gray .card-value {
+    color: #cbd5e1;
+}
+
+/* 다크모드 - 분만 기준 현황 카드 (실산) */
+.dark .weaning-stat-card.blue {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.2) 100%);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+.dark .weaning-stat-card.blue .card-label {
+    color: #60a5fa;
+}
+
+.dark .weaning-stat-card.blue .card-value {
+    color: #93c5fd;
+}
+
+/* 다크모드 - 분만 기준 현황 카드 (포유개시) */
+.dark .weaning-stat-card.green {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.2) 100%);
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.dark .weaning-stat-card.green .card-label {
+    color: #4ade80;
+}
+
+.dark .weaning-stat-card.green .card-value {
+    color: #86efac;
+}
+
+/* ============================================
+   요일별 분포 (.daily-dist)
+   - 예정작업 팝업에서 행 클릭 시 표시
+   - 월~일 7개 셀 항상 표시
+   - .wr-popup-content로 specificity 높임
+   ============================================ */
+.wr-popup-content .popup-table-02 tbody tr.daily-dist-row {
+    background: transparent;
+    box-shadow: none;
+}
+
+.wr-popup-content .popup-table-02 tbody td.daily-dist-cell {
+    padding: 8px 4px;
+    background: var(--rp-bg-secondary);
+    border-radius: 0;
+}
+
+.wr-popup-content .daily-dist-container {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    min-width: 252px;
+    overflow: visible;
+}
+
+.wr-popup-content .daily-dist-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f0f0f0;
+    border-radius: 4px;
+    width: 32px;
+    min-width: 32px;
+    height: 38px;
+    flex-shrink: 0;
+}
+
+.wr-popup-content .daily-dist-item.has-value {
+    background: #667eea;
+}
+
+/* 요일명 기본 (월~금) */
+.wr-popup-content .daily-dist-item .daily-dist-day {
+    font-size: 11px;
+    color: #555;
+}
+
+/* 주말 요일명 (토~일) - 빨간색 */
+.wr-popup-content .daily-dist-item.weekend .daily-dist-day {
+    color: #dc3545;
+}
+
+/* 값이 있는 셀의 요일명 - 흰색 */
+.wr-popup-content .daily-dist-item.has-value .daily-dist-day {
+    color: #fff;
+}
+
+/* 숫자 기본 */
+.wr-popup-content .daily-dist-item .daily-dist-count {
+    font-size: 13px;
+    font-weight: 700;
+    color: #888;
+}
+
+/* 값이 있는 셀의 숫자 - 흰색 */
+.wr-popup-content .daily-dist-item.has-value .daily-dist-count {
+    color: #fff;
+    font-size: 14px;
+}
+
+/* 다크모드 */
+.dark .wr-popup-content .popup-table-02 tbody td.daily-dist-cell {
+    background: var(--popup-table-wrap-bg, #232830);
+}
+
+.dark .wr-popup-content .daily-dist-item {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.dark .wr-popup-content .daily-dist-item.has-value {
+    background: #667eea;
+}
+
+/* 다크모드 - 요일명 (월~금) */
+.dark .wr-popup-content .daily-dist-item .daily-dist-day {
+    color: #ccc;
+}
+
+/* 다크모드 - 주말 요일명 (토~일) */
+.dark .wr-popup-content .daily-dist-item.weekend .daily-dist-day {
+    color: #ff6b6b;
+}
+
+/* 다크모드 - 값 있는 셀의 요일명 */
+.dark .wr-popup-content .daily-dist-item.has-value .daily-dist-day {
+    color: #fff;
+}
+
+/* 다크모드 - 숫자 기본 */
+.dark .wr-popup-content .daily-dist-item .daily-dist-count {
+    color: #888;
+}
+
+/* 다크모드 - 값 있는 숫자 */
+.dark .wr-popup-content .daily-dist-item.has-value .daily-dist-count {
+    color: #fff;
+}
+
+/* 반응형 - 태블릿 이상 (481px+) */
+@media (min-width: 481px) {
+    .wr-popup-content .daily-dist-container {
+        gap: 6px;
+    }
+    .wr-popup-content .daily-dist-item {
+        width: 36px;
+        min-width: 36px;
+        height: 42px;
+    }
+    .wr-popup-content .daily-dist-item .daily-dist-day {
+        font-size: 11px;
+    }
+    .wr-popup-content .daily-dist-item .daily-dist-count {
+        font-size: 14px;
+    }
+    .wr-popup-content .daily-dist-item.has-value .daily-dist-count {
+        font-size: 15px;
+    }
+}
+
+/* 반응형 - 데스크탑 (769px+) */
+@media (min-width: 769px) {
+    .wr-popup-content .daily-dist-container {
+        gap: 8px;
+    }
+    .wr-popup-content .daily-dist-item {
+        width: 40px;
+        min-width: 40px;
+        height: 46px;
+    }
+    .wr-popup-content .daily-dist-item .daily-dist-day {
+        font-size: 12px;
+    }
+    .wr-popup-content .daily-dist-item .daily-dist-count {
+        font-size: 15px;
+    }
+    .wr-popup-content .daily-dist-item.has-value .daily-dist-count {
+        font-size: 16px;
+    }
+}
+
+/* ============================================
+   관리포인트 팝업 (.mgmt-popup)
+   - 퀴즈, 중점사항, 추천학습자료
+   ============================================ */
+
+/* 팝업 컨텐츠 */
+.mgmt-popup-content {
+    padding: 0;
+}
+
+/* 아이템 목록 */
+.mgmt-popup-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* 아이템 */
+.mgmt-popup-item {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--rp-border-light, #e5e7eb);
+    transition: background 0.15s ease;
+}
+
+.mgmt-popup-item:last-child {
+    border-bottom: none;
+}
+
+.mgmt-popup-item:hover {
+    background: var(--rp-bg-secondary, #f9fafb);
+}
+
+.dark .mgmt-popup-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* 아이템 헤더 (제목 + 링크버튼) */
+.mgmt-popup-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+/* 아이템 제목 */
+.mgmt-popup-item-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--rp-text-primary, #1d1d1f);
+    flex: 1;
+    line-height: 1.4;
+}
+
+.dark .mgmt-popup-item-title {
+    color: #e6edf3;
+}
+
+/* 링크 버튼 */
+.mgmt-popup-link-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    flex-shrink: 0;
+}
+
+.mgmt-popup-link-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* 아이템 상세내용 */
+.mgmt-popup-item-content {
+    margin: 8px 0 0 0;
+    font-size: 13px;
+    color: var(--rp-text-secondary, #666);
+    line-height: 1.8;
+    word-break: keep-all;
+    white-space: pre-wrap;
+}
+
+.dark .mgmt-popup-item-content {
+    color: #9ca3af;
+}
+
+/* 게시기간 */
+.mgmt-popup-item-period {
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--rp-text-tertiary, #999);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dark .mgmt-popup-item-period {
+    color: #6b7280;
+}
+
+.mgmt-popup-item-period svg {
+    font-size: 10px;
+}
+
+/* ============================================
+   관리포인트 섹션 V2 - 컴팩트 칩 스타일
+   ============================================ */
+
+/* 섹션 컨테이너 */
+.mgmt-section-v2 {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* 카드 */
+.mgmt-card-v2 {
+    background: var(--rp-card-bg, #fff);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.dark .mgmt-card-v2 {
+    background: var(--rp-card-bg-dark, #2d2d2d);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 카드 헤더 */
+.mgmt-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+/* 배지 */
+.mgmt-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.mgmt-badge svg {
+    font-size: 11px;
+}
+
+.mgmt-badge.quiz-info {
+    background: linear-gradient(135deg, #f59e0b, #ea580c);
+}
+
+.mgmt-badge.news {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+/* 더보기 */
+.mgmt-more {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--rp-accent-primary, #667eea);
+    cursor: pointer;
+    transition: color 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.mgmt-more:hover {
+    color: #764ba2;
+}
+
+.mgmt-more svg {
+    font-size: 10px;
+    transition: transform 0.15s;
+}
+
+.mgmt-more:hover svg {
+    transform: translateX(2px);
+}
+
+/* 칩 컨테이너 */
+.mgmt-chips {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* 칩 */
+.mgmt-chip {
+    padding: 10px 16px;
+    background: var(--rp-bg-secondary, #f8f9fa);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--rp-text-primary, #333);
+    cursor: pointer;
+    transition: all 0.15s;
+    width: 100%;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dark .mgmt-chip {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e6edf3;
+}
+
+.mgmt-chip:hover {
+    background: var(--rp-accent-primary, #667eea);
+    color: #fff;
+}
+
+.dark .mgmt-chip:hover {
+    background: var(--rp-accent-primary, #667eea);
+    color: #fff;
+}
+
+/* 칩 아이콘 */
+.mgmt-chip-icon {
+    margin-right: 8px;
+    font-size: 12px;
+}
+
+/* QUIZ 칩 아이콘 - 오렌지 */
+.mgmt-chip-quiz .mgmt-chip-icon {
+    color: #ea580c;
+}
+
+.dark .mgmt-chip-quiz .mgmt-chip-icon {
+    color: #fb923c;
+}
+
+/* CHANNEL 칩 아이콘 - 빨강 */
+.mgmt-chip-channel .mgmt-chip-icon {
+    color: #dc2626;
+}
+
+.dark .mgmt-chip-channel .mgmt-chip-icon {
+    color: #f87171;
+}
+
+/* hover 시 아이콘 색상 흰색으로 */
+.mgmt-chip:hover .mgmt-chip-icon {
+    color: #fff;
+}
+
+/* 빈 메시지 */
+.mgmt-empty {
+    color: var(--rp-text-tertiary, #999);
+    font-size: 13px;
+    font-style: italic;
+}
+
+.dark .mgmt-empty {
+    color: #6b7280;
+}
+
+/* 데스크탑 (769px+) */
+@media (min-width: 769px) {
+    .mgmt-popup-item {
+        padding: 16px 20px;
+    }
+
+    .mgmt-popup-item-title {
+        font-size: 15px;
+    }
+
+    .mgmt-popup-item-content {
+        font-size: 14px;
+    }
+
+    .mgmt-popup-link-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    .mgmt-card-v2 {
+        padding: 18px 20px;
+    }
+
+    .mgmt-badge {
+        padding: 6px 14px;
+        font-size: 13px;
+    }
+
+    .mgmt-chip {
+        font-size: 14px;
+        padding: 10px 18px;
+    }
+}
+
+/* ============================================
+   관리포인트 리스트 팝업
+   ============================================ */
+
+.mgmt-list-popup-content {
+    padding: 0;
+}
+
+.mgmt-list-empty {
+    padding: 32px 16px;
+    text-align: center;
+    color: var(--rp-text-tertiary, #999);
+    font-size: 14px;
+}
+
+.mgmt-list-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.mgmt-list-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--rp-border-light, #f0f0f0);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.mgmt-list-item:last-child {
+    border-bottom: none;
+}
+
+.mgmt-list-item:hover {
+    background: var(--rp-bg-secondary, #f9fafb);
+}
+
+.dark .mgmt-list-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* 아이콘 스타일 (번호 대신 사용) */
+.mgmt-list-item-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+/* QUIZ 아이콘 - 오렌지 */
+.mgmt-list-item-icon-quiz {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+    color: #ea580c;
+}
+
+.dark .mgmt-list-item-icon-quiz {
+    background: rgba(234, 88, 12, 0.2);
+    color: #fb923c;
+}
+
+/* CHANNEL 아이콘 - 빨강 (박사채널) */
+.mgmt-list-item-icon-channel {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    color: #dc2626;
+}
+
+.dark .mgmt-list-item-icon-channel {
+    background: rgba(220, 38, 38, 0.2);
+    color: #f87171;
+}
+
+/* PORK-NEWS 아이콘 - 기본 */
+.mgmt-list-item-icon-pork-news {
+    background: var(--rp-bg-secondary, #f3f4f6);
+    color: var(--rp-text-secondary, #666);
+}
+
+.dark .mgmt-list-item-icon-pork-news {
+    background: rgba(255, 255, 255, 0.1);
+    color: #9ca3af;
+}
+
+.mgmt-list-item-num {
+    width: 24px;
+    height: 24px;
+    background: var(--rp-bg-secondary, #f3f4f6);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--rp-text-secondary, #666);
+    flex-shrink: 0;
+}
+
+.dark .mgmt-list-item-num {
+    background: rgba(255, 255, 255, 0.1);
+    color: #9ca3af;
+}
+
+.mgmt-list-item-title {
+    flex: 1;
+    font-size: 14px;
+    color: var(--rp-text-primary, #333);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dark .mgmt-list-item-title {
+    color: #e6edf3;
+}
+
+.mgmt-list-item-arrow {
+    color: var(--rp-text-tertiary, #999);
+    font-size: 12px;
+    transition: transform 0.15s;
+}
+
+.mgmt-list-item:hover .mgmt-list-item-arrow {
+    transform: translateX(3px);
+    color: var(--rp-accent-primary, #667eea);
+}
+
+.mgmt-list-item-link {
+    color: var(--rp-accent-primary, #667eea);
+    font-size: 12px;
+}
+
+/* 만료 아이템 스타일 */
+.mgmt-list-item-expired {
+    opacity: 0.5;
+}
+
+.mgmt-list-item-expired .mgmt-list-item-title {
+    color: var(--rp-text-tertiary, #999);
+}
+
+.mgmt-expired-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    background: #f3f4f6;
+    color: #9ca3af;
+    border-radius: 4px;
+    vertical-align: middle;
+}
+
+.dark .mgmt-expired-badge {
+    background: rgba(255, 255, 255, 0.1);
+    color: #6b7280;
+}
+
+/* 페이징 UI */
+.mgmt-list-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px 0 8px;
+    border-top: 1px solid var(--rp-border, #e5e7eb);
+    margin-top: 8px;
+}
+
+.dark .mgmt-list-pagination {
+    border-top-color: #30363d;
+}
+
+.mgmt-pagination-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--rp-border, #e5e7eb);
+    border-radius: 6px;
+    background: var(--rp-bg-primary, #fff);
+    color: var(--rp-text-secondary, #666);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.dark .mgmt-pagination-btn {
+    border-color: #30363d;
+    background: #21262d;
+    color: #9ca3af;
+}
+
+.mgmt-pagination-btn:hover:not(:disabled) {
+    background: var(--rp-accent-primary, #667eea);
+    border-color: var(--rp-accent-primary, #667eea);
+    color: #fff;
+}
+
+.mgmt-pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.mgmt-pagination-info {
+    font-size: 14px;
+    color: var(--rp-text-secondary, #666);
+    font-weight: 500;
+}
+
+.dark .mgmt-pagination-info {
+    color: #9ca3af;
+}
+
+/* ============================================
+   관리포인트 상세 팝업
+   ============================================ */
+
+.mgmt-detail-content {
+    padding: 16px;
+}
+
+.mgmt-detail-body {
+    font-size: 14px;
+    color: var(--rp-text-secondary, #555);
+    line-height: 1.8;
+    white-space: pre-wrap;
+    word-break: keep-all;
+    margin-bottom: 16px;
+}
+
+.dark .mgmt-detail-body {
+    color: #c9d1d9;
+}
+
+.mgmt-detail-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin-bottom: 16px;
+}
+
+.mgmt-detail-link-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.mgmt-detail-period {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--rp-text-tertiary, #999);
+    padding-top: 12px;
+    border-top: 1px solid var(--rp-border-light, #f0f0f0);
+}
+
+.dark .mgmt-detail-period {
+    color: #6b7280;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 로딩 상태 */
+.mgmt-detail-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 40px 20px;
+    color: var(--rp-text-secondary, #666);
+    font-size: 14px;
+}
+
+.dark .mgmt-detail-loading {
+    color: #9ca3af;
+}
+
+/* 에러 메시지 */
+.mgmt-detail-error {
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    background: #fef2f2;
+    color: #b91c1c;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.dark .mgmt-detail-error {
+    background: rgba(185, 28, 28, 0.15);
+    color: #fca5a5;
+}
+
+/* 동영상 보기 버튼 */
+.mgmt-detail-video-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    margin-bottom: 12px;
+    margin-right: 10px;
+}
+
+.mgmt-detail-video-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+/* 동영상 플레이어 컨테이너 */
+.mgmt-video-container {
+    margin-bottom: 16px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #000;
+}
+
+.mgmt-video-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #1a1a2e;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.mgmt-video-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.mgmt-video-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.mgmt-video-player {
+    width: 100%;
+    max-height: 400px;
+    display: block;
+}
+
+/* 첨부파일 목록 */
+.mgmt-attach-files {
+    margin: 16px 0;
+    padding: 12px;
+    background: var(--rp-bg-secondary, #f8f9fa);
+    border-radius: 8px;
+}
+
+.dark .mgmt-attach-files {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.mgmt-attach-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--rp-text-secondary, #666);
+    margin-bottom: 10px;
+}
+
+.dark .mgmt-attach-header {
+    color: #9ca3af;
+}
+
+.mgmt-attach-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mgmt-attach-item {
+    margin-bottom: 6px;
+}
+
+.mgmt-attach-item:last-child {
+    margin-bottom: 0;
+}
+
+.mgmt-attach-link {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    background: #fff;
+    border: 1px solid var(--rp-border-light, #e5e7eb);
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--rp-text-primary, #333);
+    transition: all 0.15s ease;
+}
+
+.dark .mgmt-attach-link {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #e6edf3;
+}
+
+.mgmt-attach-link:hover {
+    background: var(--rp-accent-primary, #667eea);
+    border-color: var(--rp-accent-primary, #667eea);
+    color: #fff;
+}
+
+.mgmt-attach-name {
+    flex: 1;
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mgmt-attach-size {
+    font-size: 11px;
+    color: var(--rp-text-tertiary, #999);
+    margin-right: 10px;
+}
+
+.dark .mgmt-attach-size {
+    color: #6b7280;
+}
+
+.mgmt-attach-link:hover .mgmt-attach-size {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.mgmt-attach-icon {
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+.mgmt-attach-link:hover .mgmt-attach-icon {
+    opacity: 1;
+}
+
+/* 데스크탑 (769px+) */
+@media (min-width: 769px) {
+    .mgmt-list-item {
+        padding: 16px 20px;
+    }
+
+    .mgmt-list-item-title {
+        font-size: 15px;
+    }
+
+    .mgmt-detail-content {
+        padding: 20px;
+    }
+
+    .mgmt-detail-body {
+        font-size: 15px;
+    }
+}
+
+/* ============================================
+   상세 팝업 네비게이션 (리스트에서 진입 시)
+   ============================================ */
+.mgmt-detail-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0 0;
+    margin-top: 16px;
+    border-top: 1px solid var(--rp-border-light, #e5e7eb);
+}
+
+.dark .mgmt-detail-nav {
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.mgmt-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--rp-bg-secondary, #f3f4f6);
+    border: 1px solid var(--rp-border-light, #e5e7eb);
+    border-radius: 6px;
+    color: var(--rp-text-secondary, #666);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.dark .mgmt-nav-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #9ca3af;
+}
+
+.mgmt-nav-btn:hover:not(:disabled) {
+    background: var(--rp-accent-primary, #667eea);
+    border-color: var(--rp-accent-primary, #667eea);
+    color: #fff;
+}
+
+.mgmt-nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.mgmt-nav-info {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--rp-text-secondary, #666);
+}
+
+.dark .mgmt-nav-info {
+    color: #9ca3af;
+}

@@ -1,0 +1,59 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "API Server (NestJS)",
+            "type": "shell",
+            "command": "npm run start:dev",
+            "options": {
+                "cwd": "${workspaceFolder}/api"
+            },
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*)$"
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "Starting compilation",
+                    "endsPattern": "Nest application successfully started"
+                }
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "group": "servers"
+            }
+        },
+        {
+            "label": "Web Server (Next.js)",
+            "type": "shell",
+            "command": "npm run dev",
+            "options": {
+                "cwd": "${workspaceFolder}/web"
+            },
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*)$"
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "Starting",
+                    "endsPattern": "Ready"
+                }
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "group": "servers"
+            }
+        },
+        {
+            "label": "Run All Servers",
+            "dependsOn": ["API Server (NestJS)", "Web Server (Next.js)"],
+            "dependsOrder": "sequence",
+            "problemMatcher": []
+        }
+    ]
+}

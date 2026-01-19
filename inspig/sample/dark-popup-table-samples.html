@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>다크모드 팝업 테이블 색상 샘플</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1e;
+            color: #f5f5f7;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        .samples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .sample-card {
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .sample-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sample-header h2 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .sample-header p {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        .color-info {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .color-chip {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10px;
+        }
+        .color-chip span {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .popup-content {
+            padding: 20px;
+        }
+        .popup-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .popup-subtitle {
+            font-size: 12px;
+            opacity: 0.6;
+            margin-bottom: 15px;
+        }
+        .table-wrap {
+            border-radius: 10px;
+            padding: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 6px;
+            font-size: 13px;
+        }
+        thead th {
+            padding: 8px 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        tbody tr {
+            border-radius: 8px;
+        }
+        tbody td {
+            padding: 12px 10px;
+            text-align: center;
+        }
+        tbody td:first-child {
+            border-radius: 8px 0 0 8px;
+            text-align: left;
+            font-weight: 500;
+        }
+        tbody td:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+        .total {
+            font-weight: 600;
+        }
+
+        /* ========================================
+           샘플 1: 순수 그레이 계열 (Neutral Gray)
+           ======================================== */
+        .sample-1 .popup-content {
+            background: #1f1f23;
+        }
+        .sample-1 .table-wrap {
+            background: #28282e;
+        }
+        .sample-1 thead th {
+            color: #9ca3af;
+        }
+        .sample-1 tbody tr {
+            background: #35353c;
+        }
+        .sample-1 tbody td {
+            color: #e5e7eb;
+        }
+        .sample-1 .total {
+            color: #60a5fa;
+        }
+
+        /* ========================================
+           샘플 2: 블루 틴트 계열 (Blue Tinted)
+           ======================================== */
+        .sample-2 .popup-content {
+            background: #1a1d24;
+        }
+        .sample-2 .table-wrap {
+            background: #232830;
+        }
+        .sample-2 thead th {
+            color: #8b9dc3;
+        }
+        .sample-2 tbody tr {
+            background: #2d3340;
+        }
+        .sample-2 tbody td {
+            color: #d1d9e6;
+        }
+        .sample-2 .total {
+            color: #6ea8fe;
+        }
+
+        /* ========================================
+           샘플 3: 퍼플 틴트 계열 (Purple Tinted)
+           ======================================== */
+        .sample-3 .popup-content {
+            background: #1e1a24;
+        }
+        .sample-3 .table-wrap {
+            background: #28232e;
+        }
+        .sample-3 thead th {
+            color: #a78bbd;
+        }
+        .sample-3 tbody tr {
+            background: #352d3c;
+        }
+        .sample-3 tbody td {
+            color: #e0d6e8;
+        }
+        .sample-3 .total {
+            color: #a78bfa;
+        }
+
+        /* ========================================
+           샘플 4: 그린 틴트 계열 (Green Tinted)
+           ======================================== */
+        .sample-4 .popup-content {
+            background: #1a211e;
+        }
+        .sample-4 .table-wrap {
+            background: #232b28;
+        }
+        .sample-4 thead th {
+            color: #8bb9a3;
+        }
+        .sample-4 tbody tr {
+            background: #2d3835;
+        }
+        .sample-4 tbody td {
+            color: #d1e6dc;
+        }
+        .sample-4 .total {
+            color: #6ee7b7;
+        }
+
+        /* ========================================
+           샘플 5: 웜 그레이 계열 (Warm Gray)
+           ======================================== */
+        .sample-5 .popup-content {
+            background: #211f1d;
+        }
+        .sample-5 .table-wrap {
+            background: #2a2826;
+        }
+        .sample-5 thead th {
+            color: #b8a99a;
+        }
+        .sample-5 tbody tr {
+            background: #38342f;
+        }
+        .sample-5 tbody td {
+            color: #e8e0d8;
+        }
+        .sample-5 .total {
+            color: #fbbf24;
+        }
+
+        /* CSS 변수 표시 */
+        .css-vars {
+            background: #0d0d0f;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 11px;
+            line-height: 1.8;
+            color: #a1a1a6;
+        }
+        .css-vars .var-name {
+            color: #79c0ff;
+        }
+        .css-vars .var-value {
+            color: #a5d6ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>다크모드 팝업 테이블 색상 샘플 (5종)</h1>
+
+    <div class="samples-grid">
+        <!-- 샘플 1: 순수 그레이 -->
+        <div class="sample-card sample-1">
+            <div class="sample-header">
+                <h2>샘플 1: 순수 그레이 계열 (Neutral Gray)</h2>
+                <p>무채색 기반, 깔끔하고 모던한 느낌</p>
+                <div class="color-info">
+                    <div class="color-chip"><span style="background:#1f1f23"></span>팝업: #1f1f23</div>
+                    <div class="color-chip"><span style="background:#28282e"></span>래퍼: #28282e</div>
+                    <div class="color-chip"><span style="background:#35353c"></span>행: #35353c</div>
+                </div>
+            </div>
+            <div class="popup-content">
+                <div class="popup-title">도태폐사</div>
+                <div class="popup-subtitle">지난주 원인별 도폐사현황</div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>원인</th>
+                                <th>지난주</th>
+                                <th>최근1개월</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>번식장애</td><td>12</td><td>45</td></tr>
+                            <tr><td>지제불량</td><td>8</td><td>32</td></tr>
+                            <tr><td>호흡기</td><td>5</td><td>18</td></tr>
+                            <tr><td class="total">합계</td><td class="total">25</td><td class="total">95</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="css-vars">
+                    <span class="var-name">--popup-bg:</span> <span class="var-value">#1f1f23</span><br>
+                    <span class="var-name">--table-wrap-bg:</span> <span class="var-value">#28282e</span><br>
+                    <span class="var-name">--row-bg:</span> <span class="var-value">#35353c</span><br>
+                    <span class="var-name">--header-color:</span> <span class="var-value">#9ca3af</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 샘플 2: 블루 틴트 -->
+        <div class="sample-card sample-2">
+            <div class="sample-header">
+                <h2>샘플 2: 블루 틴트 계열 (Blue Tinted)</h2>
+                <p>차가운 블루 톤, 전문적이고 신뢰감 있는 느낌</p>
+                <div class="color-info">
+                    <div class="color-chip"><span style="background:#1a1d24"></span>팝업: #1a1d24</div>
+                    <div class="color-chip"><span style="background:#232830"></span>래퍼: #232830</div>
+                    <div class="color-chip"><span style="background:#2d3340"></span>행: #2d3340</div>
+                </div>
+            </div>
+            <div class="popup-content">
+                <div class="popup-title">도태폐사</div>
+                <div class="popup-subtitle">지난주 원인별 도폐사현황</div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>원인</th>
+                                <th>지난주</th>
+                                <th>최근1개월</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>번식장애</td><td>12</td><td>45</td></tr>
+                            <tr><td>지제불량</td><td>8</td><td>32</td></tr>
+                            <tr><td>호흡기</td><td>5</td><td>18</td></tr>
+                            <tr><td class="total">합계</td><td class="total">25</td><td class="total">95</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="css-vars">
+                    <span class="var-name">--popup-bg:</span> <span class="var-value">#1a1d24</span><br>
+                    <span class="var-name">--table-wrap-bg:</span> <span class="var-value">#232830</span><br>
+                    <span class="var-name">--row-bg:</span> <span class="var-value">#2d3340</span><br>
+                    <span class="var-name">--header-color:</span> <span class="var-value">#8b9dc3</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 샘플 3: 퍼플 틴트 -->
+        <div class="sample-card sample-3">
+            <div class="sample-header">
+                <h2>샘플 3: 퍼플 틴트 계열 (Purple Tinted)</h2>
+                <p>보라빛 톤, 고급스럽고 세련된 느낌</p>
+                <div class="color-info">
+                    <div class="color-chip"><span style="background:#1e1a24"></span>팝업: #1e1a24</div>
+                    <div class="color-chip"><span style="background:#28232e"></span>래퍼: #28232e</div>
+                    <div class="color-chip"><span style="background:#352d3c"></span>행: #352d3c</div>
+                </div>
+            </div>
+            <div class="popup-content">
+                <div class="popup-title">도태폐사</div>
+                <div class="popup-subtitle">지난주 원인별 도폐사현황</div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>원인</th>
+                                <th>지난주</th>
+                                <th>최근1개월</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>번식장애</td><td>12</td><td>45</td></tr>
+                            <tr><td>지제불량</td><td>8</td><td>32</td></tr>
+                            <tr><td>호흡기</td><td>5</td><td>18</td></tr>
+                            <tr><td class="total">합계</td><td class="total">25</td><td class="total">95</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="css-vars">
+                    <span class="var-name">--popup-bg:</span> <span class="var-value">#1e1a24</span><br>
+                    <span class="var-name">--table-wrap-bg:</span> <span class="var-value">#28232e</span><br>
+                    <span class="var-name">--row-bg:</span> <span class="var-value">#352d3c</span><br>
+                    <span class="var-name">--header-color:</span> <span class="var-value">#a78bbd</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 샘플 4: 그린 틴트 -->
+        <div class="sample-card sample-4">
+            <div class="sample-header">
+                <h2>샘플 4: 그린 틴트 계열 (Green Tinted)</h2>
+                <p>자연스러운 그린 톤, 편안하고 안정적인 느낌</p>
+                <div class="color-info">
+                    <div class="color-chip"><span style="background:#1a211e"></span>팝업: #1a211e</div>
+                    <div class="color-chip"><span style="background:#232b28"></span>래퍼: #232b28</div>
+                    <div class="color-chip"><span style="background:#2d3835"></span>행: #2d3835</div>
+                </div>
+            </div>
+            <div class="popup-content">
+                <div class="popup-title">도태폐사</div>
+                <div class="popup-subtitle">지난주 원인별 도폐사현황</div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>원인</th>
+                                <th>지난주</th>
+                                <th>최근1개월</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>번식장애</td><td>12</td><td>45</td></tr>
+                            <tr><td>지제불량</td><td>8</td><td>32</td></tr>
+                            <tr><td>호흡기</td><td>5</td><td>18</td></tr>
+                            <tr><td class="total">합계</td><td class="total">25</td><td class="total">95</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="css-vars">
+                    <span class="var-name">--popup-bg:</span> <span class="var-value">#1a211e</span><br>
+                    <span class="var-name">--table-wrap-bg:</span> <span class="var-value">#232b28</span><br>
+                    <span class="var-name">--row-bg:</span> <span class="var-value">#2d3835</span><br>
+                    <span class="var-name">--header-color:</span> <span class="var-value">#8bb9a3</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 샘플 5: 웜 그레이 -->
+        <div class="sample-card sample-5">
+            <div class="sample-header">
+                <h2>샘플 5: 웜 그레이 계열 (Warm Gray)</h2>
+                <p>따뜻한 브라운 톤, 친근하고 부드러운 느낌</p>
+                <div class="color-info">
+                    <div class="color-chip"><span style="background:#211f1d"></span>팝업: #211f1d</div>
+                    <div class="color-chip"><span style="background:#2a2826"></span>래퍼: #2a2826</div>
+                    <div class="color-chip"><span style="background:#38342f"></span>행: #38342f</div>
+                </div>
+            </div>
+            <div class="popup-content">
+                <div class="popup-title">도태폐사</div>
+                <div class="popup-subtitle">지난주 원인별 도폐사현황</div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>원인</th>
+                                <th>지난주</th>
+                                <th>최근1개월</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>번식장애</td><td>12</td><td>45</td></tr>
+                            <tr><td>지제불량</td><td>8</td><td>32</td></tr>
+                            <tr><td>호흡기</td><td>5</td><td>18</td></tr>
+                            <tr><td class="total">합계</td><td class="total">25</td><td class="total">95</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="css-vars">
+                    <span class="var-name">--popup-bg:</span> <span class="var-value">#211f1d</span><br>
+                    <span class="var-name">--table-wrap-bg:</span> <span class="var-value">#2a2826</span><br>
+                    <span class="var-name">--row-bg:</span> <span class="var-value">#38342f</span><br>
+                    <span class="var-name">--header-color:</span> <span class="var-value">#b8a99a</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="max-width: 1400px; margin: 40px auto 0; padding: 20px; background: #0d0d0f; border-radius: 12px;">
+        <h3 style="margin-bottom: 15px; font-size: 16px;">색상 계층 요약</h3>
+        <table style="width: 100%; border-spacing: 0 8px; font-size: 12px;">
+            <thead>
+                <tr>
+                    <th style="text-align: left; padding: 10px; color: #9ca3af;">샘플</th>
+                    <th style="text-align: left; padding: 10px; color: #9ca3af;">팝업 배경</th>
+                    <th style="text-align: left; padding: 10px; color: #9ca3af;">테이블 래퍼</th>
+                    <th style="text-align: left; padding: 10px; color: #9ca3af;">데이터 행</th>
+                    <th style="text-align: left; padding: 10px; color: #9ca3af;">헤더 텍스트</th>
+                    <th style="text-align: left; padding: 10px; color: #9ca3af;">강조 색상</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background: #1a1a1e;">
+                    <td style="padding: 10px;">1. 순수 그레이</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#1f1f23;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#1f1f23</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#28282e;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#28282e</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#35353c;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#35353c</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#9ca3af;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#9ca3af</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#60a5fa;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#60a5fa</td>
+                </tr>
+                <tr style="background: #1a1a1e;">
+                    <td style="padding: 10px;">2. 블루 틴트</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#1a1d24;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#1a1d24</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#232830;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#232830</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#2d3340;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#2d3340</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#8b9dc3;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#8b9dc3</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#6ea8fe;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#6ea8fe</td>
+                </tr>
+                <tr style="background: #1a1a1e;">
+                    <td style="padding: 10px;">3. 퍼플 틴트</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#1e1a24;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#1e1a24</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#28232e;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#28232e</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#352d3c;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#352d3c</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#a78bbd;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#a78bbd</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#a78bfa;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#a78bfa</td>
+                </tr>
+                <tr style="background: #1a1a1e;">
+                    <td style="padding: 10px;">4. 그린 틴트</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#1a211e;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#1a211e</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#232b28;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#232b28</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#2d3835;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#2d3835</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#8bb9a3;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#8bb9a3</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#6ee7b7;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#6ee7b7</td>
+                </tr>
+                <tr style="background: #1a1a1e;">
+                    <td style="padding: 10px;">5. 웜 그레이</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#211f1d;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#211f1d</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#2a2826;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#2a2826</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#38342f;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#38342f</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#b8a99a;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#b8a99a</td>
+                    <td style="padding: 10px;"><span style="display:inline-block;width:12px;height:12px;background:#fbbf24;border-radius:2px;vertical-align:middle;margin-right:5px;"></span>#fbbf24</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # Frontend (Next.js)
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: inspig-web
+    environment:
+      - NEXT_PUBLIC_API_URL=https://ins.pigplan.io
+      - NEXT_PUBLIC_USE_MOCK=false
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  # Backend (NestJS)
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: inspig-api
+    environment:
+      - NODE_ENV=production
+      - USE_MOCK_DATA=false
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_SERVICE_NAME=${DB_SERVICE_NAME}
+      - PIG31_API_URL=https://www.pigplan.io
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+
+  # Nginx (Reverse Proxy)
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: inspig-nginx
+    ports:
+      - "8002:80"
+      - "443:443"
+    depends_on:
+      - web
+      - api
+    restart: unless-stopped

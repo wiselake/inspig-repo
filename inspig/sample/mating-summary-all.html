@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교배 요약 - 5가지 유형 샘플</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f7;
+            padding: 20px;
+            color: #1d1d1f;
+        }
+        h1 { margin-bottom: 30px; text-align: center; }
+        h2 {
+            margin: 40px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+            color: #333;
+        }
+        .sample-wrap {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        /* ============================================
+           유형 1: 인라인 스탯 바 (가로 나열)
+           ============================================ */
+        .inline-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+        }
+        .inline-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+        }
+        .inline-stat-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.8);
+        }
+        .inline-stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .inline-stat.highlight {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* ============================================
+           유형 2: 테이블형 (2열 키-값)
+           ============================================ */
+        .table-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .table-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #fff;
+        }
+        .table-stat:nth-child(odd) {
+            background: #fafbfc;
+        }
+        .table-stat-label {
+            font-size: 13px;
+            color: #6b7280;
+        }
+        .table-stat-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+        .table-stat.highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            grid-column: span 2;
+        }
+        .table-stat.highlight .table-stat-label,
+        .table-stat.highlight .table-stat-value {
+            color: #fff;
+        }
+        .table-stat.highlight .table-stat-value {
+            font-size: 20px;
+        }
+
+        /* ============================================
+           유형 3: 리스트형 (세로 나열 + 구분선)
+           ============================================ */
+        .list-stats {
+            display: flex;
+            flex-direction: column;
+        }
+        .list-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .list-stat:last-child {
+            border-bottom: none;
+        }
+        .list-stat-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .list-stat-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #667eea;
+        }
+        .list-stat-label {
+            font-size: 14px;
+            color: #374151;
+        }
+        .list-stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1d1d1f;
+        }
+        .list-stat.highlight {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8ecff 100%);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .list-stat.highlight .list-stat-dot {
+            background: #ff6b6b;
+            width: 10px;
+            height: 10px;
+        }
+        .list-stat.highlight .list-stat-value {
+            color: #667eea;
+            font-size: 22px;
+        }
+
+        /* ============================================
+           유형 4: 프로그레스 바형 (비율 시각화)
+           ============================================ */
+        .progress-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .progress-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .progress-stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .progress-stat-label {
+            font-size: 13px;
+            color: #6b7280;
+        }
+        .progress-stat-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .progress-bar-fill.primary { background: linear-gradient(90deg, #667eea, #764ba2); }
+        .progress-bar-fill.success { background: linear-gradient(90deg, #10b981, #34d399); }
+        .progress-bar-fill.warning { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .progress-bar-fill.danger { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+        /* ============================================
+           유형 5: 컴팩트 뱃지형 (한줄 요약)
+           ============================================ */
+        .badge-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        .badge-stat {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: #fff;
+            border-radius: 24px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+        }
+        .badge-stat:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+        }
+        .badge-stat-label {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .badge-stat-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1d1d1f;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .badge-stat.highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+        }
+        .badge-stat.highlight .badge-stat-label {
+            color: rgba(255,255,255,0.8);
+        }
+        .badge-stat.highlight .badge-stat-value {
+            background: none;
+            -webkit-text-fill-color: #fff;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <h1>교배 요약 - 5가지 표시 유형</h1>
+
+    <!-- 유형 1: 인라인 스탯 바 -->
+    <h2>유형 1: 인라인 스탯 바 (가로 나열)</h2>
+    <div class="sample-wrap">
+        <div class="inline-stats">
+            <div class="inline-stat highlight">
+                <span class="inline-stat-label">합계</span>
+                <span class="inline-stat-value">24</span>
+            </div>
+            <div class="inline-stat">
+                <span class="inline-stat-label">교배도중 사고</span>
+                <span class="inline-stat-value">2</span>
+            </div>
+            <div class="inline-stat">
+                <span class="inline-stat-label">교배도중 분만</span>
+                <span class="inline-stat-value">1</span>
+            </div>
+            <div class="inline-stat">
+                <span class="inline-stat-label">평균 재귀발정일</span>
+                <span class="inline-stat-value">21.5</span>
+            </div>
+            <div class="inline-stat">
+                <span class="inline-stat-label">평균 초교배일</span>
+                <span class="inline-stat-value">245</span>
+            </div>
+            <div class="inline-stat">
+                <span class="inline-stat-label">초교배</span>
+                <span class="inline-stat-value">5</span>
+            </div>
+            <div class="inline-stat">
+                <span class="inline-stat-label">사고돈교배</span>
+                <span class="inline-stat-value">3</span>
+            </div>
+            <div class="inline-stat">
+                <span class="inline-stat-label">이유돈교배(초교배포함)</span>
+                <span class="inline-stat-value">16</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 유형 2: 테이블형 -->
+    <h2>유형 2: 테이블형 (2열 키-값)</h2>
+    <div class="sample-wrap">
+        <div class="table-stats">
+            <div class="table-stat highlight">
+                <span class="table-stat-label">합계</span>
+                <span class="table-stat-value">24복</span>
+            </div>
+            <div class="table-stat">
+                <span class="table-stat-label">교배도중 사고</span>
+                <span class="table-stat-value">2</span>
+            </div>
+            <div class="table-stat">
+                <span class="table-stat-label">교배도중 분만</span>
+                <span class="table-stat-value">1</span>
+            </div>
+            <div class="table-stat">
+                <span class="table-stat-label">평균 재귀발정일</span>
+                <span class="table-stat-value">21.5일</span>
+            </div>
+            <div class="table-stat">
+                <span class="table-stat-label">평균 초교배일</span>
+                <span class="table-stat-value">245일</span>
+            </div>
+            <div class="table-stat">
+                <span class="table-stat-label">초교배</span>
+                <span class="table-stat-value">5</span>
+            </div>
+            <div class="table-stat">
+                <span class="table-stat-label">사고돈교배</span>
+                <span class="table-stat-value">3</span>
+            </div>
+            <div class="table-stat">
+                <span class="table-stat-label">이유돈교배(초교배포함)</span>
+                <span class="table-stat-value">16</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 유형 3: 리스트형 -->
+    <h2>유형 3: 리스트형 (세로 나열)</h2>
+    <div class="sample-wrap">
+        <div class="list-stats">
+            <div class="list-stat highlight">
+                <div class="list-stat-left">
+                    <div class="list-stat-dot"></div>
+                    <span class="list-stat-label">합계</span>
+                </div>
+                <span class="list-stat-value">24</span>
+            </div>
+            <div class="list-stat">
+                <div class="list-stat-left">
+                    <div class="list-stat-dot"></div>
+                    <span class="list-stat-label">교배도중 사고</span>
+                </div>
+                <span class="list-stat-value">2</span>
+            </div>
+            <div class="list-stat">
+                <div class="list-stat-left">
+                    <div class="list-stat-dot"></div>
+                    <span class="list-stat-label">교배도중 분만</span>
+                </div>
+                <span class="list-stat-value">1</span>
+            </div>
+            <div class="list-stat">
+                <div class="list-stat-left">
+                    <div class="list-stat-dot"></div>
+                    <span class="list-stat-label">평균 재귀발정일</span>
+                </div>
+                <span class="list-stat-value">21.5</span>
+            </div>
+            <div class="list-stat">
+                <div class="list-stat-left">
+                    <div class="list-stat-dot"></div>
+                    <span class="list-stat-label">평균 초교배일</span>
+                </div>
+                <span class="list-stat-value">245</span>
+            </div>
+            <div class="list-stat">
+                <div class="list-stat-left">
+                    <div class="list-stat-dot"></div>
+                    <span class="list-stat-label">초교배</span>
+                </div>
+                <span class="list-stat-value">5</span>
+            </div>
+            <div class="list-stat">
+                <div class="list-stat-left">
+                    <div class="list-stat-dot"></div>
+                    <span class="list-stat-label">사고돈교배</span>
+                </div>
+                <span class="list-stat-value">3</span>
+            </div>
+            <div class="list-stat">
+                <div class="list-stat-left">
+                    <div class="list-stat-dot"></div>
+                    <span class="list-stat-label">이유돈교배(초교배포함)</span>
+                </div>
+                <span class="list-stat-value">16</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 유형 4: 프로그레스 바형 -->
+    <h2>유형 4: 프로그레스 바형 (비율 시각화)</h2>
+    <div class="sample-wrap">
+        <div class="progress-stats">
+            <div class="progress-stat">
+                <div class="progress-stat-header">
+                    <span class="progress-stat-label">합계</span>
+                    <span class="progress-stat-value">24복</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-bar-fill primary" style="width: 100%"></div>
+                </div>
+            </div>
+            <div class="progress-stat">
+                <div class="progress-stat-header">
+                    <span class="progress-stat-label">이유돈교배(초교배포함)</span>
+                    <span class="progress-stat-value">16복 (66.7%)</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-bar-fill success" style="width: 66.7%"></div>
+                </div>
+            </div>
+            <div class="progress-stat">
+                <div class="progress-stat-header">
+                    <span class="progress-stat-label">초교배</span>
+                    <span class="progress-stat-value">5복 (20.8%)</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-bar-fill warning" style="width: 20.8%"></div>
+                </div>
+            </div>
+            <div class="progress-stat">
+                <div class="progress-stat-header">
+                    <span class="progress-stat-label">사고돈교배</span>
+                    <span class="progress-stat-value">3복 (12.5%)</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-bar-fill danger" style="width: 12.5%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 유형 5: 컴팩트 뱃지형 -->
+    <h2>유형 5: 컴팩트 뱃지형 (한줄 요약)</h2>
+    <div class="sample-wrap">
+        <div class="badge-stats">
+            <div class="badge-stat highlight">
+                <span class="badge-stat-label">합계</span>
+                <span class="badge-stat-value">24</span>
+            </div>
+            <div class="badge-stat">
+                <span class="badge-stat-label">교배도중 사고</span>
+                <span class="badge-stat-value">2</span>
+            </div>
+            <div class="badge-stat">
+                <span class="badge-stat-label">교배도중 분만</span>
+                <span class="badge-stat-value">1</span>
+            </div>
+            <div class="badge-stat">
+                <span class="badge-stat-label">재귀발정일</span>
+                <span class="badge-stat-value">21.5</span>
+            </div>
+            <div class="badge-stat">
+                <span class="badge-stat-label">초교배일</span>
+                <span class="badge-stat-value">245</span>
+            </div>
+            <div class="badge-stat">
+                <span class="badge-stat-label">초교배</span>
+                <span class="badge-stat-value">5</span>
+            </div>
+            <div class="badge-stat">
+                <span class="badge-stat-label">사고돈</span>
+                <span class="badge-stat-value">3</span>
+            </div>
+            <div class="badge-stat">
+                <span class="badge-stat-label">이유돈</span>
+                <span class="badge-stat-value">16</span>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

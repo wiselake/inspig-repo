@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INSPIG Mobile Header Sample</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* 다크모드 토글 */
+        .dark body { background: #111827; }
+        .dark .bg-white { background: #1f2937 !important; }
+        .dark .text-gray-900 { color: #fff !important; }
+        .dark .text-gray-500 { color: #9ca3af !important; }
+        .dark .text-gray-400 { color: #6b7280 !important; }
+        .dark .border-gray-200 { border-color: #374151 !important; }
+        .dark .bg-gray-50 { background: #374151 !important; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- 모바일 뷰포트 컨테이너 -->
+    <div class="max-w-md mx-auto bg-white min-h-screen shadow-xl">
+
+        <!-- 헤더 -->
+        <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
+            <div class="px-4 h-14 flex items-center justify-between">
+                <!-- 왼쪽: 메뉴 버튼 -->
+                <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                    <i class="fas fa-bars w-5 h-5"></i>
+                </button>
+
+                <!-- 오른쪽: 사용자 정보 + 로그아웃 -->
+                <div class="flex items-center gap-2">
+                    <!-- 사용자 정보 (세로 배치) -->
+                    <div class="text-right">
+                        <div class="text-xs font-medium text-gray-900">홍길동</div>
+                        <div class="text-[11px] text-gray-500">행복한농장</div>
+                    </div>
+
+                    <!-- 구분선 -->
+                    <div class="h-6 w-px bg-gray-200"></div>
+
+                    <!-- 로그아웃 -->
+                    <button class="text-xs text-gray-500 hover:text-gray-700 whitespace-nowrap">
+                        로그아웃
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 메인 컨텐츠 -->
+        <main class="p-3 space-y-3">
+
+            <!-- 조회 영역 -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- 농장번호 -->
+                    <div class="flex items-center gap-1">
+                        <span class="text-xs font-medium text-gray-700">농장</span>
+                        <input type="text" value="1387"
+                            class="w-16 px-2 py-1 bg-gray-50 border border-gray-300 rounded text-xs text-center">
+                    </div>
+
+                    <!-- 구분선 -->
+                    <div class="h-5 w-px bg-gray-300"></div>
+
+                    <!-- 날짜 선택 -->
+                    <div class="flex items-center gap-1 flex-1">
+                        <i class="fas fa-calendar-alt text-gray-400 text-xs"></i>
+                        <input type="date" value="2024-06-11"
+                            class="flex-1 min-w-0 px-1 py-1 bg-gray-50 border border-gray-300 rounded text-xs">
+                        <span class="text-gray-400 text-xs">~</span>
+                        <input type="date" value="2024-12-11"
+                            class="flex-1 min-w-0 px-1 py-1 bg-gray-50 border border-gray-300 rounded text-xs">
+                    </div>
+
+                    <!-- 조회 버튼 -->
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-medium flex items-center gap-1">
+                        <i class="fas fa-search"></i>
+                        조회
+                    </button>
+                </div>
+            </div>
+
+            <!-- 리스트 영역 -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div class="divide-y divide-gray-200">
+                    <!-- 리스트 아이템 1 -->
+                    <a href="#" class="block hover:bg-gray-50 transition-colors">
+                        <div class="p-3 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-blue-50 p-2 rounded-full text-blue-600">
+                                    <i class="fas fa-calendar-alt text-sm"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-900">2024년 50주차 주간 보고서</h3>
+                                    <div class="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
+                                        <span>12.09 ~ 12.15</span>
+                                        <span>•</span>
+                                        <span>12.11</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+                        </div>
+                    </a>
+
+                    <!-- 리스트 아이템 2 -->
+                    <a href="#" class="block hover:bg-gray-50 transition-colors">
+                        <div class="p-3 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-blue-50 p-2 rounded-full text-blue-600">
+                                    <i class="fas fa-calendar-alt text-sm"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-900">2024년 49주차 주간 보고서</h3>
+                                    <div class="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
+                                        <span>12.02 ~ 12.08</span>
+                                        <span>•</span>
+                                        <span>12.09</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+                        </div>
+                    </a>
+
+                    <!-- 리스트 아이템 3 -->
+                    <a href="#" class="block hover:bg-gray-50 transition-colors">
+                        <div class="p-3 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-blue-50 p-2 rounded-full text-blue-600">
+                                    <i class="fas fa-calendar-alt text-sm"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-900">2024년 48주차 주간 보고서</h3>
+                                    <div class="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
+                                        <span>11.25 ~ 12.01</span>
+                                        <span>•</span>
+                                        <span>12.02</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+                        </div>
+                    </a>
+
+                    <!-- 리스트 아이템 4 -->
+                    <a href="#" class="block hover:bg-gray-50 transition-colors">
+                        <div class="p-3 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-blue-50 p-2 rounded-full text-blue-600">
+                                    <i class="fas fa-calendar-alt text-sm"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-900">2024년 47주차 주간 보고서</h3>
+                                    <div class="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
+                                        <span>11.18 ~ 11.24</span>
+                                        <span>•</span>
+                                        <span>11.25</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 페이징 -->
+            <div class="flex items-center justify-center gap-1">
+                <button class="p-2 rounded hover:bg-gray-100 text-gray-400">
+                    <i class="fas fa-chevron-left text-sm"></i>
+                </button>
+                <button class="w-7 h-7 rounded text-xs font-medium bg-blue-600 text-white">1</button>
+                <button class="w-7 h-7 rounded text-xs font-medium text-gray-600 hover:bg-gray-100">2</button>
+                <button class="w-7 h-7 rounded text-xs font-medium text-gray-600 hover:bg-gray-100">3</button>
+                <button class="p-2 rounded hover:bg-gray-100 text-gray-600">
+                    <i class="fas fa-chevron-right text-sm"></i>
+                </button>
+                <span class="ml-2 text-xs text-gray-500">총 26건</span>
+            </div>
+
+        </main>
+
+        <!-- 사이드바 (슬라이드 메뉴) -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden" onclick="toggleSidebar()"></div>
+        <div id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white shadow-xl transform -translate-x-full transition-transform duration-300 z-50">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-900">INSPIG</h2>
+                <button onclick="toggleSidebar()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav class="p-4 space-y-2">
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-50 text-blue-600 font-medium">
+                    <i class="fas fa-calendar-alt w-5"></i>
+                    Weekly 보고서
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                    <i class="fas fa-chart-pie w-5"></i>
+                    Monthly 보고서
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                    <i class="fas fa-chart-bar w-5"></i>
+                    분기 보고서
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                    <i class="fas fa-cog w-5"></i>
+                    환경설정
+                </a>
+            </nav>
+            <div class="absolute bottom-0 left-0 w-full p-4 border-t border-gray-200">
+                <div class="flex items-center justify-between px-4 py-2 mb-2">
+                    <span class="text-sm text-gray-600">테마</span>
+                    <button onclick="toggleTheme()" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200">
+                        <i class="fas fa-moon text-gray-600"></i>
+                    </button>
+                </div>
+                <button class="flex items-center gap-3 px-4 py-3 w-full text-left text-red-600 hover:bg-red-50 rounded-lg">
+                    <i class="fas fa-sign-out-alt w-5"></i>
+                    로그아웃
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 사이드바 토글
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        // 헤더의 메뉴 버튼에 이벤트 연결
+        document.querySelector('header button').addEventListener('click', toggleSidebar);
+
+        // 다크모드 토글
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+        }
+    </script>
+</body>
+</html>

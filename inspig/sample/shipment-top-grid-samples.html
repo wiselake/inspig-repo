@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipment Top Grid - 레이아웃 샘플 (5가지 유형)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f7;
+            padding: 20px;
+            color: #1d1d1f;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        h2 {
+            margin: 40px 0 15px;
+            padding: 10px;
+            background: #333;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .sample-container {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 600px;
+        }
+        .desc {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            border-left: 3px solid #007aff;
+        }
+
+        /* 공통 스타일 */
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1d1d1f;
+        }
+        .metric-value.highlight {
+            color: #007aff;
+        }
+        .metric-value.positive {
+            color: #28a745;
+        }
+        .metric-value.negative {
+            color: #dc3545;
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #86868b;
+            margin-top: 4px;
+        }
+        .metric-sub {
+            font-size: 11px;
+            color: #999;
+        }
+        .grade-chart-placeholder {
+            background: linear-gradient(90deg, #f0f0f0 0%, #e0e0e0 100%);
+            height: 120px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 13px;
+        }
+
+        /* ============================================
+           유형1: 기존 2x2 + 등급차트 (가격 분리)
+           ============================================ */
+        .type1-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .type1-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .type1-metrics .metric-item {
+            background: #f5f5f7;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        .type1-price-row {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .type1-price-row .price-item {
+            background: #f5f5f7;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        .type1-chart {
+            display: flex;
+            align-items: center;
+        }
+
+        /* ============================================
+           유형2: 3열 메트릭스 + 2열 가격
+           ============================================ */
+        .type2-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .type2-top-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .type2-top-row .metric-item {
+            background: #f5f5f7;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        .type2-bottom-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .type2-bottom-row .price-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 14px;
+            text-align: center;
+            color: #fff;
+        }
+        .type2-bottom-row .price-card.national {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        .type2-bottom-row .price-card .metric-value {
+            color: #fff;
+            font-size: 22px;
+        }
+        .type2-bottom-row .price-card .metric-label {
+            color: rgba(255,255,255,0.85);
+        }
+
+        /* ============================================
+           유형3: 좌측 세로 메트릭스 + 우측 가격/차트
+           ============================================ */
+        .type3-grid {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 12px;
+        }
+        .type3-left {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .type3-left .metric-item {
+            background: #f5f5f7;
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+        }
+        .type3-left .metric-item .metric-value {
+            font-size: 18px;
+        }
+        .type3-left .metric-item .metric-label {
+            font-size: 11px;
+        }
+        .type3-right {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .type3-price-compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .type3-price-compare .price-box {
+            background: #f5f5f7;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+        .type3-price-compare .price-box.farm {
+            border-color: #28a745;
+            background: rgba(40, 167, 69, 0.08);
+        }
+        .type3-price-compare .price-box.national {
+            border-color: #007aff;
+            background: rgba(0, 122, 255, 0.08);
+        }
+        .type3-diff {
+            text-align: center;
+            padding: 8px;
+            background: #fff3cd;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .type3-diff.positive {
+            background: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+        }
+        .type3-diff.negative {
+            background: rgba(220, 53, 69, 0.15);
+            color: #dc3545;
+        }
+
+        /* ============================================
+           유형4: 상단 메트릭스/차트 + 하단 가격 비교 바
+           ============================================ */
+        .type4-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .type4-top {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .type4-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .type4-metrics .metric-item {
+            background: #f5f5f7;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        .type4-price-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(90deg, rgba(40,167,69,0.1) 0%, rgba(0,122,255,0.1) 100%);
+            border-radius: 10px;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+        }
+        .type4-price-bar .price-item {
+            text-align: center;
+            flex: 1;
+        }
+        .type4-price-bar .price-item .metric-value {
+            font-size: 20px;
+        }
+        .type4-price-bar .diff-badge {
+            background: #28a745;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .type4-price-bar .diff-badge.negative {
+            background: #dc3545;
+        }
+
+        /* ============================================
+           유형5: 컴팩트 1열 (모바일 최적화)
+           ============================================ */
+        .type5-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .type5-main-metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+        .type5-main-metrics .metric-item {
+            background: #f5f5f7;
+            border-radius: 6px;
+            padding: 10px 6px;
+            text-align: center;
+        }
+        .type5-main-metrics .metric-item .metric-value {
+            font-size: 16px;
+        }
+        .type5-main-metrics .metric-item .metric-label {
+            font-size: 10px;
+        }
+        .type5-price-section {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 8px;
+            align-items: center;
+            background: #f5f5f7;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .type5-price-section .price-item {
+            text-align: center;
+        }
+        .type5-price-section .price-item .metric-value {
+            font-size: 18px;
+        }
+        .type5-price-section .vs-badge {
+            background: #007aff;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .type5-price-section .vs-badge.positive {
+            background: #28a745;
+        }
+        .type5-price-section .vs-badge.negative {
+            background: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <h1>Shipment Top Grid - 레이아웃 샘플</h1>
+    <p style="text-align:center; color:#666; margin-bottom:30px;">
+        내농장 수취단가 vs 전국 등외제외평균 단가 분리 표시를 위한 5가지 레이아웃 유형
+    </p>
+
+    <!-- ============================================
+         유형1: 기존 2x2 확장 (가격 행 분리)
+         ============================================ -->
+    <h2>유형1: 기존 2x2 확장 (가격 행 분리)</h2>
+    <div class="desc">
+        기존 2x2 메트릭스 아래에 가격 비교 행을 추가. 등급차트는 우측 유지.<br>
+        <strong>장점:</strong> 기존 구조 유지, 확장 용이 / <strong>단점:</strong> 세로 공간 증가
+    </div>
+    <div class="sample-container">
+        <div class="type1-grid">
+            <div>
+                <div class="type1-metrics">
+                    <div class="metric-item">
+                        <div class="metric-value highlight">42</div>
+                        <div class="metric-label">출하두수</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">68.5%</div>
+                        <div class="metric-label">1등급↑</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">86.7kg</div>
+                        <div class="metric-label">도체중</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">22.1mm</div>
+                        <div class="metric-label">등지방</div>
+                    </div>
+                </div>
+                <div class="type1-price-row">
+                    <div class="price-item">
+                        <div class="metric-value positive">3,892원</div>
+                        <div class="metric-label">내농장 수취단가</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="metric-value">3,456원</div>
+                        <div class="metric-label">전국 등외제외평균</div>
+                        <div class="metric-sub">(+436원, +12.6%)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="type1-chart">
+                <div class="grade-chart-placeholder" style="width:100%;">
+                    등급 분포 차트
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         유형2: 3열 메트릭스 + 2열 가격 카드
+         ============================================ -->
+    <h2>유형2: 3열 메트릭스 + 2열 가격 카드 (그라데이션)</h2>
+    <div class="desc">
+        상단 3열로 핵심 지표, 하단에 눈에 띄는 그라데이션 가격 카드 배치.<br>
+        <strong>장점:</strong> 가격 정보 강조, 시각적 분리 / <strong>단점:</strong> 차트 공간 별도 필요
+    </div>
+    <div class="sample-container">
+        <div class="type2-grid">
+            <div class="type2-top-row">
+                <div class="metric-item">
+                    <div class="metric-value highlight">42</div>
+                    <div class="metric-label">출하두수</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">68.5%</div>
+                    <div class="metric-label">1등급↑</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">86.7kg</div>
+                    <div class="metric-label">도체중</div>
+                </div>
+            </div>
+            <div class="type2-bottom-row">
+                <div class="price-card">
+                    <div class="metric-value">3,892원</div>
+                    <div class="metric-label">내농장 수취단가</div>
+                </div>
+                <div class="price-card national">
+                    <div class="metric-value">3,456원</div>
+                    <div class="metric-label">전국 등외제외평균</div>
+                </div>
+            </div>
+            <div class="grade-chart-placeholder">등급 분포 차트</div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         유형3: 좌측 세로 메트릭스 + 우측 가격/차트
+         ============================================ -->
+    <h2>유형3: 좌측 세로 메트릭스 + 우측 가격 비교</h2>
+    <div class="desc">
+        좌측에 핵심 지표를 세로로 배치, 우측에 가격 비교와 차트 배치.<br>
+        <strong>장점:</strong> 가격 비교 명확, 차이값 강조 / <strong>단점:</strong> 가로 공간 필요
+    </div>
+    <div class="sample-container">
+        <div class="type3-grid">
+            <div class="type3-left">
+                <div class="metric-item">
+                    <div class="metric-value highlight">42</div>
+                    <div class="metric-label">출하</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">68.5%</div>
+                    <div class="metric-label">1등급↑</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">86.7</div>
+                    <div class="metric-label">도체중</div>
+                </div>
+            </div>
+            <div class="type3-right">
+                <div class="type3-price-compare">
+                    <div class="price-box farm">
+                        <div class="metric-value positive">3,892원</div>
+                        <div class="metric-label">내농장 수취단가</div>
+                    </div>
+                    <div class="price-box national">
+                        <div class="metric-value">3,456원</div>
+                        <div class="metric-label">전국 등외제외</div>
+                    </div>
+                </div>
+                <div class="type3-diff positive">
+                    내농장이 전국 대비 +436원 (12.6%) 높음
+                </div>
+                <div class="grade-chart-placeholder">등급 분포 차트</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         유형4: 상단 메트릭스/차트 + 하단 가격 비교 바
+         ============================================ -->
+    <h2>유형4: 상단 메트릭스/차트 + 하단 가격 비교 바 (선택)</h2>
+    <div class="desc">
+        상단에 기존 2x2 메트릭스 + 등급차트, 하단에 가격 비교 바 배치.<br>
+        <strong>장점:</strong> 기존 레이아웃 유지, 가격 비교 명확 / <strong>단점:</strong> 세로 공간 약간 증가
+    </div>
+    <div class="sample-container">
+        <div class="type4-grid">
+            <!-- 상단: 메트릭스 + 등급차트 -->
+            <div class="type4-top">
+                <div class="type4-metrics">
+                    <div class="metric-item">
+                        <div class="metric-value highlight">42</div>
+                        <div class="metric-label">출하두수</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">68.5%</div>
+                        <div class="metric-label">1등급↑</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">86.7kg</div>
+                        <div class="metric-label">도체중</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">22.1mm</div>
+                        <div class="metric-label">등지방</div>
+                    </div>
+                </div>
+                <div class="grade-chart-placeholder">등급 분포 차트</div>
+            </div>
+            <!-- 하단: 가격 비교 바 -->
+            <div class="type4-price-bar">
+                <div class="price-item">
+                    <div class="metric-value positive">3,892원</div>
+                    <div class="metric-label">내농장 수취단가</div>
+                </div>
+                <div class="diff-badge">+436원</div>
+                <div class="price-item">
+                    <div class="metric-value">3,456원</div>
+                    <div class="metric-label">전국 등외제외</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         유형5: 컴팩트 1열 (모바일 최적화)
+         ============================================ -->
+    <h2>유형5: 컴팩트 1열 (모바일 최적화)</h2>
+    <div class="desc">
+        모바일 환경에 최적화된 컴팩트 레이아웃. 가격 비교를 한 줄로 표시.<br>
+        <strong>장점:</strong> 좁은 화면 최적화, 한눈에 파악 / <strong>단점:</strong> 정보 밀도 높음
+    </div>
+    <div class="sample-container" style="max-width:400px;">
+        <div class="type5-grid">
+            <div class="type5-main-metrics">
+                <div class="metric-item">
+                    <div class="metric-value highlight">42</div>
+                    <div class="metric-label">출하</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">68.5%</div>
+                    <div class="metric-label">1등급↑</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">86.7</div>
+                    <div class="metric-label">도체중</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">22.1</div>
+                    <div class="metric-label">등지방</div>
+                </div>
+            </div>
+            <div class="type5-price-section">
+                <div class="price-item">
+                    <div class="metric-value positive">3,892</div>
+                    <div class="metric-label">내농장</div>
+                </div>
+                <div class="vs-badge positive">+436</div>
+                <div class="price-item">
+                    <div class="metric-value">3,456</div>
+                    <div class="metric-label">전국</div>
+                </div>
+            </div>
+            <div class="grade-chart-placeholder" style="height:80px;">등급 분포 차트</div>
+        </div>
+    </div>
+
+    <!-- 요약 테이블 -->
+    <h2 style="background:#007aff;">레이아웃 비교 요약</h2>
+    <div class="sample-container" style="max-width:100%;">
+        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+            <thead>
+                <tr style="background:#f5f5f7;">
+                    <th style="padding:10px; text-align:left; border-bottom:2px solid #ddd;">유형</th>
+                    <th style="padding:10px; text-align:left; border-bottom:2px solid #ddd;">특징</th>
+                    <th style="padding:10px; text-align:left; border-bottom:2px solid #ddd;">장점</th>
+                    <th style="padding:10px; text-align:left; border-bottom:2px solid #ddd;">단점</th>
+                    <th style="padding:10px; text-align:center; border-bottom:2px solid #ddd;">추천</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding:10px; border-bottom:1px solid #eee;"><strong>유형1</strong></td>
+                    <td style="padding:10px; border-bottom:1px solid #eee;">기존 2x2 + 가격 행 분리</td>
+                    <td style="padding:10px; border-bottom:1px solid #eee;">기존 구조 유지</td>
+                    <td style="padding:10px; border-bottom:1px solid #eee;">세로 공간 증가</td>
+                    <td style="padding:10px; border-bottom:1px solid #eee; text-align:center;">★★★★☆</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px; border-bottom:1px solid #eee;"><strong>유형2</strong></td>
+                    <td style="padding:10px; border-bottom:1px solid #eee;">3열 + 그라데이션 카드</td>
+                    <td style="padding:10px; border-bottom:1px solid #eee;">가격 시각적 강조</td>
+                    <td style="padding:10px; border-bottom:1px solid #eee;">차트 공간 별도</td>
+                    <td style="padding:10px; border-bottom:1px solid #eee; text-align:center;">★★★☆☆</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px; border-bottom:1px solid #eee;"><strong>유형3</strong></td>
+                    <td style="padding:10px; border-bottom:1px solid #eee;">좌측 세로 + 우측 가격</td>
+                    <td style="padding:10px; border-bottom:1px solid #eee;">가격 비교 명확</td>
+                    <td style="padding:10px; border-bottom:1px solid #eee;">가로 공간 필요</td>
+                    <td style="padding:10px; border-bottom:1px solid #eee; text-align:center;">★★★★☆</td>
+                </tr>
+                <tr style="background:rgba(0,122,255,0.08);">
+                    <td style="padding:10px; border-bottom:1px solid #eee;"><strong>유형4 ✓</strong></td>
+                    <td style="padding:10px; border-bottom:1px solid #eee;">상단 메트릭스/차트 + 하단 가격 바</td>
+                    <td style="padding:10px; border-bottom:1px solid #eee;">기존 레이아웃 유지, 가격 비교 명확</td>
+                    <td style="padding:10px; border-bottom:1px solid #eee;">세로 공간 약간 증가</td>
+                    <td style="padding:10px; border-bottom:1px solid #eee; text-align:center;">★★★★★</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px; border-bottom:1px solid #eee;"><strong>유형5</strong></td>
+                    <td style="padding:10px; border-bottom:1px solid #eee;">컴팩트 모바일</td>
+                    <td style="padding:10px; border-bottom:1px solid #eee;">좁은 화면 최적화</td>
+                    <td style="padding:10px; border-bottom:1px solid #eee;">정보 밀도 높음</td>
+                    <td style="padding:10px; border-bottom:1px solid #eee; text-align:center;">★★★☆☆</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

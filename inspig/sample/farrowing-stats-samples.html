@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farrowing Stats Layout Samples</title>
+    <style>
+        :root {
+            --rp-card-wrap-bg: #f8f9fa;
+            --rp-card-row-bg: #ffffff;
+            --rp-text-primary: #1d1d1f;
+            --rp-text-secondary: #6b7280;
+            --rp-text-tertiary: #86868b;
+            --rp-border-light: #e5e7eb;
+            --rp-accent-primary: #667eea;
+            --rp-bg-cell-alt: #e5e7eb;
+            --rp-card-row-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto 40px;
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .sample-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        /* 공통 스타일 */
+        .mating-summary-list {
+            background: var(--rp-card-wrap-bg);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--rp-border-light);
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+
+        .summary-row-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .summary-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--rp-accent-primary);
+        }
+
+        .summary-label {
+            font-size: 13px;
+            color: var(--rp-text-secondary);
+            font-weight: 500;
+        }
+
+        .summary-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--rp-text-primary);
+        }
+
+        .summary-row.highlight {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8ecff 100%);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-bottom: none;
+        }
+
+        .summary-row.highlight .summary-dot {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            width: 10px;
+            height: 10px;
+        }
+
+        .summary-row.highlight .summary-label {
+            font-weight: 600;
+            color: var(--rp-text-primary);
+        }
+
+        .summary-row.highlight .summary-value {
+            font-size: 20px;
+            color: #667eea;
+        }
+
+        .summary-row-right {
+            text-align: right;
+        }
+
+        .summary-sub {
+            font-size: 11px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 12px 0 8px;
+            padding: 0 12px;
+        }
+
+        .summary-row.with-bar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+            padding: 8px 12px;
+        }
+
+        .summary-row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .summary-bar {
+            height: 6px;
+            background: var(--rp-bg-cell-alt);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .summary-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .summary-bar-fill.success {
+            background: linear-gradient(90deg, #10b981, #34d399);
+        }
+
+        .summary-bar-fill.danger {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+        }
+
+        .summary-bar-fill.warning {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        }
+
+        .summary-plan {
+            display: inline;
+            font-size: 11px;
+            font-weight: 400;
+            color: #888;
+            margin-left: 6px;
+        }
+
+        /* 내장 테이블 스타일 */
+        .embedded-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 4px;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .embedded-table thead th {
+            background: transparent;
+            padding: 6px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--rp-text-secondary);
+            text-align: center;
+        }
+
+        .embedded-table tbody tr {
+            background: var(--rp-card-row-bg);
+            box-shadow: var(--rp-card-row-shadow);
+            border-radius: 6px;
+        }
+
+        .embedded-table tbody td {
+            padding: 8px;
+            text-align: center;
+            color: var(--rp-text-primary);
+        }
+
+        .embedded-table tbody td:first-child {
+            border-radius: 6px 0 0 6px;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .embedded-table tbody td:last-child {
+            border-radius: 0 6px 6px 0;
+        }
+
+        .embedded-table tbody tr.row-highlight {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+        }
+
+        .embedded-table tbody tr.row-highlight td {
+            font-weight: 600;
+        }
+
+        .text-red-600 { color: #dc2626; }
+        .text-green-600 { color: #16a34a; }
+
+        /* 구분선 */
+        .summary-divider {
+            height: 1px;
+            background: #e9ecef;
+            margin: 12px 0;
+        }
+
+        /* 샘플 2: 테이블 래퍼 스타일 */
+        .table-section {
+            background: rgba(255,255,255,0.5);
+            border-radius: 8px;
+            padding: 8px;
+            margin-top: 8px;
+        }
+
+        /* 샘플 3: 점선 구분 */
+        .dotted-divider {
+            border-top: 1px dashed #ccc;
+            margin: 12px 0;
+        }
+
+        /* 샘플 4: 그라데이션 구분 */
+        .gradient-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #667eea, transparent);
+            margin: 12px 0;
+        }
+
+        /* 샘플 5: 컴팩트 테이블 */
+        .compact-table {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: var(--rp-border-light);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .compact-table-cell {
+            background: var(--rp-card-row-bg);
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .compact-table-cell .label {
+            font-size: 12px;
+            color: var(--rp-text-secondary);
+        }
+
+        .compact-table-cell .value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--rp-text-primary);
+        }
+    </style>
+</head>
+<body>
+
+<!-- 샘플 1: 단순 통합 (구분선만) -->
+<div class="container">
+    <div class="sample-title">샘플 1: 단순 통합 (구분선)</div>
+    <div class="mating-summary-list" id="farrowing-stats-1">
+        <!-- 총산 하이라이트 -->
+        <div class="summary-row highlight">
+            <div class="summary-row-left">
+                <span class="summary-dot"></span>
+                <span class="summary-label">총산</span>
+            </div>
+            <div class="summary-row-right">
+                <span class="summary-value">156두</span>
+                <div class="summary-sub">평균 13.0두</div>
+            </div>
+        </div>
+
+        <div class="section-title">분만 성적 구성</div>
+
+        <!-- 실산 -->
+        <div class="summary-row with-bar">
+            <div class="summary-row-header">
+                <span class="summary-label">실산 <span class="summary-plan">평균 11.2두 (86.2%)</span></span>
+                <span class="summary-value">134두</span>
+            </div>
+            <div class="summary-bar">
+                <div class="summary-bar-fill success" style="width: 86.2%"></div>
+            </div>
+        </div>
+
+        <!-- 사산 -->
+        <div class="summary-row with-bar">
+            <div class="summary-row-header">
+                <span class="summary-label">사산 <span class="summary-plan">평균 1.2두 (9.2%)</span></span>
+                <span class="summary-value">14두</span>
+            </div>
+            <div class="summary-bar">
+                <div class="summary-bar-fill danger" style="width: 9.2%"></div>
+            </div>
+        </div>
+
+        <!-- 미라 -->
+        <div class="summary-row with-bar">
+            <div class="summary-row-header">
+                <span class="summary-label">미라 <span class="summary-plan">평균 0.7두 (4.6%)</span></span>
+                <span class="summary-value">8두</span>
+            </div>
+            <div class="summary-bar">
+                <div class="summary-bar-fill warning" style="width: 4.6%"></div>
+            </div>
+        </div>
+
+        <!-- 구분선 -->
+        <div class="summary-divider"></div>
+
+        <!-- 생시도태/포유개시 테이블 -->
+        <table class="embedded-table">
+            <thead>
+                <tr>
+                    <th>구분</th>
+                    <th>합계</th>
+                    <th>평균</th>
+                    <th>비율</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>생시도태</td>
+                    <td>5</td>
+                    <td>0.4</td>
+                    <td class="text-red-600">3.7%</td>
+                </tr>
+                <tr class="row-highlight">
+                    <td>포유개시</td>
+                    <td>129</td>
+                    <td>10.8</td>
+                    <td class="text-green-600">96.3%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 샘플 2: 테이블 래퍼 포함 -->
+<div class="container">
+    <div class="sample-title">샘플 2: 테이블 래퍼 스타일</div>
+    <div class="mating-summary-list" id="farrowing-stats-2">
+        <!-- 총산 하이라이트 -->
+        <div class="summary-row highlight">
+            <div class="summary-row-left">
+                <span class="summary-dot"></span>
+                <span class="summary-label">총산</span>
+            </div>
+            <div class="summary-row-right">
+                <span class="summary-value">156두</span>
+                <div class="summary-sub">평균 13.0두</div>
+            </div>
+        </div>
+
+        <div class="section-title">분만 성적 구성</div>
+
+        <!-- 실산/사산/미라 바 -->
+        <div class="summary-row with-bar">
+            <div class="summary-row-header">
+                <span class="summary-label">실산 <span class="summary-plan">평균 11.2두 (86.2%)</span></span>
+                <span class="summary-value">134두</span>
+            </div>
+            <div class="summary-bar">
+                <div class="summary-bar-fill success" style="width: 86.2%"></div>
+            </div>
+        </div>
+
+        <div class="summary-row with-bar">
+            <div class="summary-row-header">
+                <span class="summary-label">사산 <span class="summary-plan">평균 1.2두 (9.2%)</span></span>
+                <span class="summary-value">14두</span>
+            </div>
+            <div class="summary-bar">
+                <div class="summary-bar-fill danger" style="width: 9.2%"></div>
+            </div>
+        </div>
+
+        <div class="summary-row with-bar">
+            <div class="summary-row-header">
+                <span class="summary-label">미라 <span class="summary-plan">평균 0.7두 (4.6%)</span></span>
+                <span class="summary-value">8두</span>
+            </div>
+            <div class="summary-bar">
+                <div class="summary-bar-fill warning" style="width: 4.6%"></div>
+            </div>
+        </div>
+
+        <!-- 테이블 래퍼 -->
+        <div class="table-section">
+            <table class="embedded-table">
+                <thead>
+                    <tr>
+                        <th>구분</th>
+                        <th>합계</th>
+                        <th>평균</th>
+                        <th>비율</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>생시도태</td>
+                        <td>5</td>
+                        <td>0.4</td>
+                        <td class="text-red-600">3.7%</td>
+                    </tr>
+                    <tr class="row-highlight">
+                        <td>포유개시</td>
+                        <td>129</td>
+                        <td>10.8</td>
+                        <td class="text-green-600">96.3%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 샘플 3: 점선 구분 -->
+<div class="container">
+    <div class="sample-title">샘플 3: 점선 구분 + 섹션 타이틀</div>
+    <div class="mating-summary-list" id="farrowing-stats-3">
+        <!-- 총산 하이라이트 -->
+        <div class="summary-row highlight">
+            <div class="summary-row-left">
+                <span class="summary-dot"></span>
+                <span class="summary-label">총산</span>
+            </div>
+            <div class="summary-row-right">
+                <span class="summary-value">156두</span>
+                <div class="summary-sub">평균 13.0두</div>
+            </div>
+        </div>
+
+        <div class="section-title">분만 성적 구성</div>
+
+        <!-- 실산/사산/미라 바 -->
+        <div class="summary-row with-bar">
+            <div class="summary-row-header">
+                <span class="summary-label">실산 <span class="summary-plan">평균 11.2두 (86.2%)</span></span>
+                <span class="summary-value">134두</span>
+            </div>
+            <div class="summary-bar">
+                <div class="summary-bar-fill success" style="width: 86.2%"></div>
+            </div>
+        </div>
+
+        <div class="summary-row with-bar">
+            <div class="summary-row-header">
+                <span class="summary-label">사산 <span class="summary-plan">평균 1.2두 (9.2%)</span></span>
+                <span class="summary-value">14두</span>
+            </div>
+            <div class="summary-bar">
+                <div class="summary-bar-fill danger" style="width: 9.2%"></div>
+            </div>
+        </div>
+
+        <div class="summary-row with-bar">
+            <div class="summary-row-header">
+                <span class="summary-label">미라 <span class="summary-plan">평균 0.7두 (4.6%)</span></span>
+                <span class="summary-value">8두</span>
+            </div>
+            <div class="summary-bar">
+                <div class="summary-bar-fill warning" style="width: 4.6%"></div>
+            </div>
+        </div>
+
+        <!-- 점선 구분 -->
+        <div class="dotted-divider"></div>
+        <div class="section-title" style="margin-top: 0;">포유 현황</div>
+
+        <table class="embedded-table">
+            <thead>
+                <tr>
+                    <th>구분</th>
+                    <th>합계</th>
+                    <th>평균</th>
+                    <th>비율</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>생시도태</td>
+                    <td>5</td>
+                    <td>0.4</td>
+                    <td class="text-red-600">3.7%</td>
+                </tr>
+                <tr class="row-highlight">
+                    <td>포유개시</td>
+                    <td>129</td>
+                    <td>10.8</td>
+                    <td class="text-green-600">96.3%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 샘플 4: 그라데이션 구분 -->
+<div class="container">
+    <div class="sample-title">샘플 4: 그라데이션 구분선</div>
+    <div class="mating-summary-list" id="farrowing-stats-4">
+        <!-- 총산 하이라이트 -->
+        <div class="summary-row highlight">
+            <div class="summary-row-left">
+                <span class="summary-dot"></span>
+                <span class="summary-label">총산</span>
+            </div>
+            <div class="summary-row-right">
+                <span class="summary-value">156두</span>
+                <div class="summary-sub">평균 13.0두</div>
+            </div>
+        </div>
+
+        <div class="section-title">분만 성적 구성</div>
+
+        <div class="summary-row with-bar">
+            <div class="summary-row-header">
+                <span class="summary-label">실산 <span class="summary-plan">평균 11.2두 (86.2%)</span></span>
+                <span class="summary-value">134두</span>
+            </div>
+            <div class="summary-bar">
+                <div class="summary-bar-fill success" style="width: 86.2%"></div>
+            </div>
+        </div>
+
+        <div class="summary-row with-bar">
+            <div class="summary-row-header">
+                <span class="summary-label">사산 <span class="summary-plan">평균 1.2두 (9.2%)</span></span>
+                <span class="summary-value">14두</span>
+            </div>
+            <div class="summary-bar">
+                <div class="summary-bar-fill danger" style="width: 9.2%"></div>
+            </div>
+        </div>
+
+        <div class="summary-row with-bar">
+            <div class="summary-row-header">
+                <span class="summary-label">미라 <span class="summary-plan">평균 0.7두 (4.6%)</span></span>
+                <span class="summary-value">8두</span>
+            </div>
+            <div class="summary-bar">
+                <div class="summary-bar-fill warning" style="width: 4.6%"></div>
+            </div>
+        </div>
+
+        <!-- 그라데이션 구분 -->
+        <div class="gradient-divider"></div>
+
+        <table class="embedded-table">
+            <thead>
+                <tr>
+                    <th>구분</th>
+                    <th>합계</th>
+                    <th>평균</th>
+                    <th>비율</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>생시도태</td>
+                    <td>5</td>
+                    <td>0.4</td>
+                    <td class="text-red-600">3.7%</td>
+                </tr>
+                <tr class="row-highlight">
+                    <td>포유개시</td>
+                    <td>129</td>
+                    <td>10.8</td>
+                    <td class="text-green-600">96.3%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 샘플 5: 그리드 스타일 (테이블 대체) -->
+<div class="container">
+    <div class="sample-title">샘플 5: 그리드 스타일 (테이블 대체)</div>
+    <div class="mating-summary-list" id="farrowing-stats-5">
+        <!-- 총산 하이라이트 -->
+        <div class="summary-row highlight">
+            <div class="summary-row-left">
+                <span class="summary-dot"></span>
+                <span class="summary-label">총산</span>
+            </div>
+            <div class="summary-row-right">
+                <span class="summary-value">156두</span>
+                <div class="summary-sub">평균 13.0두</div>
+            </div>
+        </div>
+
+        <div class="section-title">분만 성적 구성</div>
+
+        <div class="summary-row with-bar">
+            <div class="summary-row-header">
+                <span class="summary-label">실산 <span class="summary-plan">평균 11.2두 (86.2%)</span></span>
+                <span class="summary-value">134두</span>
+            </div>
+            <div class="summary-bar">
+                <div class="summary-bar-fill success" style="width: 86.2%"></div>
+            </div>
+        </div>
+
+        <div class="summary-row with-bar">
+            <div class="summary-row-header">
+                <span class="summary-label">사산 <span class="summary-plan">평균 1.2두 (9.2%)</span></span>
+                <span class="summary-value">14두</span>
+            </div>
+            <div class="summary-bar">
+                <div class="summary-bar-fill danger" style="width: 9.2%"></div>
+            </div>
+        </div>
+
+        <div class="summary-row with-bar">
+            <div class="summary-row-header">
+                <span class="summary-label">미라 <span class="summary-plan">평균 0.7두 (4.6%)</span></span>
+                <span class="summary-value">8두</span>
+            </div>
+            <div class="summary-bar">
+                <div class="summary-bar-fill warning" style="width: 4.6%"></div>
+            </div>
+        </div>
+
+        <div class="section-title">포유 현황</div>
+
+        <!-- 컴팩트 그리드 -->
+        <div class="compact-table">
+            <div class="compact-table-cell">
+                <span class="label">생시도태</span>
+                <span class="value text-red-600">5두</span>
+            </div>
+            <div class="compact-table-cell">
+                <span class="label">평균</span>
+                <span class="value">0.4두</span>
+            </div>
+            <div class="compact-table-cell">
+                <span class="label">포유개시</span>
+                <span class="value text-green-600">129두</span>
+            </div>
+            <div class="compact-table-cell">
+                <span class="label">평균</span>
+                <span class="value">10.8두</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

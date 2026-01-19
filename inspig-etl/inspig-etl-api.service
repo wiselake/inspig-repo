@@ -1,0 +1,15 @@
+[Unit]
+Description=InsightPig ETL API Server
+After=network.target
+
+[Service]
+Type=simple
+User=pigplan
+WorkingDirectory=/data/etl/inspig
+ExecStart=/bin/bash -c 'source /data/anaconda/anaconda3/etc/profile.d/conda.sh && conda activate inspig-etl && python run_api.py --port 8001'
+Restart=always
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

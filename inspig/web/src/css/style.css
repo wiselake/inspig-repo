@@ -1,0 +1,192 @@
+@reference "tailwindcss";
+
+/* ============================================
+   PIGPLAN REPORT - BASE STYLE CSS
+   피그플랜 리포트 베이스 스타일시트
+   ============================================
+
+   [역할]
+   - CSS 변수 정의 (테마 컬러, 배경, 보더 등)
+   - 기본 레이아웃 (A4 페이지 래퍼)
+   - 타이포그래피 기본값
+   - 유틸리티 스타일
+
+   [우선순위]
+   - 가장 낮은 우선순위 (베이스)
+   - 다른 CSS 파일에서 오버라이드 가능
+
+   [종속성]
+   - 없음 (베이스 파일)
+
+   [섹션 목록]
+   1. :root - CSS 변수 (라이트 테마)
+   2. .dark - CSS 변수 (다크 테마)
+   3. FontAwesome 아이콘 기본 스타일 (fa-xs, fa-sm, fa-lg, fa-1x, fa-2x, fa-3x)
+   4. report-page-wrapper: A4 페이지 래퍼
+
+   ============================================ */
+
+/* ============================================
+   📱 반응형 디자인 지침 (RESPONSIVE DESIGN GUIDE)
+   ============================================
+
+   [원칙] 모바일 우선 (Mobile First)
+   - 기본 스타일 = 모바일 (480px 이하)
+   - 점진적으로 태블릿, 데스크탑으로 확장
+
+   [브레이크포인트]
+   - 모바일: 480px 이하 (기본)
+   - 태블릿: 481px ~ 768px (@media min-width: 481px)
+   - 데스크탑: 769px 이상 (@media min-width: 769px)
+
+   ============================================ */
+
+/* ============================================
+   CSS 변수 (Theme Variables)
+   - 라이트 테마 기본값
+   ============================================ */
+:root {
+    /* 배경 */
+    --rp-bg-primary: #e8e8ed;
+    --rp-bg-page: linear-gradient(180deg, #f5f5f7 0%, #ffffff 100%);
+    --rp-bg-card: rgba(255, 255, 255, 0.8);
+    --rp-bg-card-solid: #ffffff;
+    --rp-bg-header: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    --rp-bg-cell-alt: #fafafa;
+    --rp-bg-highlight: rgba(0, 113, 227, 0.04);
+    --rp-bg-highlight-orange: rgba(255, 149, 0, 0.06);
+
+    /* 텍스트 */
+    --rp-text-primary: #1d1d1f;
+    --rp-text-secondary: #6e6e73;
+    --rp-text-tertiary: #86868b;
+    --rp-text-inverse: #ffffff;
+
+    /* 보더 */
+    --rp-border-light: rgba(0, 0, 0, 0.06);
+    --rp-border-card: rgba(0, 0, 0, 0.05);
+
+    /* 악센트 */
+    --rp-accent-primary: #0071e3;
+    --rp-accent-secondary: #667eea;
+    --rp-accent-orange: #ff9500;
+    --rp-accent-red: #ff3b30;
+    --rp-accent-green: #34a853;
+
+    /* 섀도우 */
+    --rp-shadow-page: 0 0 30px rgba(0, 0, 0, 0.15);
+    --rp-shadow-card: 0 2px 10px rgba(0, 0, 0, 0.06);
+
+    /* 알림 카드 */
+    --rp-alert-bg: #ffffff;
+    --rp-alert-border: rgba(255, 59, 48, 0.2);
+    --rp-alert-highlight-bg: #fff5f5;
+
+    /* 아코디언 */
+    --rp-accordion-bg: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+    --rp-accordion-header-bg: rgba(102, 126, 234, 0.08);
+    --rp-accordion-border: rgba(102, 126, 234, 0.15);
+
+    /* 관리포인트 */
+    --rp-mgmt-bg: #ffffff;
+    --rp-mgmt-highlight: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --rp-mgmt-recommend-bg: #f8f9fa;
+    --rp-mgmt-recommend-border: #e9ecef;
+
+    /* 트랜지션 */
+    --rp-transition: 0.3s ease;
+
+    /* 카드 스타일 테이블 */
+    --rp-card-wrap-bg: #f5f5f7;
+    --rp-card-row-bg: #ffffff;
+    --rp-card-row-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* 다크 테마 변수 오버라이드 */
+.dark {
+    --rp-bg-primary: #1a1a1e;
+    --rp-bg-page: linear-gradient(180deg, #1a1a1e 0%, #2d2d32 100%);
+    --rp-bg-card: rgba(45, 45, 50, 0.9);
+    --rp-bg-card-solid: #2d2d32;
+    --rp-bg-cell-alt: #3a3a40;
+    --rp-bg-highlight: rgba(0, 113, 227, 0.15);
+    --rp-bg-highlight-orange: rgba(255, 149, 0, 0.15);
+
+    --rp-text-primary: #f5f5f7;
+    --rp-text-secondary: #a1a1a6;
+    --rp-text-tertiary: #8e8e93;
+
+    --rp-border-light: rgba(255, 255, 255, 0.08);
+    --rp-border-card: rgba(255, 255, 255, 0.05);
+
+    --rp-shadow-card: 0 2px 10px rgba(0, 0, 0, 0.3);
+
+    --rp-alert-bg: #2d2d32;
+    --rp-alert-highlight-bg: rgba(255, 59, 48, 0.15);
+
+    --rp-accordion-bg: linear-gradient(135deg, #2d2d32 0%, #3a3a40 100%);
+    --rp-accordion-header-bg: rgba(102, 126, 234, 0.15);
+
+    --rp-mgmt-bg: #2d2d32;
+    --rp-mgmt-recommend-bg: #3a3a40;
+    --rp-mgmt-recommend-border: #4a4a50;
+
+    /* 카드 스타일 테이블 */
+    --rp-card-wrap-bg: #38383e;
+    --rp-card-row-bg: #48484e;
+    --rp-card-row-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   FontAwesome 아이콘 기본 스타일
+   - 기본: 1em (부모 font-size와 동일)
+   - xs: 0.75em, sm: 0.875em, lg: 1.25em
+   - 1x: 1em, 2x: 2em, 3x: 3em
+   ============================================ */
+.svg-inline--fa {
+    width: var(--fa-width, 1em);
+}
+
+.svg-inline--fa.fa-xs {
+    width: 0.75em;
+    font-size: 0.75em;
+}
+
+.svg-inline--fa.fa-sm {
+    width: 0.875em;
+    font-size: 0.875em;
+}
+
+.svg-inline--fa.fa-lg {
+    width: 1.25em;
+    font-size: 1.25em;
+}
+
+.svg-inline--fa.fa-1x {
+    width: 1em;
+    font-size: 1em;
+}
+
+.svg-inline--fa.fa-2x {
+    width: 2em;
+    font-size: 2em;
+}
+
+.svg-inline--fa.fa-3x {
+    width: 3em;
+    font-size: 3em;
+}
+
+/* ============================================
+   A4 페이지 래퍼 (데스크탑 전용)
+   - 210mm = A4 용지 너비
+   ============================================ */
+.report-page-wrapper {
+    max-width: 210mm;
+    min-height: 100vh;
+    margin: 0 auto;
+    background: var(--rp-bg-page);
+    box-shadow: var(--rp-shadow-page);
+    padding: 0;
+    transition: all var(--rp-transition);
+}

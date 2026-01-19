@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Calendar Samples</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* 네이티브 date input 커스텀 */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            opacity: 0.6;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-md mx-auto space-y-6">
+        <h1 class="text-xl font-bold text-gray-900 mb-4">Mobile Calendar Samples</h1>
+
+        <!-- 샘플 1: 네이티브 Date Input (권장) -->
+        <div class="bg-white rounded-lg shadow-sm border p-4">
+            <h2 class="text-sm font-semibold text-gray-700 mb-3">1. 네이티브 Date Input (권장)</h2>
+            <p class="text-xs text-gray-500 mb-3">브라우저 기본 캘린더 - 심플하고 모바일 친화적</p>
+            <div class="flex items-center gap-2">
+                <input type="date" value="2024-06-11"
+                    class="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <span class="text-gray-400">~</span>
+                <input type="date" value="2024-12-11"
+                    class="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+
+        <!-- 샘플 2: 아이콘 포함 -->
+        <div class="bg-white rounded-lg shadow-sm border p-4">
+            <h2 class="text-sm font-semibold text-gray-700 mb-3">2. 아이콘 포함</h2>
+            <div class="flex items-center gap-2">
+                <div class="relative flex-1">
+                    <i class="fas fa-calendar-alt absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                    <input type="date" value="2024-06-11"
+                        class="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <span class="text-gray-400">~</span>
+                <div class="relative flex-1">
+                    <i class="fas fa-calendar-alt absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                    <input type="date" value="2024-12-11"
+                        class="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- 샘플 3: 콤팩트 스타일 -->
+        <div class="bg-white rounded-lg shadow-sm border p-4">
+            <h2 class="text-sm font-semibold text-gray-700 mb-3">3. 콤팩트 (조회영역용)</h2>
+            <div class="flex items-center gap-2 bg-gray-50 p-2 rounded-lg border">
+                <i class="fas fa-calendar-alt text-gray-400 text-xs ml-1"></i>
+                <input type="date" value="2024-06-11"
+                    class="flex-1 min-w-0 bg-transparent text-xs focus:outline-none">
+                <span class="text-gray-400 text-xs">~</span>
+                <input type="date" value="2024-12-11"
+                    class="flex-1 min-w-0 bg-transparent text-xs focus:outline-none">
+            </div>
+        </div>
+
+        <!-- 샘플 4: 월 선택 -->
+        <div class="bg-white rounded-lg shadow-sm border p-4">
+            <h2 class="text-sm font-semibold text-gray-700 mb-3">4. 월 선택 (Month Picker)</h2>
+            <input type="month" value="2024-12"
+                class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <!-- 샘플 5: 주 선택 -->
+        <div class="bg-white rounded-lg shadow-sm border p-4">
+            <h2 class="text-sm font-semibold text-gray-700 mb-3">5. 주 선택 (Week Picker)</h2>
+            <input type="week" value="2024-W50"
+                class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <!-- 샘플 6: 버튼형 (클릭시 캘린더) -->
+        <div class="bg-white rounded-lg shadow-sm border p-4">
+            <h2 class="text-sm font-semibold text-gray-700 mb-3">6. 버튼형</h2>
+            <div class="flex gap-2">
+                <button onclick="document.getElementById('hidden-date-1').showPicker()"
+                    class="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm hover:bg-gray-100">
+                    <i class="fas fa-calendar-alt text-gray-400"></i>
+                    <span id="date-display-1">2024.06.11</span>
+                </button>
+                <input type="date" id="hidden-date-1" value="2024-06-11" class="sr-only"
+                    onchange="document.getElementById('date-display-1').textContent = this.value.replace(/-/g, '.')">
+
+                <span class="flex items-center text-gray-400">~</span>
+
+                <button onclick="document.getElementById('hidden-date-2').showPicker()"
+                    class="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm hover:bg-gray-100">
+                    <i class="fas fa-calendar-alt text-gray-400"></i>
+                    <span id="date-display-2">2024.12.11</span>
+                </button>
+                <input type="date" id="hidden-date-2" value="2024-12-11" class="sr-only"
+                    onchange="document.getElementById('date-display-2').textContent = this.value.replace(/-/g, '.')">
+            </div>
+        </div>
+
+        <!-- 샘플 7: 빠른 기간 선택 -->
+        <div class="bg-white rounded-lg shadow-sm border p-4">
+            <h2 class="text-sm font-semibold text-gray-700 mb-3">7. 빠른 기간 선택</h2>
+            <div class="flex flex-wrap gap-2 mb-3">
+                <button class="px-3 py-1.5 bg-blue-600 text-white rounded-full text-xs font-medium">6개월</button>
+                <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium hover:bg-gray-200">3개월</button>
+                <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium hover:bg-gray-200">1개월</button>
+                <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium hover:bg-gray-200">1주</button>
+                <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium hover:bg-gray-200">직접입력</button>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="date" value="2024-06-11"
+                    class="flex-1 px-2 py-1.5 bg-gray-50 border border-gray-300 rounded text-xs">
+                <span class="text-gray-400 text-xs">~</span>
+                <input type="date" value="2024-12-11"
+                    class="flex-1 px-2 py-1.5 bg-gray-50 border border-gray-300 rounded text-xs">
+            </div>
+        </div>
+
+        <!-- 샘플 8: 단일 날짜 + 라벨 -->
+        <div class="bg-white rounded-lg shadow-sm border p-4">
+            <h2 class="text-sm font-semibold text-gray-700 mb-3">8. 라벨 포함</h2>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">시작일</label>
+                    <input type="date" value="2024-06-11"
+                        class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">종료일</label>
+                    <input type="date" value="2024-12-11"
+                        class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- 샘플 9: 다크모드 -->
+        <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-4">
+            <h2 class="text-sm font-semibold text-white mb-3">9. 다크모드</h2>
+            <div class="flex items-center gap-2">
+                <input type="date" value="2024-06-11"
+                    class="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <span class="text-gray-400">~</span>
+                <input type="date" value="2024-12-11"
+                    class="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+
+        <!-- 현재 적용된 스타일 -->
+        <div class="bg-blue-50 rounded-lg border border-blue-200 p-4">
+            <h2 class="text-sm font-semibold text-blue-700 mb-3">현재 적용 스타일 (주간리스트)</h2>
+            <div class="bg-white rounded-lg p-3 border">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-calendar-alt text-gray-400 text-sm"></i>
+                    <input type="date" value="2024-06-11"
+                        class="flex-1 min-w-0 px-2 py-1.5 bg-gray-50 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+                    <span class="text-gray-400">~</span>
+                    <input type="date" value="2024-12-11"
+                        class="flex-1 min-w-0 px-2 py-1.5 bg-gray-50 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
