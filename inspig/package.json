@@ -1,0 +1,30 @@
+{
+  "name": "inspig",
+  "version": "1.0.0",
+  "description": "INSPIG 모노레포 - 양돈 보험 관리 시스템",
+  "private": true,
+  "workspaces": [
+    "api",
+    "web"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:api": "npm run dev --workspace=api",
+    "dev:web": "npm run dev --workspace=web",
+    "build": "npm run build --workspaces --if-present",
+    "build:api": "npm run build --workspace=api",
+    "build:web": "npm run build --workspace=web",
+    "start": "npm run start --workspaces --if-present",
+    "start:api": "npm run start:prod --workspace=api",
+    "start:web": "npm run start --workspace=web",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "clean": "rimraf node_modules api/node_modules web/node_modules"
+  },
+  "devDependencies": {
+    "rimraf": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
