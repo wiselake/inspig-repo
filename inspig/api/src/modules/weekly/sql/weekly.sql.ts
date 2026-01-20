@@ -167,7 +167,8 @@ export const WEEKLY_SQL = {
         S.STR_1, S.STR_2, S.STR_3, S.STR_4, S.STR_5,
         S.STR_6, S.STR_7, S.STR_8, S.STR_9, S.STR_10,
         S.STR_11, S.STR_12, S.STR_13, S.STR_14, S.STR_15,
-        S.HINT1, S.HINT2, S.HINT3
+        S.HINT1, S.HINT2, S.HINT3,
+        S.JSON_DATA
     FROM TS_INS_WEEK_SUB S
     WHERE S.MASTER_SEQ = :masterSeq
       AND S.FARM_NO = :farmNo
@@ -198,7 +199,8 @@ export const WEEKLY_SQL = {
         S.STR_1, S.STR_2, S.STR_3, S.STR_4, S.STR_5,
         S.STR_6, S.STR_7, S.STR_8, S.STR_9, S.STR_10,
         S.STR_11, S.STR_12, S.STR_13, S.STR_14, S.STR_15,
-        S.HINT1, S.HINT2, S.HINT3
+        S.HINT1, S.HINT2, S.HINT3,
+        S.JSON_DATA
     FROM TS_INS_WEEK_SUB S
     WHERE S.MASTER_SEQ = :masterSeq
       AND S.FARM_NO = :farmNo
@@ -230,7 +232,8 @@ export const WEEKLY_SQL = {
         S.STR_1, S.STR_2, S.STR_3, S.STR_4, S.STR_5,
         S.STR_6, S.STR_7, S.STR_8, S.STR_9, S.STR_10,
         S.STR_11, S.STR_12, S.STR_13, S.STR_14, S.STR_15,
-        S.HINT1, S.HINT2, S.HINT3
+        S.HINT1, S.HINT2, S.HINT3,
+        S.JSON_DATA
     FROM TS_INS_WEEK_SUB S
     WHERE S.MASTER_SEQ = :masterSeq
       AND S.FARM_NO = :farmNo

@@ -1129,6 +1129,8 @@ export class WeeklyService {
     sub.hint1 = row.HINT1;
     sub.hint2 = row.HINT2;
     sub.hint3 = row.HINT3;
+    // JSON_DATA (CLOB)
+    sub.jsonData = row.JSON_DATA;
     return sub;
   }
 
@@ -1786,9 +1788,26 @@ export class WeeklyService {
     };
 
     // ── 4. 산점도 (GUBUN='SHIP', SUB_GUBUN='SCATTER') ──
+    // 신규 형식: 1 ROW, JSON_DATA에 JSON 배열 저장 [{"x":도체중, "y":등지방, "cnt":두수}, ...]
+    // 기존 형식: N ROW, VAL_1=도체중, VAL_2=등지방, CNT_1=두수
     const scatterSubs = subs.filter((s) => s.gubun === 'SHIP' && s.subGubun === 'SCATTER');
+    let carcassData: Array<[number, number, number]> = [];
+
+    if (scatterSubs.length === 1 && scatterSubs[0].jsonData) {
+      // 신규 형식: JSON 파싱
+      try {
+        const parsed = JSON.parse(scatterSubs[0].jsonData);
+        carcassData = parsed.map((p: { x: number; y: number; cnt: number }) => [p.x, p.y, p.cnt]);
+      } catch {
+        carcassData = [];
+      }
+    } else {
+      // 기존 형식: 각 ROW에서 추출 (하위호환)
+      carcassData = scatterSubs.map((s) => [s.val1 || 0, s.val2 || 0, s.cnt1 || 0]);
+    }
+
     const carcassChart = {
-      data: scatterSubs.map((s) => [s.val1 || 0, s.val2 || 0, s.cnt1 || 0]),
+      data: carcassData,
     };
 
     // 프론트엔드 인터페이스에 맞게 반환

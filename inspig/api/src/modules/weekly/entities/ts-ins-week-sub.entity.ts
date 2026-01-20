@@ -190,6 +190,10 @@ export class TsInsWeekSub {
   @Column({ name: 'HINT3', type: 'varchar2', length: 500, nullable: true })
   hint3: string;
 
+  // JSON 데이터 컬럼 (CLOB) - 산점도 등 대용량 JSON 저장용
+  @Column({ name: 'JSON_DATA', type: 'clob', nullable: true })
+  jsonData: string;
+
   @Column({ name: 'LOG_INS_DT', type: 'date', default: () => 'SYSDATE' })
   logInsDt: Date;
 
