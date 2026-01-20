@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FarrowingPopupData } from '@/types/weekly';
 import { PopupContainer } from './PopupContainer';
 import { formatNumber } from '@/utils/format';
+import { useTheme } from '@/contexts/ThemeContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLightbulb, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 interface FarrowingPopupProps {
     isOpen: boolean;
@@ -16,6 +19,28 @@ interface FarrowingPopupProps {
  * @see popup.js tpl-farrowing
  */
 export const FarrowingPopup: React.FC<FarrowingPopupProps> = ({ isOpen, onClose, data }) => {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+    const [showHintTooltip, setShowHintTooltip] = useState(false);
+    const hintTooltipRef = useRef<HTMLDivElement>(null);
+
+    // 툴팁 외부 클릭 감지
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (hintTooltipRef.current && !hintTooltipRef.current.contains(event.target as Node)) {
+                setShowHintTooltip(false);
+            }
+        };
+
+        if (showHintTooltip) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showHintTooltip]);
+
     // 달성률 계산 (소수점 1자리)
     const calcRate = (planned: number, actual: number): string => {
         if (planned === 0) return '-';
@@ -47,8 +72,40 @@ export const FarrowingPopup: React.FC<FarrowingPopupProps> = ({ isOpen, onClose,
         >
             {/* 작업예정대비 섹션 */}
             <div className="popup-section-label">
-                <span>작업예정대비 <span className="popup-section-desc">달성율 : 예정작업 대비</span></span>
-                <span className="popup-section-desc">단위: 복</span>
+                <span>작업예정대비</span>
+            </div>
+            <div className="popup-section-desc">
+                <span>달성율 : 예정작업 대비</span>
+                {data.hint && (
+                    <span ref={hintTooltipRef} style={{ position: 'relative', marginLeft: '4px' }}>
+                        <span
+                            className="icon-circle clickable"
+                            onClick={() => setShowHintTooltip(!showHintTooltip)}
+                            style={{ cursor: 'pointer', color: '#f59e0b' }}
+                        >
+                            <FontAwesomeIcon icon={faLightbulb} />
+                        </span>
+                        {showHintTooltip && (
+                            <div className="help-tooltip" style={{
+                                position: 'absolute',
+                                top: '100%',
+                                left: '0',
+                                zIndex: 100,
+                                marginTop: '4px',
+                                minWidth: '180px',
+                            }}>
+                                <div className="help-tooltip-header">
+                                    <span>예정 산출기준</span>
+                                    <button className="close-btn" onClick={() => setShowHintTooltip(false)}>
+                                        <FontAwesomeIcon icon={faXmark} />
+                                    </button>
+                                </div>
+                                <div className="help-tooltip-body" style={{ whiteSpace: 'pre-line', fontSize: '11px' }}>{data.hint}</div>
+                            </div>
+                        )}
+                    </span>
+                )}
+                <span style={{ marginLeft: 'auto' }}>단위: 복</span>
             </div>
             <div className="popup-table-wrap">
                 <table className="popup-table-02" id="tbl-farrowing-plan">
@@ -72,6 +129,7 @@ export const FarrowingPopup: React.FC<FarrowingPopupProps> = ({ isOpen, onClose,
                     </tbody>
                 </table>
             </div>
+
 
             {/* 분만 성적 섹션 - 유형2 스타일 */}
             <div className="popup-section-label" style={{ marginTop: '16px' }}>

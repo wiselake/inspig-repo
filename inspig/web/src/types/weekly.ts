@@ -257,6 +257,8 @@ export interface MatingPopupData {
     jsGbPlanned: number;       // 정상교배복수 (예정)
     sagoGbCnt: number;         // 재발교배복수 (실적) - 예정 없음
   };
+  // 예정 산출기준 힌트 (GB_HINT)
+  hint?: string;
 }
 
 export interface MatingTableRow {
@@ -283,6 +285,8 @@ export interface FarrowingPopupData {
     foster: { sum: number; avg: number; rate: string };  // 양자 (전입-전출)
     nursingStart: { sum: number; avg: number; rate: string };
   };
+  // 예정 산출기준 힌트 (BM_HINT)
+  hint?: string;
 }
 
 /**
@@ -312,6 +316,8 @@ export interface WeaningPopupData {
     fosterIn: number;     // 양자전입 (160003)
     fosterOut: number;    // 양자전출 (160004)
   };
+  // 예정 산출기준 힌트 (EU_HINT)
+  hint?: string;
 }
 
 /**

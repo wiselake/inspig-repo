@@ -8,9 +8,15 @@ SP_INS_WEEK_EU_POPUP 프로시저 Python 전환
 - 자돈 증감 내역 (TB_MODON_JADON_TRANS)
 - 포유개시 계산 (실산 - 폐사 + 양자전입 - 양자전출)
 - TS_INS_WEEK 이유 관련 컬럼 업데이트
+
+TS_INS_CONF 설정 지원:
+- method='farm': 농장 기본값 사용 (TC_FARM_CONFIG)
+- method='modon': 모돈 작업설정 사용 (FN_MD_SCHEDULE_BSE_2020)
 """
+import json
 import logging
-from typing import Any, Dict
+from datetime import datetime
+from typing import Any, Dict, Optional
 
 from .base import BaseProcessor
 
@@ -38,19 +44,30 @@ class WeaningProcessor(BaseProcessor):
         sdt = f"{dt_from[:4]}-{dt_from[4:6]}-{dt_from[6:8]}"
         edt = f"{dt_to[:4]}-{dt_to[4:6]}-{dt_to[6:8]}"
 
+        # 날짜 객체 변환
+        dt_from_obj = datetime.strptime(dt_from, '%Y%m%d')
+        dt_to_obj = datetime.strptime(dt_to, '%Y%m%d')
+
         # 1. 기존 데이터 삭제
         self._delete_existing()
 
-        # 2. 이유 예정 복수 조회
-        plan_eu = self._get_plan_count(sdt, edt)
+        # 2. TS_INS_CONF 설정 조회 (금주 작업예정 산정방식)
+        ins_conf = self._get_ins_conf()
 
-        # 3. 연간 누적 실적 조회
+        # 3. 이유 예정 복수 조회 (설정에 따라 분기)
+        plan_eu, prev_hint = self._get_plan_count(sdt, edt, dt_from_obj, dt_to_obj, ins_conf)
+
+        # 4. 연간 누적 실적 조회
         acc_stats = self._get_acc_stats(dt_to)
 
-        # 4. 이유 통계 집계 및 INSERT (자돈 증감 포함)
+        # 5. 이유 통계 집계 및 INSERT (자돈 증감 포함)
         stats = self._insert_stats(dt_from, dt_to, plan_eu, acc_stats)
 
-        # 5. TS_INS_WEEK 업데이트
+        # 6. 힌트 메시지 INSERT (산출 기준 설명)
+        # prev_hint가 있으면 이전 주차 힌트 사용, 없으면 현재 설정으로 생성
+        self._insert_hint(ins_conf, prev_hint)
+
+        # 7. TS_INS_WEEK 업데이트
         self._update_week(stats, acc_stats)
 
         self.logger.info(f"이유 팝업 완료: 농장={self.farm_no}, 이유복수={stats.get('total_cnt', 0)}")
@@ -68,17 +85,226 @@ class WeaningProcessor(BaseProcessor):
         """
         self.execute(sql, {'master_seq': self.master_seq, 'farm_no': self.farm_no})
 
-    def _get_plan_count(self, sdt: str, edt: str) -> int:
-        """이유 예정 복수 조회 (FN_MD_SCHEDULE_BSE_2020)"""
+    def _get_ins_conf(self) -> Dict[str, Any]:
+        """TS_INS_CONF에서 이유예정 산정방식 설정 조회
+
+        Returns:
+            {'method': 'farm'|'modon'|None, 'tasks': [], 'seq_filter': ''}
+            method=None이면 설정 없음 (예정 복수 산출 안 함)
+        """
+        # 기본값: 설정 없음 (예정 복수 산출 안 함)
+        default_conf = {'method': None, 'tasks': None, 'seq_filter': ''}
+
+        sql = """
+        SELECT WEEK_TW_EU
+        FROM TS_INS_CONF
+        WHERE FARM_NO = :farm_no
+        """
+        result = self.fetch_one(sql, {'farm_no': self.farm_no})
+
+        if not result or not result[0]:
+            self.logger.info(f"TS_INS_CONF 이유 설정 없음, 예정 복수 산출 안 함: farm_no={self.farm_no}")
+            return default_conf
+
+        try:
+            parsed = json.loads(result[0])
+            method = parsed.get('method', 'modon')
+            tasks = parsed.get('tasks') if 'tasks' in parsed else None
+
+            if method == 'modon':
+                if tasks is None or len(tasks) == 0:
+                    seq_filter = ''  # 빈 배열이면 작업 없음
+                else:
+                    seq_filter = ','.join(str(t) for t in tasks)
+            else:
+                seq_filter = '-1'
+
+            conf = {'method': method, 'tasks': tasks, 'seq_filter': seq_filter}
+            self.logger.info(f"TS_INS_CONF 이유 설정 로드: farm_no={self.farm_no}, conf={conf}")
+            return conf
+        except json.JSONDecodeError:
+            self.logger.warning(f"JSON 파싱 실패: WEEK_TW_EU={result[0]}")
+            return default_conf
+
+    def _get_farm_config(self) -> Dict[str, int]:
+        """TC_FARM_CONFIG에서 이유예정 계산에 필요한 설정값 조회
+
+        Returns:
+            {'wean_period': 평균포유기간 (140003, 기본 21일)}
+        """
+        sql = """
+        SELECT CODE, TO_NUMBER(NVL(CVALUE, '21'))
+        FROM TC_FARM_CONFIG
+        WHERE FARM_NO = :farm_no AND CODE = '140003'
+        """
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute(sql, {'farm_no': self.farm_no})
+            rows = cursor.fetchall()
+
+            config = {'wean_period': 21}
+
+            for code, value in rows:
+                if code == '140003':
+                    config['wean_period'] = int(value) if value else 21
+
+            self.logger.info(f"TC_FARM_CONFIG 이유 설정 조회: farm_no={self.farm_no}, config={config}")
+            return config
+        finally:
+            cursor.close()
+
+    def _get_plan_from_prev_week(self) -> Optional[tuple]:
+        """이전 주차 금주예정에서 이유 예정 조회 (힌트 포함)
+
+        조회 우선순위:
+        1. SCHEDULE/EU 상세 데이터 (method='modon'일 때 저장됨) → CNT_1 합산
+        2. TS_INS_WEEK.THIS_EU_SUM (method='farm'일 때도 저장됨) → Fallback
+
+        Returns:
+            (plan_eu, hint) 또는 None (이전 주차 데이터 없음)
+        """
+        # 이전 주차의 MASTER_SEQ 조회 (base.py 헬퍼 사용)
+        prev_master_seq = self._get_prev_week_master_seq()
+        if not prev_master_seq:
+            return None
+
+        # 1. 힌트 정보 조회 (SUB_GUBUN='HELP', STR_3=이유예정 힌트)
+        sql_hint = """
+        SELECT STR_3
+        FROM TS_INS_WEEK_SUB
+        WHERE MASTER_SEQ = :prev_master_seq
+          AND FARM_NO = :farm_no
+          AND GUBUN = 'SCHEDULE'
+          AND SUB_GUBUN = 'HELP'
+        """
+        hint_result = self.fetch_one(sql_hint, {
+            'prev_master_seq': prev_master_seq,
+            'farm_no': self.farm_no,
+        })
+        hint = hint_result[0] if hint_result else None
+
+        # 2. SCHEDULE/- 요약 데이터에서 이유 합계 조회
+        # CNT_4 = eu_sum (이유예정 합계)
+        sql_summary = """
+        SELECT CNT_4
+        FROM TS_INS_WEEK_SUB
+        WHERE MASTER_SEQ = :prev_master_seq
+          AND FARM_NO = :farm_no
+          AND GUBUN = 'SCHEDULE'
+          AND SUB_GUBUN = '-'
+        """
+        summary_result = self.fetch_one(sql_summary, {
+            'prev_master_seq': prev_master_seq,
+            'farm_no': self.farm_no,
+        })
+
+        if summary_result and summary_result[0] is not None:
+            plan_eu = summary_result[0] or 0
+            self.logger.info(f"이전 주차 금주예정 조회: 이유합계={plan_eu}")
+            return (plan_eu, hint)
+
+        return None
+
+    def _get_plan_count(self, sdt: str, edt: str, dt_from: datetime, dt_to: datetime,
+                        ins_conf: Dict[str, Any]) -> tuple:
+        """이유 예정 복수 조회 (이전 주차 우선 조회)
+
+        1차: 이전 주차 금주예정 조회
+        2차: 이전 주차 없으면 직접 계산 (Fallback)
+
+        Args:
+            sdt: 시작일 (yyyy-MM-dd)
+            edt: 종료일 (yyyy-MM-dd)
+            dt_from: 시작일 (datetime)
+            dt_to: 종료일 (datetime)
+            ins_conf: TS_INS_CONF 설정
+
+        Returns:
+            (이유 예정 복수, 힌트) 튜플
+        """
+        # 1. 이전 주차 금주예정 조회 시도
+        prev_data = self._get_plan_from_prev_week()
+        if prev_data is not None:
+            year, week_no = self._get_current_week_info()
+            self.logger.info(f"이전 주차 금주예정 사용: year={year}, week={week_no}")
+            return prev_data  # (plan_eu, hint) 반환
+
+        # 2. Fallback: 이전 주차 없으면 직접 계산
+        self.logger.info("직접 계산 (Fallback): 이전 주차 데이터 없음")
+        return self._calculate_plan_count(sdt, edt, dt_from, dt_to, ins_conf)
+
+    def _calculate_plan_count(self, sdt: str, edt: str, dt_from: datetime, dt_to: datetime,
+                              ins_conf: Dict[str, Any]) -> tuple:
+        """이유 예정 복수 직접 계산 (기존 로직)
+
+        Args:
+            sdt: 시작일 (yyyy-MM-dd)
+            edt: 종료일 (yyyy-MM-dd)
+            dt_from: 시작일 (datetime)
+            dt_to: 종료일 (datetime)
+            ins_conf: TS_INS_CONF 설정
+
+        Returns:
+            (이유 예정 복수, None) 튜플 - 힌트는 _insert_hint()에서 생성
+        """
+        if ins_conf['method'] is None:
+            self.logger.info("이유 예정 설정 없음, 예정 복수 산출 안 함")
+            return 0, None
+        elif ins_conf['method'] == 'farm':
+            return self._count_plan_by_farm(dt_from, dt_to), None
+        else:
+            return self._count_plan_by_modon(sdt, edt, ins_conf['seq_filter']), None
+
+    def _count_plan_by_modon(self, sdt: str, edt: str, seq_filter: str) -> int:
+        """모돈 작업설정 기준 이유 예정 복수 조회 (FN_MD_SCHEDULE_BSE_2020)"""
+        if seq_filter == '':
+            self.logger.info("이유 작업 없음 (seq_filter=''), 카운트 생략")
+            return 0
+
         sql = """
         SELECT COUNT(*)
         FROM TABLE(FN_MD_SCHEDULE_BSE_2020(
             :farm_no, 'JOB-DAJANG', '150003', NULL,
-            :sdt, :edt, NULL, 'ko', 'yyyy-MM-dd', '-1', NULL
+            :sdt, :edt, NULL, 'ko', 'yyyy-MM-dd', :seq_filter, NULL
         ))
         """
-        result = self.fetch_one(sql, {'farm_no': self.farm_no, 'sdt': sdt, 'edt': edt})
+        result = self.fetch_one(sql, {'farm_no': self.farm_no, 'sdt': sdt, 'edt': edt, 'seq_filter': seq_filter})
         return result[0] if result else 0
+
+    def _count_plan_by_farm(self, dt_from: datetime, dt_to: datetime) -> int:
+        """농장 기본값 기준 이유 예정 복수 조회
+
+        TC_FARM_CONFIG 설정값을 사용하여 예정일 계산:
+        - 이유예정: 분만일 + 평균포유기간 (기본 21일)
+        """
+        farm_config = self._get_farm_config()
+        wean_period = farm_config['wean_period']
+
+        # 이유예정: 분만(B) 작업일 + 평균포유기간 = 이유예정일
+        sql = """
+        SELECT COUNT(*)
+        FROM TB_MODON_WK WB
+        INNER JOIN TB_MODON MD
+            ON MD.FARM_NO = :farm_no
+           AND MD.FARM_NO = WB.FARM_NO
+           AND MD.PIG_NO = WB.PIG_NO
+           AND MD.USE_YN = 'Y'
+        WHERE WB.FARM_NO = :farm_no
+          AND WB.WK_GUBUN = 'B'
+          AND WB.WK_DT >= TO_CHAR(:dt_from - :wean_period, 'YYYYMMDD')
+          AND WB.WK_DT < TO_CHAR(:dt_to + 1 - :wean_period, 'YYYYMMDD')
+          AND WB.USE_YN = 'Y'
+        """
+        result = self.fetch_one(sql, {
+            'farm_no': self.farm_no,
+            'dt_from': dt_from,
+            'dt_to': dt_to,
+            'wean_period': wean_period,
+        })
+        plan_eu = result[0] if result else 0
+
+        self.logger.info(f"농장기본값 이유예정: {plan_eu}")
+        return plan_eu
 
     def _get_acc_stats(self, dt_to: str) -> Dict[str, Any]:
         """연간 누적 실적 조회 (1/1 ~ 기준일)
@@ -337,4 +563,61 @@ class WeaningProcessor(BaseProcessor):
             'acc_eu_cnt': acc_stats.get('acc_eu_cnt', 0),
             'acc_eu_jd': acc_stats.get('acc_eu_jd', 0),
             'acc_avg_jd': acc_stats.get('acc_avg_jd', 0),
+        })
+
+    def _insert_hint(self, ins_conf: Dict[str, Any], prev_hint: Optional[str] = None) -> None:
+        """예정 산출기준 힌트 메시지를 STAT ROW의 HINT1 컬럼에 UPDATE
+
+        이유 팝업에서 예정 복수 산출 기준을 표시하기 위한 힌트 저장.
+        기존: 별도 SUB_GUBUN='HINT' ROW로 INSERT
+        변경: 기존 STAT ROW의 HINT1 컬럼에 UPDATE (데이터 절감)
+
+        Args:
+            ins_conf: TS_INS_CONF 설정 (method, tasks, seq_filter)
+            prev_hint: 이전 주차에서 조회한 힌트 (있으면 우선 사용)
+        """
+        # 이전 주차 힌트가 있으면 그대로 사용
+        if prev_hint is not None:
+            hint = prev_hint
+            self.logger.info(f"이전 주차 힌트 사용")
+        elif ins_conf['method'] is None:
+            # 설정 없으면 힌트 저장 안 함
+            return
+        elif ins_conf['method'] == 'farm':
+            # 농장 기본값: TC_FARM_CONFIG 설정값 포함
+            farm_config = self._get_farm_config()
+            hint = (
+                f"(농장 기본값)\n"
+                f"· 포유모돈(평균포유기간) {farm_config['wean_period']}일"
+            )
+        else:
+            # 모돈 작업설정
+            seq_filter = ins_conf['seq_filter']
+            if seq_filter == '':
+                hint = "(모돈 작업설정)\n· 선택된 작업 없음"
+            else:
+                # TB_PLAN_MODON에서 선택된 작업 이름과 경과일 조회 (각 작업별 줄바꿈)
+                sql = """
+                SELECT LISTAGG('· ' || WK_NM || '(' || PASS_DAY || '일)', CHR(10)) WITHIN GROUP (ORDER BY WK_NM)
+                FROM TB_PLAN_MODON
+                WHERE FARM_NO = :farm_no AND JOB_GUBUN_CD = '150003' AND USE_YN = 'Y'
+                  AND SEQ IN ({})
+                """.format(seq_filter)
+                result = self.fetch_one(sql, {'farm_no': self.farm_no})
+                task_names = result[0] if result and result[0] else ''
+                hint = f"(모돈 작업설정)\n{task_names}"
+
+        # UPDATE: 기존 STAT ROW의 HINT1 컬럼에 저장 (EU는 SUB_GUBUN 없음)
+        sql = """
+        UPDATE TS_INS_WEEK_SUB
+        SET HINT1 = :hint
+        WHERE MASTER_SEQ = :master_seq
+          AND FARM_NO = :farm_no
+          AND GUBUN = 'EU'
+          AND SORT_NO = 1
+        """
+        self.execute(sql, {
+            'master_seq': self.master_seq,
+            'farm_no': self.farm_no,
+            'hint': hint,
         })

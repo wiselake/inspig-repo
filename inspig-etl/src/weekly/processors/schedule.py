@@ -508,65 +508,81 @@ class ScheduleProcessor(BaseProcessor):
             WHERE PASS_DT <= :dt_to
             """
         elif schedule_type == 'farrowing':
-            # 분만예정: 임신돈 중 교배일 + 평균임신기간 (파라미터: preg_period)
-            # 금주 범위(dt_from ~ dt_to)에 해당하는 분만예정만 조회
+            # 분만예정: 분만예정돈 대장과 동일한 로직
+            # - 교배(G) 작업 중 다음 SEQ가 사고(F)가 아닌 모돈
+            # - 교배일 + 평균임신기간 = 분만예정일
+            # - TB_MODON 조인으로 살아있는 모돈만 조회
             sql = """
-            SELECT PASS_DT
-            FROM (
-                SELECT TO_DATE(WK.WK_DT, 'YYYYMMDD') + :preg_period AS PASS_DT
-                FROM TB_MODON MD
-                INNER JOIN VM_LAST_MODON_SEQ_WK WK
-                    ON MD.FARM_NO = WK.FARM_NO AND MD.PIG_NO = WK.PIG_NO
-                WHERE MD.FARM_NO = :farm_no
-                  AND MD.USE_YN = 'Y'
-                  AND MD.OUT_DT = TO_DATE('9999-12-31', 'YYYY-MM-DD')
-                  AND WK.WK_GUBUN = 'G'
-                  AND SF_GET_MODONGB_STATUS('CD', WK.WK_GUBUN, NULL, MD.OUT_DT, NULL, 'N', '') = '010002'
-                  AND WK.WK_DT BETWEEN TO_CHAR(:dt_from - :preg_period, 'YYYYMMDD')
-                                   AND TO_CHAR(:dt_to - :preg_period, 'YYYYMMDD')
-            )
-            WHERE PASS_DT BETWEEN :dt_from AND :dt_to
+            SELECT TO_DATE(WG.WK_DT, 'YYYYMMDD') + :preg_period AS PASS_DT
+            FROM TB_MODON_WK WG
+            INNER JOIN TB_MODON MD
+                ON MD.FARM_NO = :farm_no
+               AND MD.FARM_NO = WG.FARM_NO
+               AND MD.PIG_NO = WG.PIG_NO
+               AND MD.USE_YN = 'Y'
+            LEFT OUTER JOIN TB_MODON_WK WF
+                ON WF.FARM_NO = :farm_no
+               AND WF.FARM_NO = WG.FARM_NO
+               AND WF.PIG_NO = WG.PIG_NO
+               AND WF.SEQ = WG.SEQ + 1
+               AND WF.WK_GUBUN = 'F'
+               AND WF.USE_YN = 'Y'
+            WHERE WG.FARM_NO = :farm_no
+              AND WG.WK_GUBUN = 'G'
+              AND WG.WK_DT >= TO_CHAR(TO_DATE(:dt_from_str, 'YYYYMMDD') - :preg_period, 'YYYYMMDD')
+              AND WG.WK_DT < TO_CHAR(TO_DATE(:dt_to_str, 'YYYYMMDD') + 1 - :preg_period, 'YYYYMMDD')
+              AND WF.PIG_NO IS NULL
+              AND WG.USE_YN = 'Y'
             """
         elif schedule_type == 'weaning':
-            # 이유예정: 포유돈/대리모 중 분만일 + 평균포유기간 (파라미터: wean_period)
-            # 금주 범위(dt_from ~ dt_to)에 해당하는 이유예정만 조회
-            # DAERI_YN은 TB_MODON_WK(VM_LAST_MODON_SEQ_WK)에 있음
+            # 이유예정: 이유예정돈 대장과 동일한 로직
+            # - 해당 기간에 분만한 모돈만 조회
+            # - 분만일 + 평균포유기간 = 이유예정일
+            # - TB_MODON 조인으로 살아있는 모돈만 조회
             sql = """
-            SELECT PASS_DT
-            FROM (
-                SELECT TO_DATE(WK.WK_DT, 'YYYYMMDD') + :wean_period AS PASS_DT
-                FROM TB_MODON MD
-                INNER JOIN VM_LAST_MODON_SEQ_WK WK
-                    ON MD.FARM_NO = WK.FARM_NO AND MD.PIG_NO = WK.PIG_NO
-                WHERE MD.FARM_NO = :farm_no
-                  AND MD.USE_YN = 'Y'
-                  AND MD.OUT_DT = TO_DATE('9999-12-31', 'YYYY-MM-DD')
-                  AND WK.WK_GUBUN = 'B'
-                  AND SF_GET_MODONGB_STATUS('CD', WK.WK_GUBUN, NULL, MD.OUT_DT, NULL, WK.DAERI_YN, '') IN ('010003', '010004')
-                  AND WK.WK_DT BETWEEN TO_CHAR(:dt_from - :wean_period, 'YYYYMMDD')
-                                   AND TO_CHAR(:dt_to - :wean_period, 'YYYYMMDD')
-            )
-            WHERE PASS_DT BETWEEN :dt_from AND :dt_to
+            SELECT TO_DATE(WB.WK_DT, 'YYYYMMDD') + :wean_period AS PASS_DT
+            FROM TB_MODON_WK WB
+            INNER JOIN TB_MODON MD
+                ON MD.FARM_NO = :farm_no
+               AND MD.FARM_NO = WB.FARM_NO
+               AND MD.PIG_NO = WB.PIG_NO
+               AND MD.USE_YN = 'Y'
+            WHERE WB.FARM_NO = :farm_no
+              AND WB.WK_GUBUN = 'B'
+              AND WB.WK_DT >= TO_CHAR(TO_DATE(:dt_from_str, 'YYYYMMDD') - :wean_period, 'YYYYMMDD')
+              AND WB.WK_DT < TO_CHAR(TO_DATE(:dt_to_str, 'YYYYMMDD') + 1 - :wean_period, 'YYYYMMDD')
+              AND WB.USE_YN = 'Y'
             """
         else:
             return
 
         cursor = self.conn.cursor()
         try:
-            params = {
-                'farm_no': self.farm_no,
-                'dt_from': dt_from,
-                'dt_to': dt_to,
-            }
-
-            # schedule_type별 farm_config 파라미터 추가
+            # schedule_type별 필요한 파라미터만 설정
             if schedule_type == 'mating':
-                params['avg_return_day'] = farm_config['avg_return_day']
-                params['first_mating_age'] = farm_config['first_mating_age']
+                params = {
+                    'farm_no': self.farm_no,
+                    'dt_from': dt_from,
+                    'dt_to': dt_to,
+                    'avg_return_day': farm_config['avg_return_day'],
+                    'first_mating_age': farm_config['first_mating_age'],
+                }
             elif schedule_type == 'farrowing':
-                params['preg_period'] = farm_config['preg_period']
+                params = {
+                    'farm_no': self.farm_no,
+                    'preg_period': farm_config['preg_period'],
+                    'dt_from_str': dt_from.strftime('%Y%m%d'),
+                    'dt_to_str': dt_to.strftime('%Y%m%d'),
+                }
             elif schedule_type == 'weaning':
-                params['wean_period'] = farm_config['wean_period']
+                params = {
+                    'farm_no': self.farm_no,
+                    'wean_period': farm_config['wean_period'],
+                    'dt_from_str': dt_from.strftime('%Y%m%d'),
+                    'dt_to_str': dt_to.strftime('%Y%m%d'),
+                }
+            else:
+                return
 
             cursor.execute(sql, params)
 
@@ -1033,31 +1049,33 @@ class ScheduleProcessor(BaseProcessor):
         # 형식: settings 페이지(WeeklyScheduleSettings.tsx)와 동일하게
         def get_seq_condition(conf_key: str, job_gubun_cd: str) -> str:
             if ins_conf[conf_key]['method'] == 'farm':
-                # 농장기본값: 작업별 실제 설정값 포함 (settings 페이지 형식)
+                # 농장 기본값: 작업별 실제 설정값 포함 (settings 페이지 형식)
                 # 각 항목 별도 줄로 표시 (· 기호 사용)
                 if conf_key == 'mating':
                     # 교배: 이유돈, 후보돈, 사고/재발돈 각각 한 줄씩
-                    return f"""'(농장기본값)' || CHR(10) ||
+                    return f"""'(농장 기본값)' || CHR(10) ||
                            '· 이유돈(평균재귀일) {config['avg_return_day']}일' || CHR(10) ||
                            '· 후보돈(초교배일령) {config['first_mating_age']}일' || CHR(10) ||
                            '· 사고/재발돈 즉시'"""
                 elif conf_key == 'farrowing':
                     # 분만: 임신모돈(평균임신기간) 115일
-                    return f"""'(농장기본값)' || CHR(10) ||
+                    return f"""'(농장 기본값)' || CHR(10) ||
                            '· 임신모돈(평균임신기간) {config['preg_period']}일'"""
                 elif conf_key == 'weaning':
                     # 이유: 포유모돈(평균포유기간) 21일
-                    return f"""'(농장기본값)' || CHR(10) ||
+                    return f"""'(농장 기본값)' || CHR(10) ||
                            '· 포유모돈(평균포유기간) {config['wean_period']}일'"""
                 elif conf_key == 'vaccine':
-                    return "'(농장기본값) 백신설정 기준'"
+                    return "'(농장 기본값)' || CHR(10) || '· 백신설정 기준'"
                 else:
-                    return "'농장기본값'"
+                    return "'(농장 기본값)'"
+            # 모돈 작업설정
             seq_filter = ins_conf[conf_key]['seq_filter']
             if seq_filter == '':
-                return "'(선택된 작업 없음)'"
+                return "'(모돈 작업설정)' || CHR(10) || '· 선택된 작업 없음'"
             else:
-                return f"""(SELECT LISTAGG(WK_NM || '(' || PASS_DAY || '일)', ',') WITHIN GROUP (ORDER BY WK_NM)
+                return f"""'(모돈 작업설정)' || CHR(10) ||
+                           (SELECT LISTAGG('· ' || WK_NM || '(' || PASS_DAY || '일)', CHR(10)) WITHIN GROUP (ORDER BY WK_NM)
                            FROM TB_PLAN_MODON WHERE FARM_NO = :farm_no AND JOB_GUBUN_CD = '{job_gubun_cd}' AND USE_YN = 'Y'
                            AND SEQ IN ({seq_filter}))"""
 
@@ -1066,25 +1084,27 @@ class ScheduleProcessor(BaseProcessor):
         def get_pregnancy_3w_condition() -> str:
             """재발확인(3주) 조건"""
             if ins_conf['pregnancy']['method'] == 'farm':
-                return "'(농장기본값) 교배 후 3주'"
+                return "'(농장 기본값)' || CHR(10) || '· 교배 후 21일'"
             seq_filter = ins_conf['pregnancy']['seq_filter']
             if seq_filter == '':
-                return "'(모돈작업설정) 선택된 작업 없음'"
+                return "'(모돈 작업설정)' || CHR(10) || '· 선택된 작업 없음'"
             else:
-                return f"""(SELECT LISTAGG(WK_NM || '(' || PASS_DAY || '일)', ',') WITHIN GROUP (ORDER BY WK_NM)
+                return f"""'(모돈 작업설정)' || CHR(10) ||
+                           (SELECT LISTAGG('· ' || WK_NM || '(' || PASS_DAY || '일)', CHR(10)) WITHIN GROUP (ORDER BY WK_NM)
                            FROM TB_PLAN_MODON WHERE FARM_NO = :farm_no AND JOB_GUBUN_CD = '150001' AND USE_YN = 'Y'
                            AND SEQ IN ({seq_filter}))"""
 
         def get_pregnancy_4w_condition() -> str:
             """임신진단(4주) 조건"""
             if ins_conf['pregnancy']['method'] == 'farm':
-                return "'(농장기본값) 교배 후 4주'"
+                return "'(농장 기본값)' || CHR(10) || '· 교배 후 28일'"
             seq_filter = ins_conf['pregnancy']['seq_filter']
             if seq_filter == '':
-                return "'(모돈작업설정) 선택된 작업 없음'"
+                return "'(모돈 작업설정)' || CHR(10) || '· 선택된 작업 없음'"
             else:
                 # 모돈작업설정일 때는 재발확인과 동일 (TB_PLAN_MODON에서 선택된 작업)
-                return f"""(SELECT LISTAGG(WK_NM || '(' || PASS_DAY || '일)', ',') WITHIN GROUP (ORDER BY WK_NM)
+                return f"""'(모돈 작업설정)' || CHR(10) ||
+                           (SELECT LISTAGG('· ' || WK_NM || '(' || PASS_DAY || '일)', CHR(10)) WITHIN GROUP (ORDER BY WK_NM)
                            FROM TB_PLAN_MODON WHERE FARM_NO = :farm_no AND JOB_GUBUN_CD = '150001' AND USE_YN = 'Y'
                            AND SEQ IN ({seq_filter}))"""
 

@@ -479,3 +479,93 @@ class BaseProcessor(ABC):
         """
         sorted_data = self.sort_data(data, sort_field, reverse)
         return sorted_data[:n]
+
+    # ========================================
+    # 주차 관련 헬퍼 메서드
+    # ========================================
+
+    def _get_current_week_info(self) -> tuple:
+        """현재 리포트의 연도와 주차 정보 조회
+
+        Returns:
+            (year, week_no) 튜플
+        """
+        sql = """
+        SELECT REPORT_YEAR, REPORT_WEEK_NO
+        FROM TS_INS_MASTER
+        WHERE SEQ = :master_seq
+        """
+        result = self.fetch_one(sql, {'master_seq': self.master_seq})
+        if result:
+            return (result[0], result[1])
+        return (None, None)
+
+    def _get_last_week_of_year(self, year: int) -> int:
+        """해당 연도의 마지막 ISO 주차 조회 (52 또는 53)
+
+        Args:
+            year: 연도
+
+        Returns:
+            마지막 주차 (52 또는 53)
+        """
+        # 방법 1: DB에서 해당 연도의 최대 주차 조회
+        sql = """
+        SELECT MAX(REPORT_WEEK_NO)
+        FROM TS_INS_MASTER
+        WHERE REPORT_YEAR = :year
+          AND DAY_GB = 'WEEK'
+        """
+        result = self.fetch_one(sql, {'year': year})
+        if result and result[0]:
+            return result[0]
+
+        # 방법 2: Python으로 ISO week 계산 (Fallback)
+        # 12월 28일은 항상 마지막 주차에 포함됨 (ISO 8601 규칙)
+        from datetime import date
+        dec_28 = date(year, 12, 28)
+        return dec_28.isocalendar()[1]  # 52 또는 53 반환
+
+    def _get_prev_week_info(self) -> tuple:
+        """이전 주차 정보 계산
+
+        Returns:
+            (prev_year, prev_week_no) 튜플
+        """
+        year, week_no = self._get_current_week_info()
+        if year is None or week_no is None:
+            return (None, None)
+
+        if week_no == 1:
+            # 1주차면 이전년도 마지막 주차
+            prev_year = year - 1
+            prev_week_no = self._get_last_week_of_year(prev_year)
+        else:
+            prev_year = year
+            prev_week_no = week_no - 1
+
+        return (prev_year, prev_week_no)
+
+    def _get_prev_week_master_seq(self) -> Optional[int]:
+        """이전 주차의 MASTER_SEQ 조회
+
+        Returns:
+            이전 주차 MASTER_SEQ 또는 None
+        """
+        prev_year, prev_week_no = self._get_prev_week_info()
+        if prev_year is None:
+            return None
+
+        sql = """
+        SELECT SEQ
+        FROM TS_INS_MASTER
+        WHERE REPORT_YEAR = :prev_year
+          AND REPORT_WEEK_NO = :prev_week_no
+          AND DAY_GB = 'WEEK'
+          AND STATUS_CD = 'COMPLETE'
+        """
+        result = self.fetch_one(sql, {
+            'prev_year': prev_year,
+            'prev_week_no': prev_week_no,
+        })
+        return result[0] if result else None

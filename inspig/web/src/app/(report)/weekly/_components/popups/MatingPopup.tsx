@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { MatingPopupData } from '@/types/weekly';
 import { PopupContainer } from './PopupContainer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTable, faChartSimple } from '@fortawesome/free-solid-svg-icons';
+import { faTable, faChartSimple, faLightbulb, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useChartResponsive } from './useChartResponsive';
 import { useTheme } from '@/contexts/ThemeContext';
 
@@ -23,11 +23,30 @@ interface MatingPopupProps {
  */
 export const MatingPopup: React.FC<MatingPopupProps> = ({ isOpen, onClose, data }) => {
     const [activeTab, setActiveTab] = useState<'table' | 'chart'>('table');
+    const [showHintTooltip, setShowHintTooltip] = useState(false);
+    const hintTooltipRef = useRef<HTMLDivElement>(null);
     const chartSizes = useChartResponsive();
     const { theme } = useTheme();
 
     // 다크모드 색상
     const isDark = theme === 'dark';
+
+    // 툴팁 외부 클릭 감지
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (hintTooltipRef.current && !hintTooltipRef.current.contains(event.target as Node)) {
+                setShowHintTooltip(false);
+            }
+        };
+
+        if (showHintTooltip) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showHintTooltip]);
     const textColor = isDark ? '#e6edf3' : '#1d1d1f';
     const splitLineColor = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)';
     const dataLabelColor = isDark ? '#ffd700' : '#333';  // 다크모드: 골드 (확 뜨는 색상)
@@ -143,7 +162,38 @@ export const MatingPopup: React.FC<MatingPopupProps> = ({ isOpen, onClose, data 
                 <div className="popup-tab-content" id="tab-mating-table">
                     <div className="popup-section-desc">
                         <span>달성율 : 예정작업 대비</span>
-                        <span>단위: 복</span>
+                        {data.hint && (
+                            <span ref={hintTooltipRef} style={{ position: 'relative', marginLeft: '4px' }}>
+                                <span
+                                    className="icon-circle clickable"
+                                    onClick={() => setShowHintTooltip(!showHintTooltip)}
+                                    style={{ cursor: 'pointer', color: '#f59e0b' }}
+                                >
+                                    <FontAwesomeIcon icon={faLightbulb} />
+                                </span>
+                                {showHintTooltip && (
+                                    <div className="help-tooltip" style={{
+                                        position: 'absolute',
+                                        top: '100%',
+                                        left: '0',
+                                        zIndex: 100,
+                                        marginTop: '4px',
+                                        minWidth: '200px',
+                                    }}>
+                                        <div className="help-tooltip-header">
+                                            <span>예정 산출기준</span>
+                                            <button className="close-btn" onClick={() => setShowHintTooltip(false)}>
+                                                <FontAwesomeIcon icon={faXmark} />
+                                            </button>
+                                        </div>
+                                        <div className="help-tooltip-body" style={{ whiteSpace: 'pre-line' }}>
+                                            {data.hint}
+                                        </div>
+                                    </div>
+                                )}
+                            </span>
+                        )}
+                        <span style={{ marginLeft: 'auto' }}>단위: 복</span>
                     </div>
 
                     {/* 요약 리스트 - 유형 2 스타일 */}

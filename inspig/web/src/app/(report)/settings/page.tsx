@@ -455,7 +455,7 @@ function SettingsContent() {
     const renderWeeklyTab = () => (
         <div className="space-y-4">
             {/* 금주 작업예정 산정 방식 설정 */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <div id="section-weekly-schedule" className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                 <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
                     <h2 className="font-semibold text-gray-900 dark:text-white">
                         금주 작업예정 산정 방식
@@ -465,6 +465,11 @@ function SettingsContent() {
                         <span className="block">• 모돈 작업설정 선택 시 최소 1개 이상 선택해야 합니다.</span>
                         <span className="block">• 변경된 설정은 차주 보고서부터 적용됩니다.</span>
                     </p>
+                    <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-700/50 rounded text-xs text-gray-600 dark:text-gray-400">
+                        <p className="mb-1"><span className="font-medium text-blue-600 dark:text-blue-400">농장 기본값</span>: 기준 작업일 + 경과일 (예: 교배일+115일)</p>
+                        <p><span className="font-medium text-green-600 dark:text-green-400">모돈 작업설정</span>: 마지막 작업일 + 경과일</p>
+                        <p className="text-gray-400 ml-16">※ 이후 작업 시 결과가 다를 수 있음</p>
+                    </div>
                 </div>
                 {farmNo ? (
                     <WeeklyScheduleSettings farmNo={farmNo} showSaveButton={true} />

@@ -180,6 +180,16 @@ export class TsInsWeekSub {
   @Column({ name: 'STR_15', type: 'varchar2', length: 100, nullable: true })
   str15: string;
 
+  // 힌트 컬럼 (HINT1, HINT2, HINT3) - 예정 산출기준 설명용
+  @Column({ name: 'HINT1', type: 'varchar2', length: 500, nullable: true })
+  hint1: string;
+
+  @Column({ name: 'HINT2', type: 'varchar2', length: 500, nullable: true })
+  hint2: string;
+
+  @Column({ name: 'HINT3', type: 'varchar2', length: 500, nullable: true })
+  hint3: string;
+
   @Column({ name: 'LOG_INS_DT', type: 'date', default: () => 'SYSDATE' })
   logInsDt: Date;
 

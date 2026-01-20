@@ -435,7 +435,7 @@ export default function WeeklyScheduleSettings({
                         const weanPeriod = farmConfigData?.farmConfig['140003']?.value || 21;
                         const shipOffset = shipDays - weanPeriod;
                         return (
-                            <div className="border rounded-lg border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10">
+                            <div id="schedule-shipment" className="border rounded-lg border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10">
                                 <div className="flex items-center justify-between px-4 py-3">
                                     <div className="flex items-center gap-2">
                                         <span className="text-sm lg:text-base font-medium text-gray-700 dark:text-gray-300">

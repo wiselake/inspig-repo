@@ -1125,6 +1125,10 @@ export class WeeklyService {
     sub.str13 = row.STR_13;
     sub.str14 = row.STR_14;
     sub.str15 = row.STR_15;
+    // HINT1 ~ HINT3
+    sub.hint1 = row.HINT1;
+    sub.hint2 = row.HINT2;
+    sub.hint3 = row.HINT3;
     return sub;
   }
 
@@ -1256,9 +1260,8 @@ export class WeeklyService {
    *   - VAL_1: 평균 재귀발정일
    *   - VAL_2: 평균 초교배일
    *
-   * GB/CHART 컬럼 매핑:
-   *   - CODE_1: 재귀일 구간 (~7, 10, 15, ... 50↑)
-   *   - CNT_1: 해당 구간 교배복수
+   * GB/CHART 컬럼 매핑 (1 ROW 형식):
+   *   - CNT_1~CNT_8: 재귀일별 (~3일, 4일, 5일, 6일, 7일, 8일, 9일, 10일↑)
    *
    * @returns MatingPopupData 형식
    */
@@ -1311,10 +1314,16 @@ export class WeeklyService {
     };
 
     // 재귀일별 차트 데이터 (GUBUN='GB', SUB_GUBUN='CHART')
-    const chartSubs = subs.filter((s) => s.gubun === 'GB' && s.subGubun === 'CHART').sort((a, b) => (a.sortNo || 0) - (b.sortNo || 0));
+    // 1 ROW 형식: CNT_1~CNT_8 = 재귀일별 (~3일, 4일, 5일, 6일, 7일, 8일, 9일, 10일↑)
+    const chartSub = subs.find((s) => s.gubun === 'GB' && s.subGubun === 'CHART');
+    const chartLabels = ['~3', '4', '5', '6', '7', '8', '9', '10↑'];
+    const chartData = chartLabels.map((_, i) => {
+      const cntKey = `cnt${i + 1}` as keyof TsInsWeekSub;
+      return (chartSub?.[cntKey] as number) || 0;
+    });
     const chart = {
-      xAxis: chartSubs.map((s) => s.code1 || ''),
-      data: chartSubs.map((s) => s.cnt1 || 0),
+      xAxis: chartLabels,
+      data: chartData,
     };
 
     // 요약 정보 (GB_STAT)
@@ -1332,7 +1341,11 @@ export class WeeklyService {
       sagoGbCnt: statSub.cnt5 || 0,         // CNT_5: 재발교배복수 실적 (예정 없음)
     } : undefined;
 
-    return { table, total, chart, summary };
+    // 힌트 메시지 - 예정 산출기준 설명
+    // 기존: 별도 SUB_GUBUN='HINT' ROW → 변경: STAT ROW의 HINT1 컬럼
+    const hint = statSub?.hint1 || undefined;
+
+    return { table, total, chart, summary, hint };
   }
 
   /**
@@ -1413,6 +1426,9 @@ export class WeeklyService {
           rate: calcRate(statSub?.cnt6 || 0),
         },
       },
+      // 힌트 메시지 - 예정 산출기준 설명
+      // 기존: 별도 SUB_GUBUN='HINT' ROW → 변경: STAT ROW의 HINT1 컬럼
+      hint: statSub?.hint1 || undefined,
     };
   }
 
@@ -1486,6 +1502,9 @@ export class WeeklyService {
         fosterIn: statSub?.cnt8 || 0,     // CNT_8: 양자전입 (160003)
         fosterOut: statSub?.cnt9 || 0,    // CNT_9: 양자전출 (160004)
       },
+      // 힌트 메시지 - 예정 산출기준 설명
+      // 기존: 별도 SUB_GUBUN='HINT' ROW → 변경: STAT ROW의 HINT1 컬럼
+      hint: statSub?.hint1 || undefined,
     };
   }
 

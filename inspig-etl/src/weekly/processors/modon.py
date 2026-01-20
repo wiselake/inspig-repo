@@ -265,25 +265,16 @@ class ModonProcessor(BaseProcessor):
         return total_cnt, sangsi_cnt
 
     def _get_previous_data(self) -> Optional[Dict[str, Any]]:
-        """이전 주차 데이터 조회"""
-        sql = """
-        SELECT SEQ
-        FROM (
-            SELECT SEQ
-            FROM TS_INS_MASTER
-            WHERE DAY_GB = 'WEEK'
-              AND SEQ < :master_seq
-              AND STATUS_CD = 'COMPLETE'
-            ORDER BY SEQ DESC
-        )
-        WHERE ROWNUM = 1
+        """이전 주차 데이터 조회
+
+        YEAR, WEEK_NO 기준으로 정확한 이전 주차를 조회합니다.
+        (기존: SEQ 순서 기준 → 변경: YEAR/WEEK_NO 기준)
         """
-        result = self.fetch_one(sql, {'master_seq': self.master_seq})
+        # base.py의 헬퍼 메소드 사용
+        prev_master_seq = self._get_prev_week_master_seq()
 
-        if not result:
+        if not prev_master_seq:
             return None
-
-        prev_master_seq = result[0]
 
         # 이전 주차 합계두수 조회
         sql_prev = """
