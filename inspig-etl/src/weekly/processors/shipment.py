@@ -291,21 +291,21 @@ class ShipmentProcessor(BaseProcessor):
         return insert_count
 
     def _calculate_and_insert_scatter(self, dt_from: str, dt_to: str) -> int:
-        """출하 산점도 INSERT (직접 SQL 조회)
+        """출하 산점도 INSERT (JSON 형식 - 1 ROW)
 
-        Oracle SP_INS_WEEK_SHIP_POPUP과 동일:
+        기존 N ROW 방식에서 JSON 1 ROW로 변경 (데이터 효율화):
         - ROUND(NET_KG), ROUND(BACK_DEPTH) 단위로 GROUP BY
-        - VAL_1: ROUND(NET_KG)
-        - VAL_2: ROUND(BACK_DEPTH)
-        - CNT_1: 건수
+        - STR_1: JSON 배열 [{"x":도체중, "y":등지방, "cnt":두수}, ...]
 
         Args:
             dt_from: 시작일 (YYYYMMDD)
             dt_to: 종료일 (YYYYMMDD)
 
         Returns:
-            INSERT된 레코드 수
+            INSERT된 레코드 수 (0 또는 1)
         """
+        import json
+
         dt_from_str = f"{dt_from[:4]}-{dt_from[4:6]}-{dt_from[6:8]}"
         dt_to_str = f"{dt_to[:4]}-{dt_to[4:6]}-{dt_to[6:8]}"
 
@@ -328,30 +328,33 @@ class ShipmentProcessor(BaseProcessor):
         if not lpd_scatter:
             return 0
 
-        insert_count = 0
+        # JSON 배열 생성: [{"x": 도체중, "y": 등지방, "cnt": 두수}, ...]
+        scatter_data = []
+        for row in lpd_scatter:
+            scatter_data.append({
+                'x': int(row[0]) if row[0] is not None else 0,  # NET_KG_GRP (도체중)
+                'y': int(row[1]) if row[1] is not None else 0,  # BACK_GRP (등지방)
+                'cnt': int(row[2]) if row[2] is not None else 0,  # 두수
+            })
+
+        scatter_json = json.dumps(scatter_data, ensure_ascii=False)
+
+        # 1 ROW로 INSERT (JSON_DATA CLOB에 JSON 저장 - 크기 제한 없음)
         sql_ins = """
             INSERT INTO TS_INS_WEEK_SUB (
-                MASTER_SEQ, FARM_NO, GUBUN, SUB_GUBUN, SORT_NO,
-                VAL_1, VAL_2, CNT_1
+                MASTER_SEQ, FARM_NO, GUBUN, SUB_GUBUN, SORT_NO, JSON_DATA
             ) VALUES (
-                :master_seq, :farm_no, 'SHIP', 'SCATTER', :sort_no,
-                :val_1, :val_2, :cnt_1
+                :master_seq, :farm_no, 'SHIP', 'SCATTER', 1, :scatter_json
             )
         """
+        self.execute(sql_ins, {
+            'master_seq': self.master_seq,
+            'farm_no': self.farm_no,
+            'scatter_json': scatter_json,
+        })
 
-        for sort_no, row in enumerate(lpd_scatter, start=1):
-            # SQL 결과: ROUND(NET_KG), ROUND(BACK_DEPTH), COUNT(*)
-            self.execute(sql_ins, {
-                'master_seq': self.master_seq,
-                'farm_no': self.farm_no,
-                'sort_no': sort_no,
-                'val_1': row[0],  # NET_KG_GRP
-                'val_2': row[1],  # BACK_GRP
-                'cnt_1': row[2],  # CNT
-            })
-            insert_count += 1
-
-        return insert_count
+        self.logger.info(f"SCATTER JSON 저장: {len(scatter_data)}개 좌표 → 1 ROW")
+        return 1
 
     def _calculate_and_insert_row(self, lpd_daily: List[Dict], lpd_week_avg: Dict,
                                      dt_from: str, dt_to: str) -> int:

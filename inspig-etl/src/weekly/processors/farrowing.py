@@ -63,7 +63,7 @@ class FarrowingProcessor(BaseProcessor):
 
         # 6. 힌트 메시지 INSERT (산출 기준 설명)
         # prev_hint가 있으면 이전 주차 힌트 사용, 없으면 현재 설정으로 생성
-        self._insert_hint(ins_conf)
+        self._insert_hint(ins_conf, prev_hint)
 
         # 7. TS_INS_WEEK 업데이트
         self._update_week(stats, acc_stats)
@@ -523,17 +523,25 @@ class FarrowingProcessor(BaseProcessor):
             'acc_avg_live': acc_stats.get('acc_avg_live', 0),
         })
 
-    def _insert_hint(self, ins_conf: Dict[str, Any]) -> None:
+    def _insert_hint(self, ins_conf: Dict[str, Any], prev_hint: Optional[str] = None) -> None:
         """예정 산출기준 힌트 메시지를 STAT ROW의 HINT1 컬럼에 UPDATE
 
         분만 팝업에서 예정 복수 산출 기준을 표시하기 위한 힌트 저장.
         기존: 별도 SUB_GUBUN='HINT' ROW로 INSERT
         변경: 기존 STAT ROW의 HINT1 컬럼에 UPDATE (데이터 절감)
 
+        힌트 사용 우선순위:
+        1. prev_hint가 있으면 (이전 주 금주예정의 힌트) 그대로 사용
+        2. prev_hint가 없으면 (Fallback) 현재 설정으로 힌트 생성
+
         Args:
             ins_conf: TS_INS_CONF 설정 (method, tasks, seq_filter)
+            prev_hint: 이전 주차의 금주예정 힌트 (지난주 예정 산출시 사용)
         """
-        if ins_conf['method'] == 'farm':
+        # 이전 주 힌트가 있으면 그대로 사용 (지난주 예정 산출기준)
+        if prev_hint and prev_hint.strip():
+            hint = prev_hint
+        elif ins_conf['method'] == 'farm':
             # 농장 기본값: TC_FARM_CONFIG 설정값 포함
             farm_config = self._get_farm_config()
             hint = (
