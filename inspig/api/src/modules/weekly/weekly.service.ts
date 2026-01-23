@@ -981,8 +981,9 @@ export class WeeklyService {
     const helpSub = subs.find((s) => s.gubun === 'SCHEDULE' && s.subGubun === 'HELP');
     if (!helpSub) return undefined;
 
-    // 산정방식 판단: '농장기본값' 문자열 포함 여부
-    const isFarmDefault = (str: string) => str === '농장기본값' || str.includes('농장기본값');
+    // METHOD row에서 산정방식 직접 조회 (farm/modon)
+    // ETL에서 SUB_GUBUN='METHOD'로 별도 저장: STR_1=교배, STR_2=분만, STR_3=임신감정, STR_4=이유, STR_5=백신
+    const methodSub = subs.find((s) => s.gubun === 'SCHEDULE' && s.subGubun === 'METHOD');
 
     return {
       mating: helpSub.str1 || '',        // 교배 산출기준
@@ -995,10 +996,11 @@ export class WeeklyService {
       // 모돈작업설정일 때 통합 표시용 (str6, str7 동일한 값)
       pregnancy: helpSub.str6 || '',     // 임신감정 산출기준 (모돈작업설정용)
       // 각 작업별 산정방식 (true: 농장기본값 = 팝업 없음, false: 모돈작업설정 = 팝업 있음)
-      isFarmMating: isFarmDefault(helpSub.str1 || ''),
-      isFarmFarrowing: isFarmDefault(helpSub.str2 || ''),
-      isFarmWeaning: isFarmDefault(helpSub.str3 || ''),
-      isFarmVaccine: isFarmDefault(helpSub.str4 || ''),
+      // METHOD row에서 직접 method 값 확인 (farm이면 팝업 없음)
+      isFarmMating: methodSub?.str1 === 'farm',
+      isFarmFarrowing: methodSub?.str2 === 'farm',
+      isFarmWeaning: methodSub?.str4 === 'farm',  // METHOD row: STR_4=이유
+      isFarmVaccine: methodSub?.str5 === 'farm',  // METHOD row: STR_5=백신
     };
   }
 
