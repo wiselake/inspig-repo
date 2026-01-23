@@ -973,47 +973,146 @@ class ScheduleProcessor(BaseProcessor):
     def _insert_mating_farm_popup(self, v_sdt: str, v_edt: str, dt_from: datetime) -> None:
         """교배예정 팝업 상세 INSERT - 농장기본값 (SUB_GUBUN='GB')
 
-        농장기본값(다장 방식)일 때 교배예정 팝업 상세 데이터 생성
-        - 이유돈: 평균재귀일 기준
-        - 후보돈: 초교배일령 기준
-        - 사고/재발돈: 즉시
+        농장기본값일 때 교배예정 팝업 상세 데이터 생성
+        - 이유돈: 이유일 + 평균재귀일 기준
+        - 후보돈: 생년월일 + 초교배일령 기준
+        - 사고/재발돈: 사고일 + 1일 (즉시)
 
-        FN_MD_SCHEDULE_BSE_2020 함수를 seq_filter=NULL로 호출하면 다장 방식으로 계산
+        _count_schedule_by_farm()과 동일한 로직 사용
         """
+        # TC_FARM_CONFIG 설정 조회
+        farm_config = self._get_farm_config_for_schedule()
+        avg_return_day = farm_config['avg_return_day']
+        first_mating_age = farm_config['first_mating_age']
+
+        dt_to = dt_from + timedelta(days=6)
+
+        # 3가지 카테고리별로 팝업 상세 INSERT
+        # STR_1: 작업명, STR_4: 경과일, CNT_1: 합계, CNT_2~8: 요일별
         sql = """
         INSERT INTO TS_INS_WEEK_SUB (
             MASTER_SEQ, FARM_NO, GUBUN, SUB_GUBUN, SORT_NO,
-            STR_1, STR_2, STR_3, STR_4, CNT_1,
+            STR_1, STR_4, CNT_1,
             CNT_2, CNT_3, CNT_4, CNT_5, CNT_6, CNT_7, CNT_8
         )
         SELECT :master_seq, :farm_no, 'SCHEDULE', 'GB', ROWNUM,
-               WK_NM, STD_CD, MODON_STATUS_CD, PASS_DAY, NVL(CNT, 0),
+               WK_NM, PASS_DAY, NVL(CNT, 0),
                NVL(D1, 0), NVL(D2, 0), NVL(D3, 0), NVL(D4, 0), NVL(D5, 0), NVL(D6, 0), NVL(D7, 0)
         FROM (
-            SELECT WK_NM, STD_CD, MODON_STATUS_CD, PASS_DAY,
+            SELECT WK_NM, PASS_DAY,
                    COUNT(*) CNT,
-                   SUM(CASE WHEN TRUNC(TO_DATE(PASS_DT, 'YYYY-MM-DD')) < :dt_from THEN 1
-                            WHEN TRUNC(TO_DATE(PASS_DT, 'YYYY-MM-DD')) = :dt_from THEN 1 ELSE 0 END) AS D1,
-                   SUM(CASE WHEN TRUNC(TO_DATE(PASS_DT, 'YYYY-MM-DD')) = :dt_from + 1 THEN 1 ELSE 0 END) AS D2,
-                   SUM(CASE WHEN TRUNC(TO_DATE(PASS_DT, 'YYYY-MM-DD')) = :dt_from + 2 THEN 1 ELSE 0 END) AS D3,
-                   SUM(CASE WHEN TRUNC(TO_DATE(PASS_DT, 'YYYY-MM-DD')) = :dt_from + 3 THEN 1 ELSE 0 END) AS D4,
-                   SUM(CASE WHEN TRUNC(TO_DATE(PASS_DT, 'YYYY-MM-DD')) = :dt_from + 4 THEN 1 ELSE 0 END) AS D5,
-                   SUM(CASE WHEN TRUNC(TO_DATE(PASS_DT, 'YYYY-MM-DD')) = :dt_from + 5 THEN 1 ELSE 0 END) AS D6,
-                   SUM(CASE WHEN TRUNC(TO_DATE(PASS_DT, 'YYYY-MM-DD')) = :dt_from + 6 THEN 1 ELSE 0 END) AS D7
-            FROM TABLE(FN_MD_SCHEDULE_BSE_2020(
-                :farm_no, 'JOB-DAJANG', '150005', NULL,
-                :v_sdt, :v_edt, NULL, 'ko', 'yyyy-MM-dd', NULL, NULL
-            ))
-            GROUP BY WK_NM, STD_CD, MODON_STATUS_CD, PASS_DAY
-            ORDER BY WK_NM
+                   SUM(CASE WHEN PASS_DT <= :dt_from THEN 1 ELSE 0 END) AS D1,
+                   SUM(CASE WHEN PASS_DT = :dt_from + 1 THEN 1 ELSE 0 END) AS D2,
+                   SUM(CASE WHEN PASS_DT = :dt_from + 2 THEN 1 ELSE 0 END) AS D3,
+                   SUM(CASE WHEN PASS_DT = :dt_from + 3 THEN 1 ELSE 0 END) AS D4,
+                   SUM(CASE WHEN PASS_DT = :dt_from + 4 THEN 1 ELSE 0 END) AS D5,
+                   SUM(CASE WHEN PASS_DT = :dt_from + 5 THEN 1 ELSE 0 END) AS D6,
+                   SUM(CASE WHEN PASS_DT = :dt_from + 6 THEN 1 ELSE 0 END) AS D7
+            FROM (
+                WITH LAST_WK AS (
+                    SELECT WK.FARM_NO, WK.PIG_NO, WK.WK_DT, WK.WK_GUBUN, WK.DAERI_YN
+                    FROM (
+                        SELECT FARM_NO, PIG_NO, WK_DT, WK_GUBUN, DAERI_YN,
+                               ROW_NUMBER() OVER (PARTITION BY FARM_NO, PIG_NO ORDER BY SEQ DESC) AS RN
+                        FROM TB_MODON_WK
+                        WHERE FARM_NO = :farm_no
+                          AND USE_YN = 'Y'
+                          AND WK_DT < TO_CHAR(:dt_from, 'YYYYMMDD')
+                          AND PIG_NO IN (
+                              SELECT PIG_NO FROM TB_MODON
+                              WHERE FARM_NO = :farm_no AND USE_YN = 'Y' AND OUT_DT > :dt_to
+                          )
+                    ) WK
+                    WHERE WK.RN = 1
+                )
+                -- 1. 이유돈: 마지막 작업이 이유(E), 대리모 아님
+                SELECT '이유돈(평균재귀일)' AS WK_NM,
+                       :avg_return_day || '일' AS PASS_DAY,
+                       TO_DATE(WK.WK_DT, 'YYYYMMDD') + :avg_return_day AS PASS_DT
+                FROM TB_MODON MD
+                INNER JOIN LAST_WK WK ON MD.FARM_NO = WK.FARM_NO AND MD.PIG_NO = WK.PIG_NO
+                WHERE MD.FARM_NO = :farm_no
+                  AND MD.USE_YN = 'Y'
+                  AND MD.OUT_DT > :dt_to
+                  AND WK.WK_GUBUN = 'E'
+                  AND WK.DAERI_YN = 'N'
+                  AND WK.WK_DT <= TO_CHAR(:dt_to - :avg_return_day, 'YYYYMMDD')
+                UNION ALL
+                -- 2. 이유돈: TB_MODON_WK 없고 STATUS_CD='010005'
+                SELECT '이유돈(평균재귀일)' AS WK_NM,
+                       :avg_return_day || '일' AS PASS_DAY,
+                       MD.LAST_WK_DT + :avg_return_day AS PASS_DT
+                FROM TB_MODON MD
+                WHERE MD.FARM_NO = :farm_no
+                  AND MD.USE_YN = 'Y'
+                  AND MD.OUT_DT > :dt_to
+                  AND MD.STATUS_CD = '010005'
+                  AND MD.LAST_WK_DT IS NOT NULL
+                  AND MD.LAST_WK_DT <= :dt_to - :avg_return_day
+                  AND NOT EXISTS (
+                      SELECT 1 FROM TB_MODON_WK WK
+                      WHERE WK.FARM_NO = :farm_no AND WK.PIG_NO = MD.PIG_NO
+                        AND WK.USE_YN = 'Y' AND WK.WK_DT < TO_CHAR(:dt_from, 'YYYYMMDD')
+                  )
+                UNION ALL
+                -- 3. 후보돈: TB_MODON_WK 없고 STATUS_CD='010001'
+                SELECT '후보돈(초교배일령)' AS WK_NM,
+                       :first_mating_age || '일' AS PASS_DAY,
+                       MD.BIRTH_DT + :first_mating_age AS PASS_DT
+                FROM TB_MODON MD
+                WHERE MD.FARM_NO = :farm_no
+                  AND MD.USE_YN = 'Y'
+                  AND MD.OUT_DT > :dt_to
+                  AND MD.STATUS_CD = '010001'
+                  AND MD.BIRTH_DT IS NOT NULL
+                  AND MD.BIRTH_DT <= :dt_to - :first_mating_age
+                  AND NOT EXISTS (
+                      SELECT 1 FROM TB_MODON_WK WK
+                      WHERE WK.FARM_NO = :farm_no AND WK.PIG_NO = MD.PIG_NO
+                        AND WK.USE_YN = 'Y' AND WK.WK_DT < TO_CHAR(:dt_from, 'YYYYMMDD')
+                  )
+                UNION ALL
+                -- 4. 사고/재발돈: 마지막 작업이 사고(F)
+                SELECT '사고/재발돈' AS WK_NM,
+                       '즉시' AS PASS_DAY,
+                       TO_DATE(WK.WK_DT, 'YYYYMMDD') + 1 AS PASS_DT
+                FROM TB_MODON MD
+                INNER JOIN LAST_WK WK ON MD.FARM_NO = WK.FARM_NO AND MD.PIG_NO = WK.PIG_NO
+                WHERE MD.FARM_NO = :farm_no
+                  AND MD.USE_YN = 'Y'
+                  AND MD.OUT_DT > :dt_to
+                  AND WK.WK_GUBUN = 'F'
+                  AND WK.WK_DT <= TO_CHAR(:dt_to - 1, 'YYYYMMDD')
+                UNION ALL
+                -- 5. 사고/재발돈: TB_MODON_WK 없고 STATUS_CD IN ('010006', '010007')
+                SELECT '사고/재발돈' AS WK_NM,
+                       '즉시' AS PASS_DAY,
+                       MD.LAST_WK_DT + 1 AS PASS_DT
+                FROM TB_MODON MD
+                WHERE MD.FARM_NO = :farm_no
+                  AND MD.USE_YN = 'Y'
+                  AND MD.OUT_DT > :dt_to
+                  AND MD.STATUS_CD IN ('010006', '010007')
+                  AND MD.LAST_WK_DT IS NOT NULL
+                  AND MD.LAST_WK_DT <= :dt_to - 1
+                  AND NOT EXISTS (
+                      SELECT 1 FROM TB_MODON_WK WK
+                      WHERE WK.FARM_NO = :farm_no AND WK.PIG_NO = MD.PIG_NO
+                        AND WK.USE_YN = 'Y' AND WK.WK_DT < TO_CHAR(:dt_from, 'YYYYMMDD')
+                  )
+            )
+            WHERE PASS_DT <= :dt_to
+            GROUP BY WK_NM, PASS_DAY
+            ORDER BY DECODE(WK_NM, '이유돈(평균재귀일)', 1, '후보돈(초교배일령)', 2, '사고/재발돈', 3, 4)
         )
         """
         self.execute(sql, {
             'master_seq': self.master_seq,
             'farm_no': self.farm_no,
-            'v_sdt': v_sdt,
-            'v_edt': v_edt,
             'dt_from': dt_from,
+            'dt_to': dt_to,
+            'avg_return_day': avg_return_day,
+            'first_mating_age': first_mating_age,
         })
 
     def _insert_vaccine_popup(self, v_sdt: str, v_edt: str, dt_from: datetime,
