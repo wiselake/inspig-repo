@@ -64,8 +64,7 @@ class MatingProcessor(BaseProcessor):
         chart_cnt = self._insert_chart(dt_from, dt_to)
 
         # 7. 힌트 메시지 INSERT (산출 기준 설명)
-        # prev_hint가 있으면 이전 주차 힌트 사용, 없으면 현재 설정으로 생성
-        self._insert_hint(ins_conf, prev_hint)
+        self._insert_hint(ins_conf)
 
         # 8. TS_INS_WEEK 업데이트
         self._update_week(stats['total_cnt'], acc_gb_cnt)
@@ -702,7 +701,7 @@ class MatingProcessor(BaseProcessor):
             'farm_no': self.farm_no,
         })
 
-    def _insert_hint(self, ins_conf: Dict[str, Any], prev_hint: Optional[str] = None) -> None:
+    def _insert_hint(self, ins_conf: Dict[str, Any]) -> None:
         """예정 산출기준 힌트 메시지를 STAT ROW의 HINT1 컬럼에 UPDATE
 
         교배 팝업에서 예정 복수 산출 기준을 표시하기 위한 힌트 저장.
@@ -711,13 +710,8 @@ class MatingProcessor(BaseProcessor):
 
         Args:
             ins_conf: TS_INS_CONF 설정 (method, tasks, seq_filter)
-            prev_hint: 이전 주차에서 조회한 힌트 (있으면 우선 사용)
         """
-        # 이전 주차 힌트가 있으면 그대로 사용 (빈 문자열 제외)
-        if prev_hint is not None and prev_hint.strip():
-            hint = prev_hint
-            self.logger.info(f"이전 주차 힌트 사용")
-        elif ins_conf['method'] == 'farm':
+        if ins_conf['method'] == 'farm':
             # 농장 기본값: TC_FARM_CONFIG 설정값 포함
             farm_config = self._get_farm_config()
             hint = (
