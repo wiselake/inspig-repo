@@ -713,8 +713,8 @@ class MatingProcessor(BaseProcessor):
             ins_conf: TS_INS_CONF 설정 (method, tasks, seq_filter)
             prev_hint: 이전 주차에서 조회한 힌트 (있으면 우선 사용)
         """
-        # 이전 주차 힌트가 있으면 그대로 사용
-        if prev_hint is not None:
+        # 이전 주차 힌트가 있으면 그대로 사용 (빈 문자열 제외)
+        if prev_hint is not None and prev_hint.strip():
             hint = prev_hint
             self.logger.info(f"이전 주차 힌트 사용")
         elif ins_conf['method'] == 'farm':
