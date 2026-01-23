@@ -589,6 +589,16 @@ class WeaningProcessor(BaseProcessor):
             seq_filter = ins_conf['seq_filter']
             if seq_filter == '':
                 hint = "(모돈 작업설정)\n· 선택된 작업 없음"
+            elif seq_filter == '-1':
+                # 전체 선택: SEQ 조건 없이 조회
+                sql = """
+                SELECT LISTAGG('· ' || WK_NM || '(' || PASS_DAY || '일)', CHR(10)) WITHIN GROUP (ORDER BY WK_NM)
+                FROM TB_PLAN_MODON
+                WHERE FARM_NO = :farm_no AND JOB_GUBUN_CD = '150003' AND USE_YN = 'Y'
+                """
+                result = self.fetch_one(sql, {'farm_no': self.farm_no})
+                task_names = result[0] if result and result[0] else ''
+                hint = f"(모돈 작업설정)\n{task_names}"
             else:
                 # TB_PLAN_MODON에서 선택된 작업 이름과 경과일 조회 (각 작업별 줄바꿈)
                 sql = """
