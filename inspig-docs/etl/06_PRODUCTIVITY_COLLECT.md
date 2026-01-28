@@ -72,35 +72,42 @@ GET http://10.4.35.10:11000/statistics/productivity/period/{farmNo}
 |----------|-----|------|------|
 | `statDate` | `YYYY-MM-DD` | **가변** | 기준일 (예: 2025-01-20) |
 | `period` | `W` / `M` | **가변** | W=주간, M=월간 |
+| `numOfPeriod` | `1` / `12` | **가변** | W=1, M=12 (12개월 롤링) |
 | `memberId` | `null` | 고정 | 회원ID (기본값 null) |
 | `lang` | `ko` | 고정 | 언어 |
 | `serviceId` | `01051` | 고정 | 서비스ID |
 | `sizeOfPeriod` | `1` | 고정 | 기간 크기 |
-| `numOfPeriod` | `1` | 고정 | 기간 수 |
 | `pumjongCd` | `- 전체 -` | 고정 | 품종코드 |
 | `reportType` | `1` | 고정 | 리포트 타입 |
 
-#### 1.3.2 W/M 호출 예시
+#### 1.3.2 W/M 호출 차이
 
-**주간 (W)** - 2025년 4주차:
+| 구분 | `period` | `numOfPeriod` | 수집 데이터 |
+|------|----------|---------------|-------------|
+| 주간 (W) | W | 1 | 해당 주차 1건 |
+| 월간 (M) | M | 12 | 12개월 롤링 (MERGE) |
+
+**주간 (W)** - 단일 주차:
 ```
 GET http://10.4.35.10:11000/statistics/productivity/period/1387
     ?statDate=2025-01-20
     &period=W
-    &memberId=null&lang=ko&serviceId=01051&sizeOfPeriod=1&numOfPeriod=1
+    &numOfPeriod=1
+    &memberId=null&lang=ko&serviceId=01051&sizeOfPeriod=1
     &pumjongCd=- 전체 -&reportType=1
 ```
 
-**월간 (M)** - 2025년 1월:
+**월간 (M)** - 12개월 롤링:
 ```
 GET http://10.4.35.10:11000/statistics/productivity/period/1387
     ?statDate=2025-01-20
     &period=M
-    &memberId=null&lang=ko&serviceId=01051&sizeOfPeriod=1&numOfPeriod=1
+    &numOfPeriod=12
+    &memberId=null&lang=ko&serviceId=01051&sizeOfPeriod=1
     &pumjongCd=- 전체 -&reportType=1
 ```
 
-> **W와 M의 차이**: `period` 파라미터 값만 다름 (나머지 동일)
+> **월간 12개월 롤링**: 월간 데이터는 수개월간 변경될 수 있으므로 항상 12개월을 수집하여 MERGE
 
 ### 1.4 수집 대상
 

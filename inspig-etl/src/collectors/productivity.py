@@ -102,6 +102,7 @@ class ProductivityCollector(BaseCollector):
         stat_date: str,
         period: str = 'W',
         member_id: str = 'null',
+        num_of_period: int = 1,
     ) -> Optional[Dict]:
         """생산성 API 호출
 
@@ -110,12 +111,14 @@ class ProductivityCollector(BaseCollector):
             stat_date: 기준 날짜 (YYYYMMDD 또는 YYYY-MM-DD)
             period: 기간 구분 (W:주간, M:월간)
             member_id: 회원 ID (기본값 'null')
+            num_of_period: 수집할 기간 수 (기본 1, 월간 롤링 12개월 수집 시 12)
 
         Returns:
             생산성 데이터 딕셔너리
 
         Note:
-            API 파라미터 중 statDate, memberId, period 외에는 모두 고정값 사용
+            - API 파라미터 중 statDate, memberId, period, numOfPeriod 외에는 고정값 사용
+            - 월간(M) 수집 시 num_of_period=12로 12개월 롤링 데이터 수집
         """
         # stat_date를 YYYY-MM-DD 형식으로 변환
         if len(stat_date) == 8:
@@ -129,6 +132,7 @@ class ProductivityCollector(BaseCollector):
             'memberId': member_id,
             'period': period,
             **self.FIXED_PARAMS,
+            'numOfPeriod': str(num_of_period),  # 기간 수 오버라이드
         }
 
         try:
@@ -230,9 +234,12 @@ class ProductivityCollector(BaseCollector):
         period_no = period_info['period_no']
 
         period_name = {'W': '주간', 'M': '월간', 'Q': '분기'}.get(period, period)
+        # 월간 수집 시 12개월 롤링 데이터 (numOfPeriod=12)
+        # 주간/분기는 단일 기간 (numOfPeriod=1)
+        num_of_period = 12 if period == 'M' else 1
         self.logger.info(
             f"기준 날짜: {stat_date}, 대상 농장: {len(farm_list)}개, "
-            f"기간: {period_name}({period}), "
+            f"기간: {period_name}({period}), numOfPeriod: {num_of_period}, "
             f"년도: {stat_year}, 차수: {period_no}, "
             f"skip_existing: {skip_existing}"
         )
@@ -250,12 +257,13 @@ class ProductivityCollector(BaseCollector):
             farm_no = farm.get('FARM_NO')
             try:
                 # skip_existing 옵션: 이미 수집된 농장은 스킵
-                if skip_existing and self.exists(farm_no, stat_year, period, period_no):
+                # 월간(M)은 12개월 롤링이므로 skip_existing 무시 (항상 MERGE)
+                if skip_existing and period != 'M' and self.exists(farm_no, stat_year, period, period_no):
                     return ([], True)  # skipped
 
                 # API 호출 (Q는 API에서 지원하지 않으므로 M으로 호출)
                 api_period = 'M' if period == 'Q' else period
-                data = self._fetch_productivity(farm_no, stat_date, api_period)
+                data = self._fetch_productivity(farm_no, stat_date, api_period, num_of_period=num_of_period)
                 if data and 'data' in data:
                     return (self._process_response(farm_no, stat_date, period, period_info, data), False)
                 return ([], False)
@@ -315,6 +323,10 @@ class ProductivityCollector(BaseCollector):
     ) -> List[Dict]:
         """API 응답을 PCODE별 Row 형식으로 변환
 
+        numOfPeriod > 1인 경우 (월간 12개월 롤링):
+        - 응답의 __INDEX__ (날짜)별로 그룹화하여 각 기간별 Row 생성
+        - __INDEX__에서 STAT_YEAR, PERIOD_NO 계산
+
         Args:
             farm_no: 농장 번호
             stat_date: 기준 날짜 (YYYYMMDD)
@@ -325,66 +337,97 @@ class ProductivityCollector(BaseCollector):
         Returns:
             PCODE별 Row 리스트
             [
-                {'FARM_NO': 1234, 'PCODE': '031', 'STAT_YEAR': 2024, 'PERIOD': 'W', 'PERIOD_NO': 52, 'C001': 10.5, ...},
-                {'FARM_NO': 1234, 'PCODE': '032', ...},
+                {'FARM_NO': 1234, 'PCODE': '031', 'STAT_YEAR': 2024, 'PERIOD': 'M', 'PERIOD_NO': 1, 'C001': 10.5, ...},
+                {'FARM_NO': 1234, 'PCODE': '032', 'STAT_YEAR': 2024, 'PERIOD': 'M', 'PERIOD_NO': 1, ...},
+                {'FARM_NO': 1234, 'PCODE': '031', 'STAT_YEAR': 2024, 'PERIOD': 'M', 'PERIOD_NO': 2, ...},
                 ...
             ]
         """
-        # stat_date를 YYYY-MM-DD 형식으로 변환
-        if len(stat_date) == 8:
-            stat_date_formatted = f"{stat_date[:4]}-{stat_date[4:6]}-{stat_date[6:8]}"
-        else:
-            stat_date_formatted = stat_date
-
-        # PCODE별 Row 초기화
-        rows = {}
-        for pcode in self.VALID_PCODES:
-            rows[pcode] = {
-                'FARM_NO': farm_no,
-                'PCODE': pcode,
-                'STAT_YEAR': period_info['stat_year'],
-                'PERIOD': period,
-                'PERIOD_NO': period_info['period_no'],
-                'STAT_DATE': stat_date_formatted,
-            }
+        from datetime import datetime
+        from collections import defaultdict
 
         items = data.get('data', [])
+        if not items:
+            return []
 
+        # __INDEX__별로 아이템 그룹화 (multi-period 지원)
+        items_by_index = defaultdict(list)
         for item in items:
-            try:
-                stat_cd = item.get('__STATCD__')
-                if not stat_cd or len(stat_cd) != 6:
-                    continue
+            index_val = item.get('__INDEX__', '')
+            items_by_index[index_val].append(item)
 
-                pcode = stat_cd[:3]  # 앞 3자리: PCODE
-                col_suffix = stat_cd[3:]  # 뒤 3자리: 컬럼 suffix
-
-                if pcode not in rows:
-                    continue
-
-                # 컬럼명: C + 뒤 3자리 (예: 031001 -> C001)
-                col_name = f"C{col_suffix}"
-
-                # 값 변환
-                stat_val = item.get('__VAL__')
-                if stat_val is not None and str(stat_val).strip():
-                    try:
-                        stat_val = float(stat_val)
-                    except (ValueError, TypeError):
-                        stat_val = None
-
-                rows[pcode][col_name] = stat_val
-
-            except Exception as e:
-                self.logger.warning(f"항목 변환 실패: {e}, item={item}")
-                continue
-
-        # 데이터가 있는 PCODE만 반환 (기본 필드 외에 C??? 컬럼이 있는 경우)
         result = []
-        for pcode, row in rows.items():
-            c_columns = [k for k in row.keys() if k.startswith('C')]
-            if c_columns:
-                result.append(row)
+
+        for index_val, index_items in items_by_index.items():
+            # __INDEX__에서 년도/기간차수 추출
+            try:
+                if index_val and len(index_val) >= 10:  # YYYY-MM-DD 형식
+                    idx_date = datetime.strptime(index_val[:10], '%Y-%m-%d')
+                    idx_year = idx_date.year
+                    if period == 'M':
+                        idx_period_no = idx_date.month  # 월: 1-12
+                    elif period == 'W':
+                        idx_period_no = idx_date.isocalendar()[1]  # ISO 주차
+                    else:
+                        idx_period_no = period_info['period_no']  # Q 등
+                    idx_stat_date = index_val[:10]
+                else:
+                    # __INDEX__ 없으면 기본값 사용
+                    idx_year = period_info['stat_year']
+                    idx_period_no = period_info['period_no']
+                    idx_stat_date = stat_date if len(stat_date) == 10 else f"{stat_date[:4]}-{stat_date[4:6]}-{stat_date[6:8]}"
+            except Exception:
+                idx_year = period_info['stat_year']
+                idx_period_no = period_info['period_no']
+                idx_stat_date = stat_date if len(stat_date) == 10 else f"{stat_date[:4]}-{stat_date[4:6]}-{stat_date[6:8]}"
+
+            # 이 기간에 대한 PCODE별 Row 초기화
+            rows = {}
+            for pcode in self.VALID_PCODES:
+                rows[pcode] = {
+                    'FARM_NO': farm_no,
+                    'PCODE': pcode,
+                    'STAT_YEAR': idx_year,
+                    'PERIOD': period,
+                    'PERIOD_NO': idx_period_no,
+                    'STAT_DATE': idx_stat_date,
+                }
+
+            # 아이템 처리
+            for item in index_items:
+                try:
+                    stat_cd = item.get('__STATCD__')
+                    if not stat_cd or len(stat_cd) != 6:
+                        continue
+
+                    pcode = stat_cd[:3]  # 앞 3자리: PCODE
+                    col_suffix = stat_cd[3:]  # 뒤 3자리: 컬럼 suffix
+
+                    if pcode not in rows:
+                        continue
+
+                    # 컬럼명: C + 뒤 3자리 (예: 031001 -> C001)
+                    col_name = f"C{col_suffix}"
+
+                    # 값 변환
+                    stat_val = item.get('__VAL__')
+                    if stat_val is not None and str(stat_val).strip():
+                        try:
+                            stat_val = float(stat_val)
+                        except (ValueError, TypeError):
+                            stat_val = None
+
+                    rows[pcode][col_name] = stat_val
+
+                except Exception as e:
+                    self.logger.warning(f"항목 변환 실패: {e}, item={item}")
+                    continue
+
+            # 데이터가 있는 PCODE만 결과에 추가
+            for pcode, row in rows.items():
+                c_columns = [k for k in row.keys() if k.startswith('C')]
+                if c_columns:
+                    result.append(row)
 
         return result
 
