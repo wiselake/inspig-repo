@@ -5,7 +5,7 @@ inspig, inspig-etl, pig3.1 프로젝트에서 공통으로 참조하는 문서 �
 ## 문서 구조
 
 ```
-inspig-docs-shared/
+inspig-docs/
 ├── db/
 │   ├── ref/                    # DB 테이블/뷰/함수 참조 (공통)
 │   │   ├── 01.table.md         # 테이블 정의
@@ -29,13 +29,13 @@ inspig-docs-shared/
 
 ```bash
 # inspig 프로젝트
-mklink /D "C:\Projects\inspig\docs\shared" "C:\Projects\docs\inspig-docs-shared"
+mklink /D "C:\Projects\inspig\docs\shared" "C:\Projects\docs\inspig-docs"
 
 # inspig-etl 프로젝트
-mklink /D "C:\Projects\inspig-etl\docs\shared" "C:\Projects\docs\inspig-docs-shared"
+mklink /D "C:\Projects\inspig-etl\docs\shared" "C:\Projects\docs\inspig-docs"
 
 # pig3.1 프로젝트 (선택적)
-mklink /D "C:\Projects\pig3.1\pigplan\pigplanxe\docs\shared" "C:\Projects\docs\inspig-docs-shared"
+mklink /D "C:\Projects\pig3.1\pigplan\pigplanxe\docs\shared" "C:\Projects\docs\inspig-docs"
 ```
 
 ### Claude Code에서 참조

@@ -372,7 +372,7 @@ crontab -e
 **관련 소스:**
 | 구분 | 파일 | ID/프로시저 |
 |------|------|-------------|
-| ETL 프로시저 | `inspig-docs-shared/db/sql/ins/week/01_SP_INS_WEEK_MAIN.sql` | `SP_INS_WEEK_MAIN` |
+| ETL 프로시저 | `inspig-docs/db/sql/ins/week/01_SP_INS_WEEK_MAIN.sql` | `SP_INS_WEEK_MAIN` |
 | 카카오 발송 SQL | `pig3.1/.../InsEtlApiMapper.xml` | `selectInsWeeklyReportTargetList` |
 | 카카오 스케줄러 | `pig3.1/.../Scheduler.java` | `sendInsWeeklyReportKakaoAM7`, `sendInsWeeklyReportKakaoPM2` |
 | 설정 화면 | `inspig/web/src/app/(report)/settings/page.tsx` | - |

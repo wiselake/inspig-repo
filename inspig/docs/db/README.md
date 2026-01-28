@@ -39,7 +39,7 @@ docs/db/
 ### 레거시 Oracle 프로시저 (참조용)
 
 Oracle 프로시저/JOB은 Python ETL 작성 기준으로만 참조:
-- 위치: `inspig-docs-shared/db/sql/ins/backup/`
+- 위치: `inspig-docs/db/sql/ins/backup/`
 - 상세: [inspig-etl/docs/db/ins/02_TABLE.md](../../inspig-etl/docs/db/ins/02_TABLE.md) 참조
 
 ---

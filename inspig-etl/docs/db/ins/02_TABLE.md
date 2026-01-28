@@ -461,71 +461,22 @@ CREATE TABLE TS_INS_WEEK_SUB (
 
 ## 7. 부가 테이블
 
-### TM_WEATHER (일별 날씨)
+### TM_WEATHER / TM_WEATHER_HOURLY (날씨)
 
-기상청 격자(NX, NY) 기준 일별 날씨 데이터
+기상청 격자(NX, NY) 기준 날씨 데이터
 
-- **UK**: NX + NY + WK_DATE
+| 테이블 | UK | 설명 |
+|--------|-----|------|
+| TM_WEATHER | NX + NY + WK_DATE | 일별 날씨 |
+| TM_WEATHER_HOURLY | NX + NY + WK_DATE + WK_TIME | 시간별 날씨 |
+
 - **관계**: TA_FARM N:1 TM_WEATHER (다수 농장 → 1개 날씨)
 - **격자 변환**: TA_FARM.MAP_X/Y → WEATHER_NX/NY (5km 단위)
 
+> **상세 문서**: 테이블 구조, 격자 변환, API 수집 로직, 날씨 코드 등은 공유 문서 참조
+> - [07_WEATHER_COLLECT.md](../../../../inspig-docs/etl/07_WEATHER_COLLECT.md)
+>
 > DDL: [TM_WEATHER.sql](../ddl/TM_WEATHER.sql)
-
-### TM_WEATHER_HOURLY (시간별 날씨)
-
-기상청 격자(NX, NY) 기준 시간별 날씨 데이터 (당일 상세 예보)
-
-- **UK**: NX + NY + WK_DATE + WK_TIME
-
-> DDL: [TM_WEATHER.sql](../ddl/TM_WEATHER.sql)
-
-### TA_FARM 확장
-
-```sql
-ALTER TABLE TA_FARM ADD WEATHER_NX INTEGER;
-ALTER TABLE TA_FARM ADD WEATHER_NY INTEGER;
-
-COMMENT ON COLUMN TA_FARM.MAP_X IS 'WGS84 경도 (longitude) - Kakao API로 조회된 좌표';
-COMMENT ON COLUMN TA_FARM.MAP_Y IS 'WGS84 위도 (latitude) - Kakao API로 조회된 좌표';
-COMMENT ON COLUMN TA_FARM.WEATHER_NX IS '기상청 격자 X좌표 (5km 단위, MAP_X/MAP_Y로부터 변환)';
-COMMENT ON COLUMN TA_FARM.WEATHER_NY IS '기상청 격자 Y좌표 (5km 단위, MAP_X/MAP_Y로부터 변환)';
-
-CREATE INDEX IDX_TA_FARM_WEATHER ON TA_FARM(WEATHER_NX, WEATHER_NY);
-```
-
-### 좌표 컬럼 비교
-
-| 항목 | MAP_X, MAP_Y | WEATHER_NX, WEATHER_NY |
-|------|--------------|------------------------|
-| **좌표계** | WGS84 (위경도) | 기상청 Lambert 격자 |
-| **단위** | 도(degree) | 격자 번호 (정수) |
-| **예시** | 126.8979, 36.5767 | 63, 89 |
-| **정밀도** | 미터 단위 | 5km 단위 |
-| **출처** | Kakao API | MAP_X/Y 변환 결과 |
-
-### 날씨 코드 정의
-
-| WEATHER_CD | WEATHER_NM | SKY_CD | PTY_CD |
-|------------|------------|--------|--------|
-| sunny | 맑음 | 1 | 0 |
-| cloudy | 구름많음 | 3 | 0 |
-| overcast | 흐림 | 4 | 0 |
-| rainy | 비 | - | 1 |
-| rain_snow | 비/눈 | - | 2 |
-| snow | 눈 | - | 3 |
-| shower | 소나기 | - | 4 |
-
-### 기상청 API 정보
-
-| 항목 | 값 |
-|------|-----|
-| API | 기상청 단기예보 API (공공데이터포털) |
-| 격자 | 5km x 5km (Lambert Conformal Conic) |
-| 예보 범위 | 당일 ~ +7일 |
-| 갱신 주기 | 3시간 (02, 05, 08, 11, 14, 17, 20, 23시) |
-| API 키 관리 | TS_API_KEY_INFO 테이블 (REQ_CNT 기반 로드밸런싱) |
-
-> 격자 변환 함수: `latlon_to_grid()` - [weather.py](../../src/collectors/weather.py)
 
 ### TS_PSY_DELAY_HEATMAP (히트맵)
 
@@ -547,133 +498,16 @@ CREATE TABLE TS_PSY_DELAY_HEATMAP (
 
 외부 API(10.4.35.10:11000)에서 수집한 생산성 지표 저장
 
-### 기간 구분
+| 항목 | 설명 |
+|------|------|
+| UK | FARM_NO + PCODE + STAT_YEAR + PERIOD + PERIOD_NO |
+| PCODE | 031(교배), 032(분만), 033(이유), 034(번식종합), 035(모돈현황) |
+| PERIOD | W(주간), M(월간), Q(분기) |
 
-| PERIOD | 설명 | PERIOD_NO 범위 |
-|--------|------|----------------|
-| W | 주간 | 1~53 (ISO 주차) |
-| M | 월간 | 1~12 (월) |
-| Q | 분기 | 1~4 (분기) |
-
-### PCODE 구분
-
-| PCODE | 설명 | 항목 수 |
-|-------|------|---------|
-| 031 | 교배 | 28개 |
-| 032 | 분만 | 24개 |
-| 033 | 이유 | 18개 |
-| 034 | 번식종합 | 30개 |
-| 035 | 모돈현황 | 13개 |
-
-### 테이블 구조
-
-```sql
-CREATE TABLE TS_PRODUCTIVITY (
-    SEQ             NUMBER(12) NOT NULL,
-    FARM_NO         NUMBER(10) NOT NULL,
-    PCODE           VARCHAR2(3) NOT NULL,              -- 031:교배, 032:분만, 033:이유, 034:번식종합, 035:모돈현황
-    STAT_YEAR       NUMBER(4) NOT NULL,                -- 통계년도 (YYYY)
-    PERIOD          VARCHAR2(1) NOT NULL,              -- 기간구분 (W:주간, M:월간, Q:분기)
-    PERIOD_NO       NUMBER(2) NOT NULL,                -- 기간차수 (W:1~53, M:1~12, Q:1~4)
-    STAT_DATE       VARCHAR2(10) NOT NULL,             -- 통계기준일 (YYYY-MM-DD)
-    -- 데이터 컬럼 (C001~C043) - PCODE별로 사용 컬럼 다름
-    C001            NUMBER(15,4),
-    C002            NUMBER(15,4),
-    C003            NUMBER(15,4),
-    C004            NUMBER(15,4),
-    C005            NUMBER(15,4),
-    C006            NUMBER(15,4),
-    C007            NUMBER(15,4),
-    C008            NUMBER(15,4),
-    C009            NUMBER(15,4),
-    C010            NUMBER(15,4),
-    C011            NUMBER(15,4),
-    C012            NUMBER(15,4),
-    C013            NUMBER(15,4),
-    C014            NUMBER(15,4),
-    C015            NUMBER(15,4),
-    C016            NUMBER(15,4),
-    C017            NUMBER(15,4),
-    C018            NUMBER(15,4),
-    C019            NUMBER(15,4),
-    C020            NUMBER(15,4),
-    C021            NUMBER(15,4),
-    C022            NUMBER(15,4),
-    C023            NUMBER(15,4),
-    C024            NUMBER(15,4),
-    C025            NUMBER(15,4),
-    C026            NUMBER(15,4),
-    C027            NUMBER(15,4),
-    C028            NUMBER(15,4),
-    C029            NUMBER(15,4),
-    C030            NUMBER(15,4),
-    C031            NUMBER(15,4),
-    C032            NUMBER(15,4),
-    C033            NUMBER(15,4),
-    C034            NUMBER(15,4),
-    C035            NUMBER(15,4),
-    C036            NUMBER(15,4),
-    C037            NUMBER(15,4),
-    C038            NUMBER(15,4),
-    C039            NUMBER(15,4),
-    C040            NUMBER(15,4),
-    C041            NUMBER(15,4),
-    C042            NUMBER(15,4),
-    C043            NUMBER(15,4),
-    INS_DT          DATE DEFAULT SYSDATE,
-    UPD_DT          DATE,
-    CONSTRAINT PK_TS_PRODUCTIVITY PRIMARY KEY (SEQ)
-);
-
--- 유니크 인덱스: 농장 + PCODE + 년도 + 기간구분 + 차수
-CREATE UNIQUE INDEX UK_TS_PRODUCTIVITY ON TS_PRODUCTIVITY (FARM_NO, PCODE, STAT_YEAR, PERIOD, PERIOD_NO);
-
--- 조회용 인덱스
-CREATE INDEX IX_TS_PRODUCTIVITY_01 ON TS_PRODUCTIVITY (STAT_YEAR, PERIOD, PERIOD_NO);
-CREATE INDEX IX_TS_PRODUCTIVITY_02 ON TS_PRODUCTIVITY (PCODE, STAT_DATE);
-
--- 시퀀스
-CREATE SEQUENCE SEQ_TS_PRODUCTIVITY START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-```
-
-### 컬럼명 규칙
-
-- `C + 뒤3자리` (예: 031001 → C001, 035024 → C024)
-- TC_CODE_SYS 조인: `PCODE IN ('031','032','033','034','035'), CODE=PCODE||컬럼뒤3자리`
-- CNAME = 통계명 (STAT_NM), HELP_MSG = {"tooltip":"설명"} (JSON 형식)
-
-### PCODE별 주요 컬럼 (031: 교배)
-
-| 컬럼 | 코드 | 설명 |
-|------|------|------|
-| C001 | 031001 | 교배복수 |
-| C013 | 031013 | 정상교배 |
-| C014 | 031014 | 1차재발교배 |
-| C015 | 031015 | 2차재발교배 |
-| C016 | 031016 | 기타사고후교배 |
-| C017 | 031017 | 미경산돈교배복수 |
-| C024 | 031024 | 초교배복수(모돈편입) |
-| C025 | 031025 | 평균초교배일령 |
-| C028 | 031028 | 평균재귀발정일령 |
-| C037 | 031037 | 7일내재귀율 |
-| C039 | 031039 | 재발교배비율 |
-
-### 조회 예시
-
-```sql
--- 2024년 52주차 주간 데이터 조회
-SELECT FARM_NO, PCODE, C023 AS PSY, C029 AS MSY
-FROM TS_PRODUCTIVITY
-WHERE STAT_YEAR = 2024 AND PERIOD = 'W' AND PERIOD_NO = 52 AND PCODE = '034';
-
--- 2024년 12월 월간 데이터 조회
-SELECT FARM_NO, PCODE, C023 AS PSY, C029 AS MSY
-FROM TS_PRODUCTIVITY
-WHERE STAT_YEAR = 2024 AND PERIOD = 'M' AND PERIOD_NO = 12 AND PCODE = '034';
-```
-
-> 전체 DDL: [TS_PRODUCTIVITY.sql](../ddl/TS_PRODUCTIVITY.sql)
-> 상세 코드 목록: [api_stat_codes.csv](../../api_stat_codes.csv)
+> **상세 문서**: 컬럼 생성규칙, PCODE별 항목, ETL 로직 등은 공유 문서 참조
+> - [06_PRODUCTIVITY_COLLECT.md](../../../../inspig-docs/etl/06_PRODUCTIVITY_COLLECT.md)
+>
+> DDL: [TS_PRODUCTIVITY.sql](../ddl/TS_PRODUCTIVITY.sql)
 
 ---
 
@@ -683,19 +517,19 @@ Python ETL 작성 기준이 된 Oracle 프로시저/JOB 백업 파일:
 
 | 파일 | 프로시저/JOB | 설명 |
 |------|-------------|------|
-| `inspig-docs-shared/db/sql/ins/backup/01_SP_INS_WEEK_MAIN.sql` | SP_INS_WEEK_MAIN | 주간 ETL 메인 (→ orchestrator.py) |
-| `inspig-docs-shared/db/sql/ins/backup/02_SP_INS_WEEK_CONFIG.sql` | SP_INS_WEEK_CONFIG | 설정 처리 (→ ConfigProcessor) |
-| `inspig-docs-shared/db/sql/ins/backup/11_SP_INS_WEEK_MODON_POPUP.sql` | SP_INS_WEEK_MODON_POPUP | 모돈현황 (→ SowStatusProcessor) |
-| `inspig-docs-shared/db/sql/ins/backup/12_SP_INS_WEEK_ALERT_POPUP.sql` | SP_INS_WEEK_ALERT_POPUP | 관리대상 (→ AlertProcessor) |
-| `inspig-docs-shared/db/sql/ins/backup/21_SP_INS_WEEK_GB_POPUP.sql` | SP_INS_WEEK_GB_POPUP | 교배 (→ MatingProcessor) |
-| `inspig-docs-shared/db/sql/ins/backup/22_SP_INS_WEEK_BM_POPUP.sql` | SP_INS_WEEK_BM_POPUP | 분만 (→ FarrowingProcessor) |
-| `inspig-docs-shared/db/sql/ins/backup/23_SP_INS_WEEK_EU_POPUP.sql` | SP_INS_WEEK_EU_POPUP | 이유 (→ WeaningProcessor) |
-| `inspig-docs-shared/db/sql/ins/backup/31_SP_INS_WEEK_SG_POPUP.sql` | SP_INS_WEEK_SG_POPUP | 사고 (→ AccidentProcessor) |
-| `inspig-docs-shared/db/sql/ins/backup/32_SP_INS_WEEK_DOPE_POPUP.sql` | SP_INS_WEEK_DOPE_POPUP | 도폐 (→ CullingProcessor) |
-| `inspig-docs-shared/db/sql/ins/backup/41_SP_INS_WEEK_SHIP_POPUP.sql` | SP_INS_WEEK_SHIP_POPUP | 출하 (→ ShipmentProcessor) |
-| `inspig-docs-shared/db/sql/ins/backup/51_SP_INS_WEEK_SCHEDULE_POPUP.sql` | SP_INS_WEEK_SCHEDULE_POPUP | 예정 (→ ScheduleProcessor) |
-| `inspig-docs-shared/db/sql/ins/backup/99_JOB_INS_WEEKLY.sql` | JOB_INS_WEEKLY | Oracle JOB (→ run_weekly.sh) |
-| `inspig-docs-shared/db/sql/ins/backup/11_SP_INS_COM_LOG.sql` | SP_INS_COM_LOG_* | 로그 프로시저 |
+| `inspig-docs/db/sql/ins/backup/01_SP_INS_WEEK_MAIN.sql` | SP_INS_WEEK_MAIN | 주간 ETL 메인 (→ orchestrator.py) |
+| `inspig-docs/db/sql/ins/backup/02_SP_INS_WEEK_CONFIG.sql` | SP_INS_WEEK_CONFIG | 설정 처리 (→ ConfigProcessor) |
+| `inspig-docs/db/sql/ins/backup/11_SP_INS_WEEK_MODON_POPUP.sql` | SP_INS_WEEK_MODON_POPUP | 모돈현황 (→ SowStatusProcessor) |
+| `inspig-docs/db/sql/ins/backup/12_SP_INS_WEEK_ALERT_POPUP.sql` | SP_INS_WEEK_ALERT_POPUP | 관리대상 (→ AlertProcessor) |
+| `inspig-docs/db/sql/ins/backup/21_SP_INS_WEEK_GB_POPUP.sql` | SP_INS_WEEK_GB_POPUP | 교배 (→ MatingProcessor) |
+| `inspig-docs/db/sql/ins/backup/22_SP_INS_WEEK_BM_POPUP.sql` | SP_INS_WEEK_BM_POPUP | 분만 (→ FarrowingProcessor) |
+| `inspig-docs/db/sql/ins/backup/23_SP_INS_WEEK_EU_POPUP.sql` | SP_INS_WEEK_EU_POPUP | 이유 (→ WeaningProcessor) |
+| `inspig-docs/db/sql/ins/backup/31_SP_INS_WEEK_SG_POPUP.sql` | SP_INS_WEEK_SG_POPUP | 사고 (→ AccidentProcessor) |
+| `inspig-docs/db/sql/ins/backup/32_SP_INS_WEEK_DOPE_POPUP.sql` | SP_INS_WEEK_DOPE_POPUP | 도폐 (→ CullingProcessor) |
+| `inspig-docs/db/sql/ins/backup/41_SP_INS_WEEK_SHIP_POPUP.sql` | SP_INS_WEEK_SHIP_POPUP | 출하 (→ ShipmentProcessor) |
+| `inspig-docs/db/sql/ins/backup/51_SP_INS_WEEK_SCHEDULE_POPUP.sql` | SP_INS_WEEK_SCHEDULE_POPUP | 예정 (→ ScheduleProcessor) |
+| `inspig-docs/db/sql/ins/backup/99_JOB_INS_WEEKLY.sql` | JOB_INS_WEEKLY | Oracle JOB (→ run_weekly.sh) |
+| `inspig-docs/db/sql/ins/backup/11_SP_INS_COM_LOG.sql` | SP_INS_COM_LOG_* | 로그 프로시저 |
 
 > **Note**: 현재 운영은 Python ETL(`run_etl.py weekly`)로 수행됩니다. 위 SQL은 참조용 백업입니다.
 
