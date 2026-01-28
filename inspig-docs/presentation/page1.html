@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>피그플랜 시스템 소개 - PAGE 1</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Hero Layout Grid */
+        .hero-layout {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            height: 100%;
+            gap: 2rem;
+        }
+
+        /* Header Area */
+        .hero-header {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .page-indicator {
+            font-size: 0.9rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .title-area {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        h1 {
+            margin-bottom: 0;
+            line-height: 1.2;
+        }
+
+        .badge-no1 {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            color: #451a03;
+            font-weight: 700;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.4);
+            animation: float-badge 3s ease-in-out infinite;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            white-space: nowrap;
+        }
+
+        @keyframes float-badge {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Body Area */
+        .hero-body {
+            display: grid;
+            grid-template-columns: 1.3fr 0.7fr;
+            /* Adjusted for wider text area */
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .content-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .image-right {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            position: relative;
+        }
+
+        .adaptive-image-frame {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            animation: float-img 6s ease-in-out infinite;
+
+            /* Adaptive Sizing */
+            width: auto;
+            max-width: 100%;
+            max-height: 550px;
+            /* Limit height to prevent overflow */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .adaptive-image-frame img {
+            max-width: 100%;
+            max-height: 100%;
+            height: auto;
+            width: auto;
+            border-radius: 16px;
+            display: block;
+            object-fit: contain;
+        }
+
+        @keyframes float-img {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <aside>
+        <div class="logo">PIGPLAN 시스템 소개</div>
+        <nav>
+            <ul id="sidebar-nav"></ul>
+        </nav>
+    </aside>
+    <main>
+        <button class="nav-btn prev" onclick="changePage(-1, 0)" style="opacity: 0.3; cursor: default;" disabled>
+            <svg viewBox="0 0 24 24">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+            </svg>
+        </button>
+        <button class="nav-btn next" onclick="changePage(1, 0)">
+            <svg viewBox="0 0 24 24">
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+            </svg>
+        </button>
+        <div class="slide-container">
+            <div class="slide">
+                <div class="hero-layout">
+                    <!-- Header Section -->
+                    <div class="hero-header">
+                        <div class="page-indicator">PAGE 1 / 8</div>
+                        <div class="title-area">
+                            <h1>피그플랜 시스템</h1>
+                            <div class="badge-no1">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                    <path
+                                        d="M18 2H6c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 13.9V17H8v2h8v-2h-3v-3.1a5.01 5.01 0 002.61-4.96C18.08 7.63 20 5.55 20 3V2h-2zm-9 5c-1.1 0-2-.9-2-2V4h2v3zm7 0h-2V4h2v1c0 1.1-.9 2-2 2z" />
+                                </svg>
+                                <span>국내 양돈 시스템 1위</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Body Section -->
+                    <div class="hero-body">
+                        <div class="content-left">
+                            <div style="padding-right: 1rem;">
+                                <p
+                                    style="font-size: 1.25rem; line-height: 1.6; margin-bottom: 2rem; color: var(--text-secondary);">
+                                    피그플랜은 양돈장의 <span class="highlight"
+                                        style="color: #fbbf24; font-weight: 700; font-size: 1.3rem;">생산성·경영 효율
+                                        극대화</span>를 목표로 개발된 통합관리 시스템입니다.
+                                </p>
+                                <ul class="feature-list"
+                                    style="display: flex; flex-direction: column; gap: 1.4rem; font-size: 1.05rem;">
+                                    <li style="white-space: nowrap;">번식 관리, 질병·방역, 사양·사료관리, 농장 경영상태 분석 등 <strong
+                                            style="color: #fbbf24;">전 과정 데이터 기반 지원</strong></li>
+                                    <li style="white-space: nowrap;">25년 축적 데이터 기반의 <strong style="color: #fbbf24;">정밀
+                                            시계열 분석</strong>을 통한 최적의 양돈 경영 솔루션 제시</li>
+                                    <li style="white-space: nowrap;">종돈장 성적 관리 및 유전 평가 지원으로 <strong
+                                            style="color: #fbbf24;">생산·개량 체계 고도화</strong></li>
+                                    <li style="white-space: nowrap;">축산물품질평가원 등 유관기관 데이터 연계를 통한 출하 성적 및 도체 품질의 <strong
+                                            style="color: #fbbf24;">입체적 분석</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="image-right">
+                            <div class="adaptive-image-frame">
+                                <img src="20260121_100119.png" alt="피그플랜 시스템 샘플">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+    <script>initNavigation(0);</script>
+</body>
+
+</html>

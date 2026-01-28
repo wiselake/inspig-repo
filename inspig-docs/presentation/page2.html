@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>피그플랜 시스템 소개 - PAGE 2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .timeline-container {
+            width: 100%;
+            padding: 4rem 0;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .timeline-h {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            position: relative;
+            min-width: 1000px;
+            padding: 0 2rem;
+        }
+
+        .timeline-h::before {
+            content: "";
+            position: absolute;
+            top: 30px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(to right, var(--accent), rgba(255, 255, 255, 0.1));
+            z-index: 0;
+        }
+
+        .timeline-item-h {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1.5rem;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .timeline-dot {
+            width: 16px;
+            height: 16px;
+            background: var(--bg-main);
+            border: 3px solid var(--accent);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item-h:hover .timeline-dot {
+            transform: scale(1.5);
+            background: var(--accent);
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        .timeline-content-h {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .year-label {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .desc-label {
+            color: var(--text-secondary);
+            line-height: 1.4;
+            word-break: keep-all;
+        }
+
+        /* Graduated Styles */
+        .item-2026 .year-label {
+            font-size: 2.5rem;
+            color: #fff;
+            text-shadow: 0 0 20px var(--accent);
+        }
+
+        .item-2026 .desc-label {
+            font-size: 1.2rem;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .item-2026 .timeline-dot {
+            width: 24px;
+            height: 24px;
+            border-width: 4px;
+        }
+
+        .item-2020 .year-label {
+            font-size: 1.8rem;
+            color: var(--accent);
+        }
+
+        .item-2020 .desc-label {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .item-2020 .timeline-dot {
+            width: 20px;
+            height: 20px;
+        }
+
+        .item-2005 .year-label {
+            font-size: 1.4rem;
+            opacity: 1;
+        }
+
+        .item-2005 .desc-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .item-1999 .year-label {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .item-1999 .desc-label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .item-1998 .year-label {
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .item-1998 .desc-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .item-1995 .year-label {
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+
+        .item-1995 .desc-label {
+            font-size: 0.75rem;
+            opacity: 0.6;
+        }
+
+        .vision-statement {
+            text-align: center;
+            margin-top: 4rem;
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #fff, var(--accent), #fff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+            animation: shimmer 3s infinite linear;
+            background-size: 200% auto;
+        }
+
+        @keyframes shimmer {
+            to {
+                background-position: 200% center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <aside>
+        <div class="logo">PIGPLAN 시스템 소개</div>
+        <nav>
+            <ul id="sidebar-nav"></ul>
+        </nav>
+    </aside>
+    <main>
+        <button class="nav-btn prev" onclick="changePage(-1, 1)">
+            <svg viewBox="0 0 24 24">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+            </svg>
+        </button>
+        <button class="nav-btn next" onclick="changePage(1, 1)">
+            <svg viewBox="0 0 24 24">
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+            </svg>
+        </button>
+        <div class="slide-container">
+            <div class="slide">
+                <div style="font-size: 0.9rem; color: var(--accent); margin-bottom: 0.5rem; font-weight: 600;">PAGE 2 /
+                    8</div>
+                <h1>개발 역사</h1>
+                <div class="content-card"
+                    style="padding: 0; background: transparent; border: none; backdrop-filter: none;">
+                    <div class="timeline-container">
+                        <div class="timeline-h">
+                            <div class="timeline-item-h item-2026">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content-h">
+                                    <span class="year-label">2026</span>
+                                    <span class="desc-label">인사이트 피그플랜 런칭</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item-h item-2020">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content-h">
+                                    <span class="year-label">2020</span>
+                                    <span class="desc-label">클라우드 고도화 완료</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item-h item-2005">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content-h">
+                                    <span class="year-label">2005</span>
+                                    <span class="desc-label">피그플랜 WEB/MOBILE</br>시스템 구축</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item-h item-1999">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content-h">
+                                    <span class="year-label">1999</span>
+                                    <span class="desc-label">도드람 플랜 개발</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item-h item-1998">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content-h">
+                                    <span class="year-label">1998</span>
+                                    <span class="desc-label">PC 버전 보급 개시</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item-h item-1995">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content-h">
+                                    <span class="year-label">1995</span>
+                                    <span class="desc-label">피그플랜 최초 개발</br>(서울대연구소)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="vision-statement">
+                        현재는 디지털 축산(AI+플랫폼+솔루션) 플랫폼으로 지속 발전 중입니다.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+    <script>initNavigation(1);</script>
+</body>
+
+</html>

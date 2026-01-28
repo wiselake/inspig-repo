@@ -15,6 +15,181 @@
 
 수집기: `src/collectors/weather.py`
 
+### 1.1 수집 시기
+
+| 스케줄 | 설명 |
+|--------|------|
+| 주간 리포트 ETL | 매주 월요일 02:00 (`run_etl.py weekly`) 실행 시 함께 수집 |
+| 수동 실행 | `run_etl.py weather` 명령으로 단독 실행 가능 |
+
+### 1.2 수집 대상
+
+| 조건 | 설명 |
+|------|------|
+| 대상 격자 | TA_FARM.WEATHER_NX, WEATHER_NY 조회 (중복 제거) |
+| 보조 조회 | WEATHER_NX/NY가 없으면 MAP_X_N/Y_N → 격자 변환 |
+| API 키 | TS_API_KEY_INFO에서 REQ_CNT 기반 로드밸런싱 |
+
+### 1.3 수집 전략
+
+| 구분 | API | 대상 기간 | IS_FORECAST |
+|------|-----|-----------|-------------|
+| 단기예보 | getVilageFcst | 오늘 ~ +3일 | Y (예보) |
+| 초단기실황 | getUltraSrtNcst | 현재 시각 | N (실측) |
+| ASOS 일자료 | getWthrDataList | 어제까지 | N (실측) |
+
+### 1.4 실행 흐름 (WeatherCollector)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                       WeatherCollector 실행 흐름                                  │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│  [1] 초기화                                                                      │
+│  ┌─────────────────────────────────────────────────────────────────────────┐    │
+│  │  collector = WeatherCollector()                                          │    │
+│  │  - base_url: https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0  │    │
+│  │  - asos_daily_url: https://apis.data.go.kr/1360000/AsosDalyInfoService  │    │
+│  │  - key_manager: ApiKeyManager (TS_API_KEY_INFO 관리)                     │    │
+│  └─────────────────────────────────────────────────────────────────────────┘    │
+│                              │                                                  │
+│                              ▼                                                  │
+│  [2] 수집 (collect)                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────────┐    │
+│  │  data = collector.collect()                                              │    │
+│  │                                                                         │    │
+│  │  1. API 키 로드                                                          │    │
+│  │     └→ key_manager.load_keys() → TS_API_KEY_INFO에서 유효 키 조회        │    │
+│  │                                                                         │    │
+│  │  2. 대상 격자 조회                                                        │    │
+│  │     ├→ _get_target_grids()                                              │    │
+│  │     │   └→ TA_FARM.WEATHER_NX, WEATHER_NY (중복 제거)                    │    │
+│  │     └→ _get_grids_from_mapxy()                                          │    │
+│  │         └→ MAP_X_N, MAP_Y_N → latlon_to_grid() 변환                     │    │
+│  │                                                                         │    │
+│  │  3. 기준 시간 계산                                                        │    │
+│  │     ├→ _get_base_datetime() → 단기예보 기준 (02:00/05:00/08:00/...)     │    │
+│  │     └→ _get_ncst_base_datetime() → 초단기실황 기준 (매시 정각)            │    │
+│  │                                                                         │    │
+│  │  4. 격자별 API 호출 (순차 처리)                                           │    │
+│  │     ┌─────────────────────────────────────────────────────────────────┐ │    │
+│  │     │ for (nx, ny) in unique_grids:                                   │ │    │
+│  │     │                                                                 │ │    │
+│  │     │   [4-1] 단기예보 수집 (IS_FORECAST='Y')                          │ │    │
+│  │     │         └→ _fetch_forecast(nx, ny, base_date, base_time)       │ │    │
+│  │     │             └→ GET /getVilageFcst                               │ │    │
+│  │     │                                                                 │ │    │
+│  │     │   [4-2] TMN/TMX 확보 (필요시)                                    │ │    │
+│  │     │         └→ _fetch_forecast(..., '0500') → 05:00 발표 데이터     │ │    │
+│  │     │                                                                 │ │    │
+│  │     │   [4-3] 초단기실황 수집 (IS_FORECAST='N')                         │ │    │
+│  │     │         └→ _fetch_ultra_srt_ncst(nx, ny, base_date, base_time)  │ │    │
+│  │     │             └→ GET /getUltraSrtNcst                             │ │    │
+│  │     └─────────────────────────────────────────────────────────────────┘ │    │
+│  │                                                                         │    │
+│  │  5. 응답 변환                                                             │    │
+│  │     ├→ _parse_forecast_items() → daily_data, hourly_data               │    │
+│  │     ├→ _finalize_daily_data() → TM_WEATHER 레코드                       │    │
+│  │     ├→ _finalize_hourly_data() → TM_WEATHER_HOURLY 레코드               │    │
+│  │     └→ _parse_ncst_items() → 실황 레코드                                 │    │
+│  │                                                                         │    │
+│  │  6. 결과 반환                                                             │    │
+│  │     └→ {'daily': [...], 'hourly': [...], 'ncst': [...],                │    │
+│  │          'is_complete': bool, 'total_grids': N, 'collected_grids': M}   │    │
+│  └─────────────────────────────────────────────────────────────────────────┘    │
+│                              │                                                  │
+│                              ▼                                                  │
+│  [3] 저장 (save)                                                                │
+│  ┌─────────────────────────────────────────────────────────────────────────┐    │
+│  │  collector.save(data)                                                    │    │
+│  │                                                                         │    │
+│  │  ※ is_complete=False 이면 저장 스킵 (API limit 등으로 중단 시)            │    │
+│  │                                                                         │    │
+│  │  1. TM_WEATHER 저장 (일별)                                               │    │
+│  │     └→ MERGE INTO TM_WEATHER (UK: NX, NY, WK_DATE)                      │    │
+│  │                                                                         │    │
+│  │  2. TM_WEATHER_HOURLY 저장 (시간별)                                       │    │
+│  │     └→ MERGE INTO TM_WEATHER_HOURLY (UK: NX, NY, WK_DATE, WK_TIME)      │    │
+│  │                                                                         │    │
+│  │  3. API 키 사용량 업데이트                                                │    │
+│  │     └→ UPDATE TS_API_KEY_INFO SET REQ_CNT = REQ_CNT + :cnt              │    │
+│  └─────────────────────────────────────────────────────────────────────────┘    │
+│                              │                                                  │
+│                              ▼                                                  │
+│  [4] ASOS 실측 업데이트 (선택)                                                   │
+│  ┌─────────────────────────────────────────────────────────────────────────┐    │
+│  │  collector.collect_asos_daily()                                          │    │
+│  │                                                                         │    │
+│  │  - 어제까지의 실측 데이터로 TM_WEATHER 덮어쓰기                            │    │
+│  │  - IS_FORECAST='N'으로 업데이트                                          │    │
+│  │  - 농장별 가장 가까운 ASOS 관측소 데이터 사용                              │    │
+│  └─────────────────────────────────────────────────────────────────────────┘    │
+│                                                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 1.5 API 키 관리 (TS_API_KEY_INFO)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                          API 키 로드밸런싱 전략                                   │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│  1. 키 로드 (ApiKeyManager.load_keys)                                           │
+│     └→ SELECT * FROM TS_API_KEY_INFO WHERE USE_YN = 'Y'                        │
+│         ORDER BY REQ_CNT ASC  ← 사용량 적은 순서                                │
+│                                                                                 │
+│  2. 키 선택 (get_current_key)                                                   │
+│     └→ REQ_CNT가 가장 작은 유효 키 반환                                         │
+│                                                                                 │
+│  3. 호출 성공 시                                                                 │
+│     └→ increment_count(key) → REQ_CNT += 1                                     │
+│                                                                                 │
+│  4. 호출 제한 시 (resultCode: 22, 99 등)                                        │
+│     └→ mark_key_exhausted(key) → 해당 키 제외, 다음 키로 전환                   │
+│                                                                                 │
+│  5. 모든 키 소진 시                                                              │
+│     └→ 수집 중단, is_complete=False 반환 → 저장 스킵                            │
+│                                                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 1.6 CLI 실행 예시
+
+```bash
+# 날씨 데이터만 수집 (현재 시간 기준)
+python run_etl.py weather
+
+# ASOS 실측 데이터 수집 (어제까지)
+python run_etl.py weather --asos
+
+# 테스트 모드 (특정 격자만)
+python run_etl.py weather --test --grids "60,127,61,128"
+
+# 전체 ETL (날씨 + 생산성 + 주간리포트)
+python run_etl.py all
+```
+
+### 1.7 Python 사용 예시
+
+```python
+from src.collectors.weather import WeatherCollector
+
+# 날씨 데이터 수집
+collector = WeatherCollector()
+data = collector.collect()
+
+# 수집 완료 여부 확인 후 저장
+if data['is_complete']:
+    collector.save(data)
+    print(f"저장 완료: 일별 {len(data['daily'])}건, 시간별 {len(data['hourly'])}건")
+else:
+    print(f"수집 중단: {data['collected_grids']}/{data['total_grids']} 격자만 수집됨")
+
+# ASOS 실측 데이터로 업데이트 (어제까지)
+collector.collect_asos_daily()
+```
+
 ---
 
 ## 2. 격자 좌표 시스템

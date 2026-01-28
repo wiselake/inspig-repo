@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>피그플랜 인터뷰 요청내용 발표자료</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            --bg-color: #0f172a;
+            --sidebar-bg: rgba(30, 41, 59, 0.7);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --accent: #38bdf8;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+        }
+
+        .bg-blob {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: var(--primary-gradient);
+            filter: blur(150px);
+            opacity: 0.15;
+            z-index: -1;
+            border-radius: 50%;
+        }
+
+        .blob-1 {
+            top: -100px;
+            right: -100px;
+        }
+
+        .blob-2 {
+            bottom: -100px;
+            left: -100px;
+        }
+
+        aside {
+            width: 300px;
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            color: #fff;
+        }
+
+        nav ul {
+            list-style: none;
+        }
+
+        nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        nav a {
+            display: block;
+            padding: 0.8rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: var(--transition);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+
+        nav a.active {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
+        }
+
+        main {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem;
+        }
+
+        .slide-container {
+            width: 100%;
+            max-width: 1100px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            animation: slideIn 0.6s ease-out forwards;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            line-height: 1.2;
+            color: #fff;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .content-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2.5rem;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .content-card p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        ul.feature-list {
+            list-style: none;
+            margin-top: 1.5rem;
+        }
+
+        ul.feature-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        ul.feature-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            z-index: 10;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-gradient);
+            border-color: transparent;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .nav-btn.prev {
+            left: 2rem;
+        }
+
+        .nav-btn.next {
+            right: 2rem;
+        }
+
+        .nav-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.4rem;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        .timeline-year {
+            font-weight: 700;
+            color: var(--accent);
+            margin-right: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        th {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            aside {
+                width: 240px;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+
+    <aside>
+        <div class="logo">PIGPLAN Presentation</div>
+        <nav>
+            <ul id="sidebar-nav"></ul>
+        </nav>
+    </aside>
+
+    <main>
+        <button class="nav-btn prev" onclick="changeSlide(-1)">
+            <svg viewBox="0 0 24 24">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+            </svg>
+        </button>
+        <button class="nav-btn next" onclick="changeSlide(1)">
+            <svg viewBox="0 0 24 24">
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+            </svg>
+        </button>
+        <div class="slide-container" id="slide-container"></div>
+    </main>
+
+    <script>
+        const slidesData = [
+            {
+                title: '피그플랜 시스템',
+                content: '<div class="content-card"><p>피그플랜은 양돈장의 <span class="highlight">생산성·경영 효율 극대화</span>를 목표로 개발된 통합관리 시스템입니다.</p><ul class="feature-list"><li>번식 관리, 질병·방역, 사양·사료관리, 농장 경영상태 분석 등 전 과정 데이터 기반 지원</li><li>농가·사료업체·도축장·관련기관 데이터 연계로 객관적 경영 진단</li><li>종돈장 성적 관리 및 유전 평가 지원으로 생산·개량 체계 고도화</li></ul></div>'
+            },
+            {
+                title: '개발 역사',
+                content: '<div class="content-card"><div class="timeline"><div class="timeline-item"><span class="timeline-year">2020년</span> 클라우드 시스템 고도화 완료 (WEB, 모바일)</div><div class="timeline-item"><span class="timeline-year">2005년</span> 부경양돈 통합정보시스템 구축 및 웹서비스 개시</div><div class="timeline-item"><span class="timeline-year">1999년</span> 도드람양돈조합과 제휴, ‘도드람 플랜’ 개발</div><div class="timeline-item"><span class="timeline-year">1998년</span> ㈜이지팜에서 피그플랜 초기 PC 버전 보급</div><div class="timeline-item"><span class="timeline-year">1995년</span> 서울대학교 농업정보체계실에서 피그플랜 개발</div></div><p style="margin-top: 2rem; font-style: italic;">현재는 스마트양돈 플랫폼으로 지속 발전 중입니다.</p></div>'
+            },
+            {
+                title: '주요 사용자층',
+                content: '<div class="content-card"><p>국내 최대 양돈 경영 정보 플랫폼으로서 다양한 주체가 활용하고 있습니다.</p><div class="stats-grid"><div class="stat-item"><span class="stat-value">조합업체</span><span class="stat-label">도드람, 다비육종 등</span></div><div class="stat-item"><span class="stat-value">사료업체</span><span class="stat-label">우성사료, 천하제일 등</span></div><div class="stat-item"><span class="stat-value">개인농가</span><span class="stat-label">전국 양돈 농가</span></div></div></div>'
+            },
+            {
+                title: '회원 가입 현황',
+                content: '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; width: 100%;">' +
+                    '<div style="display: flex; flex-direction: column; gap: 1.5rem;">' +
+                    '<div class="content-card" style="text-align: center; padding: 2rem;">' +
+                    '<span class="stat-label" style="font-size: 1.1rem; margin-bottom: 0.5rem;">총 농가수</span>' +
+                    '<span class="stat-value" style="font-size: 3.5rem;">695</span>' +
+                    '</div>' +
+                    '<div class="content-card" style="display: flex; justify-content: space-around; text-align: center; padding: 1.5rem;">' +
+                    '<div>' +
+                    '<span class="stat-label" style="font-size: 0.9rem;">개인농가</span>' +
+                    '<span class="stat-value" style="font-size: 1.8rem;">246</span>' +
+                    '</div>' +
+                    '<div style="width: 1px; background: rgba(255,255,255,0.1); margin: 0 1rem;"></div>' +
+                    '<div>' +
+                    '<span class="stat-label" style="font-size: 0.9rem;">조합/사료</span>' +
+                    '<span class="stat-value" style="font-size: 1.8rem;">449</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div style="display: flex; flex-direction: column; gap: 1.5rem;">' +
+                    '<div class="content-card" style="text-align: center; padding: 2rem;">' +
+                    '<span class="stat-label" style="font-size: 1.1rem; margin-bottom: 0.5rem;">총 회원 수</span>' +
+                    '<span class="stat-value" style="font-size: 3.5rem;">1,356</span>' +
+                    '</div>' +
+                    '<div class="content-card" style="display: flex; justify-content: space-around; text-align: center; padding: 1.5rem;">' +
+                    '<div>' +
+                    '<span class="stat-label" style="font-size: 0.9rem;">농장 회원</span>' +
+                    '<span class="stat-value" style="font-size: 1.8rem;">1,114명</span>' +
+                    '</div>' +
+                    '<div style="width: 1px; background: rgba(255,255,255,0.1); margin: 0 1rem;"></div>' +
+                    '<div>' +
+                    '<span class="stat-label" style="font-size: 0.9rem;">조합/사료</span>' +
+                    '<span class="stat-value" style="font-size: 1.8rem;">242명</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '<p style="text-align: center; margin-top: 1.5rem; opacity: 0.5; font-size: 0.9rem;">2025년 12월 10일 기준</p>'
+            },
+            {
+                title: '일평균 방문자 수',
+                content: '<div class="content-card"><div class="stats-grid" style="margin-bottom: 2rem;"><div class="stat-item"><span class="stat-label">일평균 접속</span><span class="stat-value">198.6</span></div><div class="stat-item"><span class="stat-label">순 방문자수</span><span class="stat-value">733</span></div><div class="stat-item"><span class="stat-label">총 접속횟수</span><span class="stat-value">226,212</span></div></div><table><thead><tr><th>요일</th><th>접속수</th><th>방문자</th></tr></thead><tbody><tr><td>월요일</td><td>816</td><td>241</td></tr><tr><td>화요일</td><td>739</td><td>222</td></tr><tr><td>수요일</td><td>749</td><td>217</td></tr><tr><td>목요일</td><td>785</td><td>232</td></tr><tr><td>금요일</td><td>653</td><td>210</td></tr></tbody></table></div>'
+            },
+            {
+                title: '회원 전용 서비스',
+                content: '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; width: 100%;">' +
+                    '<div class="content-card" style="height: 100%;">' +
+                    '<h2 style="color: var(--accent); margin-bottom: 1.5rem; font-size: 1.4rem;">🔹 농장 관리 기능</h2>' +
+                    '<div style="margin-bottom: 1.5rem;">' +
+                    '<h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 0.5rem;">번식/비육농장</h3>' +
+                    '<ul class="feature-list" style="margin-top: 0.5rem;"><li>번식·자돈·비육돈 통합관리</li><li>경영 분석 및 농장 종합 진단</li><li>농장 개체·그룹 기반 생산성 관리</li></ul>' +
+                    '</div>' +
+                    '<div>' +
+                    '<h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 0.5rem;">종돈장 기능</h3>' +
+                    '<ul class="feature-list" style="margin-top: 0.5rem;"><li>검정돈 관리 / 도체·자손 성적 연계</li><li>판매·분양 관리</li><li>AI센터 및 종돈 개량 지원</li></ul>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="content-card" style="height: 100%;">' +
+                    '<h2 style="color: var(--accent); margin-bottom: 1.5rem; font-size: 1.4rem;">🔹 분석 및 연계 서비스</h2>' +
+                    '<div style="margin-bottom: 1.5rem;">' +
+                    '<h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 0.5rem;">보고서 서비스</h3>' +
+                    '<ul class="feature-list" style="margin-top: 0.5rem;"><li>약 <span class="highlight">520종</span>의 보고서 제공</li><li>실시간 120여개 지표 분석 (3~10초)</li><li>데이터 기반 의사결정 지원</li></ul>' +
+                    '</div>' +
+                    '<div>' +
+                    '<h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 0.5rem;">추가 연계 서비스</h3>' +
+                    '<ul class="feature-list" style="margin-top: 0.5rem;">' +
+                    '<li>축평원 등급판정 및 돼지이력제 연계</li>' +
+                    '<li>전국 경락가격 실시간 제공</li>' +
+                    '<li>농장지역 기상정보 수집</li>' +
+                    '</ul>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>'
+            }
+        ];
+
+        let currentSlide = 0;
+
+        function init() {
+            const nav = document.getElementById('sidebar-nav');
+            const container = document.getElementById('slide-container');
+            if (!nav || !container) return;
+
+            slidesData.forEach((slide, index) => {
+                const pageNum = index + 1;
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = '#';
+                a.id = 'nav-' + index;
+                a.innerHTML = '<span style="opacity: 0.5; margin-right: 8px;">' + pageNum + '.</span>' + slide.title;
+                a.onclick = (e) => { e.preventDefault(); goToSlide(index); };
+                li.appendChild(a);
+                nav.appendChild(li);
+
+                const slideDiv = document.createElement('div');
+                slideDiv.className = 'slide' + (index === 0 ? ' active' : '');
+                slideDiv.id = 'slide-' + index;
+                slideDiv.innerHTML = '<div style="font-size: 0.9rem; color: var(--accent); margin-bottom: 0.5rem; font-weight: 600;">PAGE ' + pageNum + ' / ' + slidesData.length + '</div>' + '<h1>' + slide.title + '</h1>' + slide.content;
+                container.appendChild(slideDiv);
+            });
+            updateNav();
+        }
+
+        function updateNav() {
+            document.querySelectorAll('nav a').forEach((a, i) => {
+                a.className = i === currentSlide ? 'active' : '';
+            });
+        }
+
+        function goToSlide(index) {
+            const currentEl = document.getElementById('slide-' + currentSlide);
+            const nextEl = document.getElementById('slide-' + index);
+            if (currentEl) currentEl.classList.remove('active');
+            currentSlide = index;
+            if (nextEl) nextEl.classList.add('active');
+            updateNav();
+        }
+
+        function changeSlide(direction) {
+            let newSlide = currentSlide + direction;
+            if (newSlide >= 0 && newSlide < slidesData.length) goToSlide(newSlide);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+        });
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+
+</html>

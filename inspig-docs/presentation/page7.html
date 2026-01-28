@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>피그플랜 시스템 소개 - PAGE 7</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .insight-container {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            align-items: center;
+        }
+
+        .content-left {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.2rem;
+        }
+
+        .report-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 1.5rem 2rem;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .report-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--card-accent);
+            transform: translateX(10px);
+        }
+
+        .report-icon {
+            width: 56px;
+            height: 56px;
+            flex-shrink: 0;
+            background: var(--icon-bg);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--card-accent);
+        }
+
+        .card-weekly {
+            --card-accent: #38bdf8;
+            --icon-bg: rgba(56, 189, 248, 0.1);
+        }
+
+        .card-monthly {
+            --card-accent: #34d399;
+            --icon-bg: rgba(52, 211, 153, 0.1);
+        }
+
+        .card-consulting {
+            --card-accent: #a78bfa;
+            --icon-bg: rgba(167, 139, 250, 0.1);
+        }
+
+        .report-info h3 {
+            font-size: 1.2rem;
+            color: #fff;
+            margin-bottom: 0.4rem;
+        }
+
+        .report-info p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            word-break: keep-all;
+        }
+
+        .delivery-section {
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            border-radius: 30px;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .delivery-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .delivery-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        .delivery-text h4 {
+            font-size: 1rem;
+            color: #fff;
+            margin-bottom: 0.2rem;
+        }
+
+        .delivery-text p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .delivery-arrow {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 1.2rem;
+        }
+
+        .image-right {
+            position: relative;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .sample-image-frame {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 32px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .sample-image-frame img {
+            width: 100%;
+            height: auto;
+            border-radius: 20px;
+            display: block;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .title-sub {
+            font-size: 1.1rem;
+            font-weight: 400;
+            opacity: 0.7;
+            margin-left: 0.6rem;
+            -webkit-text-fill-color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <aside>
+        <div class="logo">PIGPLAN 시스템 소개</div>
+        <nav>
+            <ul id="sidebar-nav"></ul>
+        </nav>
+    </aside>
+    <main>
+        <button class="nav-btn prev" onclick="changePage(-1, 6)">
+            <svg viewBox="0 0 24 24">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+            </svg>
+        </button>
+        <button class="nav-btn next" onclick="changePage(1, 6)">
+            <svg viewBox="0 0 24 24">
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+            </svg>
+        </button>
+        <div class="slide-container">
+            <div class="slide">
+                <div style="font-size: 0.9rem; color: var(--accent); margin-bottom: 0.5rem; font-weight: 600;">PAGE 7 /
+                    8</div>
+                <h1>인사이트 피그플랜 서비스<span class="title-sub">(`26년 런칭)</span></h1>
+
+                <div class="insight-container">
+                    <div class="content-left">
+                        <!-- 3대 핵심 리포트 -->
+                        <div class="report-grid">
+                            <div class="report-card card-weekly">
+                                <div class="report-icon">
+                                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <div class="report-info">
+                                    <h3>주간보고서</h3>
+                                    <p>매주 월요일 자동 발송, 지난주 실적 및 금주 작업 요약</p>
+                                </div>
+                            </div>
+                            <div class="report-card card-monthly">
+                                <div class="report-icon">
+                                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path
+                                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                </div>
+                                <div class="report-info">
+                                    <h3>월간/분기보고서</h3>
+                                    <p>생산 성적 추세 분석, 전월/전분기 대비 변동 사항 심층 진단</p>
+                                </div>
+                            </div>
+                            <div class="report-card card-consulting">
+                                <div class="report-icon">
+                                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </div>
+                                <div class="report-info">
+                                    <h3>컨설팅 진단서</h3>
+                                    <p>AI 기반 정밀 진단, 전문가 수준의 개선 가이드 제공</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 스마트 서비스 흐름 -->
+                        <div class="delivery-section">
+                            <div class="delivery-item">
+                                <div class="delivery-icon">⚙️</div>
+                                <div class="delivery-text">
+                                    <h4>자동 발송 설정</h4>
+                                    <p>등록된 연락처로 자동 발송</p>
+                                </div>
+                            </div>
+                            <div class="delivery-arrow">→</div>
+                            <div class="delivery-item">
+                                <div class="delivery-icon">📱</div>
+                                <div class="delivery-text">
+                                    <h4>카카오톡/SMS 수신</h4>
+                                    <p>링크 클릭으로 즉시 확인</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="image-right">
+                        <div class="sample-image-frame">
+                            <img src="20260121_094307.png" alt="서비스 샘플 이미지">
+                        </div>
+                    </div>
+                </div>
+
+                <p
+                    style="text-align: center; color: var(--accent); font-weight: 600; font-size: 1.1rem; letter-spacing: 0.05em; margin-top: 2rem;">
+                    데이터를 인사이트로, 농장 경영의 새로운 기준
+                </p>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+    <script>initNavigation(6);</script>
+</body>
+
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>피그플랜 시스템 소개 - PAGE 8</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            width: 100%;
+            margin-top: 2rem;
+        }
+
+        .service-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2.5rem 2rem;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(56, 189, 248, 0.1);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .service-card h3 {
+            font-size: 1.5rem;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .service-card p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .service-link {
+            font-size: 0.9rem;
+            color: var(--accent);
+            font-weight: 500;
+            background: rgba(56, 189, 248, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <aside>
+        <div class="logo">PIGPLAN 시스템 소개</div>
+        <nav>
+            <ul id="sidebar-nav"></ul>
+        </nav>
+    </aside>
+    <main>
+        <button class="nav-btn prev" onclick="changePage(-1, 7)">
+            <svg viewBox="0 0 24 24">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+            </svg>
+        </button>
+        <button class="nav-btn next" onclick="changePage(1, 7)" style="opacity: 0.3; cursor: default;" disabled>
+            <svg viewBox="0 0 24 24">
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+            </svg>
+        </button>
+        <div class="slide-container">
+            <div class="slide">
+                <div style="font-size: 0.9rem; color: var(--accent); margin-bottom: 0.5rem; font-weight: 600;">PAGE 8 /
+                    8</div>
+                <h1>서비스 바로가기</h1>
+                <div class="service-grid">
+                    <a href="https://pigplan.io/" target="_blank" class="service-card">
+                        <div class="service-icon">
+                            <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path
+                                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                        </div>
+                        <h3>피그플랜 서비스</h3>
+                        <p>국내 최대 양돈 전산 관리 시스템<br>데이터 기반의 정밀 사양 관리</p>
+                        <div class="service-link">pigplan.io</div>
+                    </a>
+                    <a href="https://ins.pigplan.io/login?dev=1" target="_blank" class="service-card">
+                        <div class="service-icon">
+                            <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                        <h3>인사이트 피그플랜</h3>
+                        <p>데이터 시각화 및 지능형 분석 서비스<br>경영 의사결정을 위한 핵심 지표 제공</p>
+                        <div class="service-link">ins.pigplan.io</div>
+                    </a>
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <h3>모바일 앱</h3>
+                        <p>언제 어디서나 간편한 현장 기록<br>구글 플레이스토어에서 <strong>pigplan</strong> 검색</p>
+                        <div class="service-link">Google Play Store</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+    <script>initNavigation(7);</script>
+</body>
+
+</html>
