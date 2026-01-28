@@ -504,3 +504,91 @@ class ProductivityCollector(BaseCollector):
         except Exception as e:
             self.logger.error(f"TS_INS_WEEK.MODON_SANGSI_CNT 업데이트 실패: {e}")
             raise
+
+    def exists(
+        self,
+        farm_no: int,
+        stat_year: int,
+        period: str,
+        period_no: int,
+    ) -> bool:
+        """생산성 데이터 존재 여부 확인
+
+        수동 생성 시 이미 수집된 데이터가 있는지 확인.
+        데이터가 있으면 수집을 스킵.
+
+        Args:
+            farm_no: 농장 번호
+            stat_year: 통계년도
+            period: 기간구분 (W:주간, M:월간, Q:분기)
+            period_no: 기간차수 (W:1~53, M:1~12, Q:1~4)
+
+        Returns:
+            True: 데이터 존재, False: 데이터 없음
+        """
+        check_sql = """
+            SELECT COUNT(*) AS CNT
+            FROM TS_PRODUCTIVITY
+            WHERE FARM_NO = :farm_no
+              AND STAT_YEAR = :stat_year
+              AND PERIOD = :period
+              AND PERIOD_NO = :period_no
+        """
+
+        try:
+            result = self.db.fetch_one(check_sql, {
+                'farm_no': farm_no,
+                'stat_year': stat_year,
+                'period': period,
+                'period_no': period_no,
+            })
+            cnt = result.get('CNT', 0) if result else 0
+            return cnt > 0
+
+        except Exception as e:
+            self.logger.error(f"TS_PRODUCTIVITY 존재 확인 실패: {e}")
+            return False
+
+    def collect_if_not_exists(
+        self,
+        farm_no: int,
+        stat_date: Optional[str] = None,
+        period: str = 'W',
+    ) -> int:
+        """수동 생성용: 데이터가 없을 때만 수집
+
+        pigplan 시스템에서 수동 생성 시 호출.
+        이미 해당 주차 데이터가 있으면 스킵.
+
+        Args:
+            farm_no: 농장 번호
+            stat_date: 기준 날짜 (YYYYMMDD), None이면 오늘
+            period: 기간구분 (W:주간, M:월간, Q:분기)
+
+        Returns:
+            저장된 레코드 수 (이미 존재하면 0)
+        """
+        if stat_date is None:
+            stat_date = today_kst()
+
+        # 년도, 기간차수 계산
+        period_info = self._calculate_period_info(stat_date, period)
+        stat_year = period_info['stat_year']
+        period_no = period_info['period_no']
+
+        # 이미 존재하는지 확인
+        if self.exists(farm_no, stat_year, period, period_no):
+            self.logger.info(
+                f"농장 {farm_no}: {stat_year}년 {period}{period_no} 데이터 이미 존재 - 스킵"
+            )
+            return 0
+
+        # 수집 및 저장
+        self.logger.info(
+            f"농장 {farm_no}: {stat_year}년 {period}{period_no} 데이터 수집 시작"
+        )
+        farm_list = [{'FARM_NO': farm_no}]
+        data = self.collect(farm_list=farm_list, stat_date=stat_date, period=period)
+        if data:
+            return self.save(data)
+        return 0

@@ -41,6 +41,24 @@ SERVICE_FARM_NO_SQL = """
     ORDER BY F.FARM_NO
 """
 
+# 전체 농장번호 조회 SQL (productivity-all 명령용)
+# 승인된 회원이 있는 모든 농장 (InsightPig 서비스 농장 우선)
+# 정기 배치: 매주 월요일 00:05, 매월 1일 00:05
+ALL_FARM_NO_SQL = """
+    SELECT DISTINCT FM.FARM_NO,
+           CASE WHEN S.FARM_NO IS NOT NULL THEN 0 ELSE 1 END AS SORT_ORDER
+    FROM TA_FARM FM
+    LEFT JOIN VW_INS_SERVICE_ACTIVE S ON FM.FARM_NO = S.FARM_NO
+    WHERE FM.USE_YN = 'Y'
+      AND FM.TEST_YN = 'N'
+      AND EXISTS (
+          SELECT 1 FROM TA_MEMBER UR
+          WHERE UR.FARM_NO = FM.FARM_NO
+            AND UR.USER_OK_CD = '991002'
+      )
+    ORDER BY SORT_ORDER, FM.FARM_NO
+"""
+
 
 def get_service_farms(
     db,
@@ -104,6 +122,48 @@ def get_service_farm_nos(
         exclude_nos = [int(f.strip()) for f in exclude_farms.split(',') if f.strip()]
         exclude_placeholders = ', '.join([f':ex{i}' for i in range(len(exclude_nos))])
         sql = sql.replace('ORDER BY F.FARM_NO', f'AND F.FARM_NO NOT IN ({exclude_placeholders})\n    ORDER BY F.FARM_NO')
+        params.update({f'ex{i}': f for i, f in enumerate(exclude_nos)})
+
+    if params:
+        return db.fetch_dict(sql, params)
+
+    return db.fetch_dict(sql)
+
+
+def get_all_farm_nos(
+    db,
+    exclude_farms: Optional[str] = None,
+) -> List[Dict]:
+    """전체 농장번호 목록 조회 (productivity-all 명령용)
+
+    승인된 회원이 있는 모든 농장 대상.
+    InsightPig 서비스 농장이 먼저 수집되도록 정렬.
+
+    조건:
+    - USE_YN = 'Y' (사용중)
+    - TEST_YN = 'N' (테스트 농장 제외)
+    - EXISTS (승인된 회원: USER_OK_CD = '991002')
+
+    정렬:
+    - InsightPig 서비스 농장 (VW_INS_SERVICE_ACTIVE) 우선
+    - 이후 일반 농장 (FARM_NO 순)
+
+    Args:
+        db: Database 인스턴스
+        exclude_farms: 제외할 농장 목록 (콤마 구분, 예: "848,1234")
+
+    Returns:
+        농장번호 리스트
+        [{'FARM_NO': 1387, 'SORT_ORDER': 0}, ...]
+    """
+    sql = ALL_FARM_NO_SQL
+    params = {}
+
+    # 제외 필터링 (NOT IN)
+    if exclude_farms:
+        exclude_nos = [int(f.strip()) for f in exclude_farms.split(',') if f.strip()]
+        exclude_placeholders = ', '.join([f':ex{i}' for i in range(len(exclude_nos))])
+        sql = sql.replace('ORDER BY SORT_ORDER', f'AND FM.FARM_NO NOT IN ({exclude_placeholders})\n    ORDER BY SORT_ORDER')
         params.update({f'ex{i}': f for i, f in enumerate(exclude_nos)})
 
     if params:

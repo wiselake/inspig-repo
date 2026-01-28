@@ -8,6 +8,7 @@ InsightPig ETL 메인 실행 스크립트
     python run_etl.py --dry-run    # 설정 확인만
     python run_etl.py weather      # 기상청 수집만
     python run_etl.py weekly       # 주간 리포트만
+    python run_etl.py productivity-all  # 전체 농장 생산성 수집
 
 수동 실행 (웹시스템에서 호출):
     python run_etl.py --manual --farm-no 12345
@@ -22,7 +23,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from src.common import Config, setup_logger
+from src.common import Config, setup_logger, Database, get_all_farm_nos
 from src.weekly import WeeklyReportOrchestrator
 from src.collectors import WeatherCollector, ProductivityCollector
 
@@ -37,6 +38,7 @@ def parse_args():
   python run_etl.py                    # 운영 모드 ETL (기본, 크론 등록용)
   python run_etl.py weekly             # 주간 리포트만
   python run_etl.py weather            # 기상청 수집만
+  python run_etl.py productivity-all   # 전체 농장 생산성 수집 (00:05 크론)
   python run_etl.py --test             # 테스트 모드 (기존 데이터 삭제 안함)
   python run_etl.py --test --init-week # 테스트 + 해당 주차 데이터만 삭제
   python run_etl.py --test --init-all  # 테스트 + 전체 데이터 삭제
@@ -65,7 +67,7 @@ def parse_args():
         'command',
         nargs='?',
         default='all',
-        choices=['all', 'weekly', 'monthly', 'quarterly', 'weather', 'productivity'],
+        choices=['all', 'weekly', 'monthly', 'quarterly', 'weather', 'productivity', 'productivity-all'],
         help='실행할 ETL 작업 (기본: all)'
     )
 
@@ -139,6 +141,14 @@ def parse_args():
         choices=['AM7', 'PM2'],
         default=None,
         help='스케줄 그룹 필터 (AM7:오전7시, PM2:오후2시, 미지정 시 전체)'
+    )
+
+    parser.add_argument(
+        '--period',
+        type=str,
+        choices=['W', 'M', 'Q'],
+        default='W',
+        help='생산성 데이터 기간구분 (W:주간, M:월간, Q:분기, 기본: W)'
     )
 
     # 수동 실행 관련 인자
@@ -386,13 +396,44 @@ def main():
                 print(f"기상청 데이터 수집 완료: {count}건")
 
         elif args.command == 'productivity':
-            # 생산성 데이터만 수집
+            # 생산성 데이터만 수집 (InsightPig 서비스 농장만)
             if args.dry_run:
                 print("DRY-RUN: 생산성 데이터 수집")
             else:
                 collector = ProductivityCollector(config)
                 count = collector.run(stat_date=base_date)
                 print(f"생산성 데이터 수집 완료: {count}건")
+
+        elif args.command == 'productivity-all':
+            # 전체 농장 생산성 데이터 수집 (InsightPig 서비스 농장 우선)
+            # 크론: 매주 월요일 00:05 (--period W), 매월 1일 00:05 (--period M)
+            period = args.period
+            period_name = {'W': '주간', 'M': '월간', 'Q': '분기'}.get(period, period)
+
+            if args.dry_run:
+                print(f"DRY-RUN: 전체 농장 생산성 데이터 수집 ({period_name})")
+                db = Database(config)
+                farm_list = get_all_farm_nos(db, exclude_farms=args.exclude)
+                print(f"  대상 농장 수: {len(farm_list)}개")
+                service_cnt = sum(1 for f in farm_list if f.get('SORT_ORDER') == 0)
+                print(f"  - InsightPig 서비스 농장: {service_cnt}개")
+                print(f"  - 일반 농장: {len(farm_list) - service_cnt}개")
+                print(f"  - 기간구분: {period} ({period_name})")
+            else:
+                db = Database(config)
+                farm_list = get_all_farm_nos(db, exclude_farms=args.exclude)
+
+                print("=" * 60)
+                print(f"전체 농장 생산성 데이터 수집 ({period_name})")
+                print("=" * 60)
+                service_cnt = sum(1 for f in farm_list if f.get('SORT_ORDER') == 0)
+                print(f"대상 농장: {len(farm_list)}개 (서비스: {service_cnt}, 일반: {len(farm_list) - service_cnt})")
+                print(f"기간구분: {period} ({period_name})")
+                print()
+
+                collector = ProductivityCollector(config, db)
+                count = collector.run(farm_list=farm_list, stat_date=base_date, period=period)
+                print(f"전체 농장 생산성 데이터 수집 완료: {count}건")
 
         sys.exit(0)
 
