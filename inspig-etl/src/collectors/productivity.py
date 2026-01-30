@@ -78,7 +78,7 @@ class ProductivityCollector(BaseCollector):
         self.api_config = self.config.api
         self.base_url = self.api_config.get('productivity_base_url', 'http://10.4.35.10:11000')
         self.timeout = self.api_config.get('productivity_timeout', 60)
-        self.max_workers = self.api_config.get('productivity_workers', 4)
+        self.max_workers = self.api_config.get('productivity_workers', 8)
 
     # 고정 파라미터 (statDate, memberId, period 외 모두 고정)
     FIXED_PARAMS = {

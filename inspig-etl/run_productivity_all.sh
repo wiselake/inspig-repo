@@ -7,8 +7,15 @@
 #   Q: 분기 데이터 수집
 #
 # Crontab 예시 (KST 기준, 서버는 UTC):
-#   5 15 * * 0 /data/etl/inspig/run_productivity_all.sh W     # 매주 월요일 00:05 KST (주간)
-#   5 15 28-31 * * [ "$(date -d tomorrow +\%d)" = "01" ] && /data/etl/inspig/run_productivity_all.sh M  # 매월 1일 00:05 KST (월간)
+#   주간: 매주 월요일 00:05 KST (UTC 일요일 15:05)
+#   5 15 * * 0 /data/etl/inspig/run_productivity_all.sh W
+#
+#   월간: 매월 1일, 15일 02:05 KST (UTC 전날 17:05)
+#   - 15일 기준으로 API 데이터 범위 변경되므로 월 2회 수집
+#   - 1일~14일: 전전월 말일 기준 12개월
+#   - 15일~말일: 전월 말일 기준 12개월
+#   5 17 1 * * /data/etl/inspig/run_productivity_all.sh M
+#   5 17 15 * * /data/etl/inspig/run_productivity_all.sh M
 #
 # 수집 대상:
 #   - 승인된 회원이 있는 모든 농장

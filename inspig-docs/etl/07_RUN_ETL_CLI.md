@@ -60,7 +60,12 @@ python run_etl.py productivity-all --dry-run
 | 기간 | Cron (UTC) | KST 실행 | 명령 |
 |------|------------|----------|------|
 | 주간 | `5 15 * * 0` | 월 00:05 | `./run_productivity_all.sh W` |
-| 월간 | `5 15 28-31 * *` | 1일 00:05 | `./run_productivity_all.sh M` |
+| 월간 (1일) | `5 17 1 * *` | 1일 02:05 | `./run_productivity_all.sh M` |
+| 월간 (15일) | `5 17 15 * *` | 15일 02:05 | `./run_productivity_all.sh M` |
+
+> **월간 2회 수집 이유**: API 내부에서 15일 기준으로 데이터 집계 범위가 변경됨
+> - 1일~14일: 전전월 말일 기준 과거 12개월
+> - 15일~말일: 전월 말일 기준 과거 12개월
 
 ### 2.2 productivity (서비스 농장)
 

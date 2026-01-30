@@ -21,8 +21,6 @@ description: 이중화 서버(38, 99)에 소스 전송 및 Docker 빌드 통합 
 ```bash
 ssh -i "E:/ssh key/sshkey/aws/ProdPigplanKey.pem" pigplan@10.4.38.10 "cd /data/insightPig && docker-compose up -d --build"
 
-cd /data/insightPig && docker-compose down && docker-compose build --no-cache && docker-compose up -d
-
 ```
 
 ### 2. 운영 서버 #2 (10.4.99.10) 배포
@@ -30,6 +28,10 @@ cd /data/insightPig && docker-compose down && docker-compose build --no-cache &&
 ```bash
 ssh -i "E:/ssh key/sshkey/aws/ProdPigplanKey.pem" pigplan@10.4.99.10 "cd /data/insightPig && docker-compose up -d --build"
 ```
+
+-- 캐시 없이 강제 빌드
+cd /data/insightPig && docker-compose down && docker-compose build --no-cache && docker-compose up -d
+
 
 ### 3. 배포 상태 확인
 

@@ -143,6 +143,14 @@ python weather_etl.py --dry-run
 # 주간 리포트 ETL (PM2 그룹): 매주 월요일 12:00 KST (UTC 월요일 03:00)
 0 3 * * 1 /data/etl/inspig/run_weekly.sh PM2
 
+# 전체 농장 주간 생산성: 매주 월요일 00:05 KST (UTC 일요일 15:05)
+5 15 * * 0 /data/etl/inspig/run_productivity_all.sh W
+
+# 전체 농장 월간 생산성: 매월 1일, 15일 02:05 KST (UTC 전날 17:05)
+# - 15일 기준 API 데이터 범위 변경으로 월 2회 수집
+5 17 1 * * /data/etl/inspig/run_productivity_all.sh M
+5 17 15 * * /data/etl/inspig/run_productivity_all.sh M
+
 # 날씨 수집: 매 1시간 (예보 + 실황)
 0 * * * * cd /data/etl/inspig && ./venv/bin/python weather_etl.py >> logs/weather_cron.log 2>&1
 

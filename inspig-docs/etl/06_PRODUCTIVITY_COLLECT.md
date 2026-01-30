@@ -21,8 +21,16 @@
 |------|------------|----------|----------|------|
 | `weekly` | `0 17 * * 0` | 월 02:00 | 서비스 농장 | 주간 리포트 ETL 시 생산성 수집 |
 | `productivity-all W` | `5 15 * * 0` | 월 00:05 | 전체 농장 | 이미 수집된 농장 스킵 |
-| `productivity-all M` | `5 15 28-31 * *` | 1일 00:05 | 전체 농장 | 이미 수집된 농장 스킵 |
+| `productivity-all M` | `5 17 1 * *` | 1일 02:05 | 전체 농장 | 12개월 롤링 (항상 MERGE) |
+| `productivity-all M` | `5 17 15 * *` | 15일 02:05 | 전체 농장 | 12개월 롤링 (항상 MERGE) |
 | `productivity` | - | 수동 | 서비스 농장 | InsightPig 서비스 농장만 |
+
+**월간 수집 15일 기준 로직**:
+- API 내부에서 15일을 기준으로 데이터 집계 범위가 변경됨
+- 1일~14일 실행: 전전월 말일 기준 과거 12개월
+- 15일~말일 실행: 전월 말일 기준 과거 12개월
+- 예) 1월 8일 실행 → 기준일 2024-11-30, 1월 20일 실행 → 기준일 2024-12-31
+- 따라서 **매월 1일과 15일** 두 번 수집하여 최신 데이터 유지
 
 **수집 순서 및 중복 방지**:
 1. `weekly` (월 02:00): 서비스 농장 생산성 먼저 수집
@@ -180,7 +188,7 @@ ORDER BY F.FARM_NO
 │  │  collector = ProductivityCollector()                                     │    │
 │  │  - base_url: http://10.4.35.10:11000                                    │    │
 │  │  - timeout: 60초                                                         │    │
-│  │  - max_workers: 4 (병렬 처리 스레드 수)                                   │    │
+│  │  - max_workers: 8 (병렬 처리 스레드 수)                                   │    │
 │  └─────────────────────────────────────────────────────────────────────────┘    │
 │                              │                                                  │
 │                              ▼                                                  │
@@ -195,7 +203,7 @@ ORDER BY F.FARM_NO
 │  │     └→ _calculate_period_info(stat_date, period)                        │    │
 │  │         → stat_year=2025, period_no=4 (4주차)                            │    │
 │  │                                                                         │    │
-│  │  3. API 병렬 호출 (ThreadPoolExecutor, max_workers=4)                    │    │
+│  │  3. API 병렬 호출 (ThreadPoolExecutor, max_workers=8)                    │    │
 │  │     ├→ 농장 A: _fetch_productivity(farm_no, stat_date, period)          │    │
 │  │     ├→ 농장 B: _fetch_productivity(...)                                 │    │
 │  │     ├→ 농장 C: _fetch_productivity(...)                                 │    │
